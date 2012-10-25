@@ -1,4 +1,4 @@
-mall-sim
-========
+Shopping mall Simulation
+========================
 
-A simulation of movement of people at a shopping mall using Social Distances.
+A discrete simulation of pedestrian movement at a shopping mall using Social Distances.
