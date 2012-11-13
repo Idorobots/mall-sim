@@ -1,0 +1,52 @@
+<project name="Shopping mall simulation" default="run">
+
+	<!-- External JARs included into classpath -->
+	<path id="external-libs">
+		<fileset dir="lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="clean">
+		<delete dir="bin" />
+	</target>
+
+	<target name="compile">
+		<mkdir dir="bin" />
+		<mkdir dir="bin/classes" />
+
+		<javac srcdir="src" destdir="bin/classes">
+			<classpath refid="external-libs" />
+		</javac>
+	</target>
+
+	<target name="jar" depends="compile">
+		<mkdir dir="bin/jar" />
+
+		<manifestclasspath property="lib.list" jarfile="bin/jar/shopping-mall.jar">
+			<classpath refid="external-libs" />
+		</manifestclasspath>
+
+		<jar destfile="bin/jar/shopping-mall.jar" basedir="bin/classes">
+			<manifest>
+				<attribute name="Main-Class" value="mallsim.gui.MallFrame" />
+				<attribute name="Class-Path" value="${lib.list}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="run" depends="jar">
+		<java jar="bin/jar/shopping-mall.jar" fork="true">
+			<classpath refid="external-libs" />
+		</java>
+	</target>
+
+	<target name="docs">
+	        <mkdir dir="docs/html" />
+		<javadoc sourcepath="src/"
+			 packagenames="sim"
+			 destdir="docs/html">
+			 <classpath refid="external-libs" />
+		</javadoc>
+	</target>
+</project>
