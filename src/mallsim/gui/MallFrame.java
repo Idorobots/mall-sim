@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.UIManager;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -34,6 +35,7 @@ public class MallFrame extends JFrame {
 
             public void run() {
                 try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                     MallFrame frame = new MallFrame();
                     frame.setVisible(true);
                 } catch (Exception e) {
