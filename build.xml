@@ -42,11 +42,19 @@
 	</target>
 
 	<target name="docs">
+		<!-- Make JavaDoc -->
 	        <mkdir dir="docs/html" />
 		<javadoc sourcepath="src/"
-			 packagenames="sim"
+			 packagenames="mallsim.gui.*,mallsim.sim.*"
 			 destdir="docs/html">
 			 <classpath refid="external-libs" />
 		</javadoc>
+		<!-- Make DocDoc (two runs of xelatex required) -->
+		<exec dir="docs" executable="xelatex">
+		         <arg value="docs.tex" />
+		</exec>
+		<exec dir="docs" executable="xelatex">
+		         <arg value="docs.tex" />
+		</exec>
 	</target>
 </project>

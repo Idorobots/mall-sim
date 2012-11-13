@@ -1,6 +1,15 @@
+# Compiled sources #
 *.class
 
 # Package Files #
 *.jar
 *.war
 *.ear
+
+# Generated docs #
+docs/*.toc
+docs/*.log
+docs/*.out
+docs/*.aux
+docs/*.lof
+docs/html
