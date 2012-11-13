@@ -57,7 +57,15 @@ Na rysunku \ref{fig:decomp} została przedstawiona przykładowa dekompozycja pro
     \subsection{State of the art}
     \label{sec:sota}
 
-    % TODO Trzeba to skompletować i opisać kilka wybranych pozycji (max 1 strona).
+\noindent
+Zagadnienia modelowania ruchu ludzi są od długiego czasu postrzegane jako istotne z punktu widzenia usługowego. Już w latach 80 ubiegłego wieku Aloys Borgers i Harry Timmermans zajmowali się modelowaniem ruchu pieszych w środowisku centrum handlowego  (\cite{refs:route-choice-1}).
+Na przestrzeni lat modele te ewoluowały w wielu kierunkach, od automatów komórkowych (\cite{refs:cellural-movement}) przez systemy agentowe (\cite{refs:real-data-2}) aż do modeli probabilistycznych i opartych o algorytmy genetyczne (\cite{refs:pedestrian-behaviour-2}). \\
+
+% TODO Opisać refs:cellural-movement
+% TODO Opisać refs:pedestrian-behaviour-2
+% TODO Opisać refs:real-data-2
+
+Więcej interesujących publikacji związanych z tematyką tego projektu zawarto w secji \ref{sec:refs}.
 
 \newpage
     \section{Model centrum handlowego}
@@ -262,13 +270,21 @@ Faza operacyjna zachodzi w lokalnym otoczeniu każdego agenta, a jej celem jest 
         % TODO Napisać dokładne porównanie z rzeczywistymi danymi.
 
 \newpage
-    \phantomsection
-    \label{sec:refs}
-
-    % TODO Uzupełnić referencje.
-
     \begin{thebibliography}{9}
-        \bibitem[Wąs]{refs:social-distances-1} - Social Distances
-        \bibitem[Wąs]{refs:social-distances-2} - Social Distances II
+        \label{sec:refs}
+
+        \bibitem[Wąs, Gudowski, Matuszyk]{refs:social-distances-1} - Social Distances Model of Pedestrian Dynamics
+        \bibitem[Karakayali]{refs:social-distances-2} - Social Distance and affective orientation
+        \bibitem[Bogardus]{refs:group-relations} - Measurement of personal-group relations
+
+        \bibitem[Blue, Adler]{refs:4-way-movement} - Modelling Four Directional Pedestriam Movements
+        \bibitem[Blue, Adler]{refs:cellural-movement} - Cellural automata microsimulation for modeling bi-directional pedestrian walkways
+        \bibitem[Bitgood, Dukes]{refs:movement-economy} - Economy of Movement and Pedestrian Choice Point Behavior in Shopping Malls
+        \bibitem[Borgers, Timmermans]{refs:route-choice-1} - A Model of Pedestrian Route Choice and Demand for Retail Facilities within Inner-City Shopping Areas
+        \bibitem[Borgers, Timmermans]{refs:route-choice-2} - City centre entry points, store location, patterns and pedestrian route choice behaviour: a microlevel simulation model
+        \bibitem[Borgers, Timmermans]{refs:pedestrian-behaviour-1} - Modelling pedestrian behaviour in downtown shopping areas
+        \bibitem[Kitazawa, Batty]{refs:pedestrian-behaviour-2} - Pedestrian Behaviour Modelling
+        \bibitem[Zacharias]{refs:real-data-1} - Shopping behavior at Alexis-Nihion Plaza in Montreal
+        \bibitem[Rauh, Schenk, Schrődl]{refs:real-data-2} - The Simulated consumer - an agent-based approach to shopping behaviour
     \end{thebibliography}
 \end{document}
