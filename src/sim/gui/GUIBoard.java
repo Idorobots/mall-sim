@@ -8,20 +8,28 @@ import java.awt.Point;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
+import sim.gui.helpers.Helpers;
 import sim.model.Board;
 import sim.model.Cell;
+import sim.model.Agent;
 
 @SuppressWarnings("serial")
 public class GUIBoard extends JComponent implements MouseInputListener,
+        MouseWheelListener,
         ComponentListener {
 
     private Board board;
 
     private int cellSize = 14;
+    private int agentSize = 16;
+
+    private int resizeDelta = 1; // Used for dynamic resizing.
 
     public GUIBoard(Board board) {
         this.board = board;
@@ -32,6 +40,7 @@ public class GUIBoard extends JComponent implements MouseInputListener,
         addMouseListener(this);
         addComponentListener(this);
         addMouseMotionListener(this);
+        addMouseWheelListener(this);
         setBackground(Color.WHITE);
         setOpaque(true);
 
@@ -73,23 +82,59 @@ public class GUIBoard extends JComponent implements MouseInputListener,
                 Cell c = board.getCell(new Point(x, y));
 
                 switch (c.getType()) {
-                case FLOOR:
+                case PASSABLE:
                     g.setColor(Color.WHITE);
                     break;
-                case WALL:
+                case BLOCKED:
                     g.setColor(Color.BLACK);
                     break;
                 }
 
-                if (c.getAgent() != null) {
-                    g.setColor(Color.BLUE);
-                }
-
                 g.fillRect((x * cellSize) + 1, (y * cellSize) + 1,
-                        (cellSize - 1), (cellSize - 1));
+                           (cellSize - 1), (cellSize - 1));
+
+                Agent a = c.getAgent();
+
+                if (a != null) {
+                    drawAgent(g, a, x, y);
+                }
             }
         }
 
+    }
+
+    // Convinience method for the soon to be lengthy Agent drawing code.
+    private void drawAgent(Graphics g, Agent a, int x, int y) {
+        assert a != null;
+        assert g != null;
+
+        g.setColor(Color.BLUE);
+
+        int agentH = 0;
+        int agentW = 0;
+        int agentHeadSize = agentSize/3;
+
+        switch (a.getDirection()) {
+        case N:
+        case S:
+            agentH = agentSize/2;
+            agentW = agentSize;
+            break;
+        case E:
+        case W:
+            agentH = agentSize;
+            agentW = agentSize/2;
+            break;
+        }
+
+        int agentX = x * cellSize + cellSize/2;
+        int agentY = y * cellSize + cellSize/2;
+
+
+        g.fillOval(agentX - agentW/2, agentY - agentH/2, agentW, agentH);
+
+        g.setColor(Color.YELLOW);
+        g.fillOval(agentX - agentHeadSize/2, agentY - agentHeadSize/2, agentHeadSize, agentHeadSize);
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -133,6 +178,25 @@ public class GUIBoard extends JComponent implements MouseInputListener,
     }
 
     public void mousePressed(MouseEvent e) {
+    }
+
+    // Half-assed dynamic resizing. Still needs some work. FIXME
+    public void mouseWheelMoved(MouseWheelEvent e) {
+       int rotation = e.getWheelRotation();
+
+       if(rotation != 0) {
+           cellSize = Helpers.clamp(cellSize + resizeDelta * rotation, 3, 25);
+           agentSize = Helpers.clamp(agentSize + resizeDelta * rotation, 2, 27);
+
+           Dimension d = new Dimension(board.getDimension().width * cellSize
+                   + 1, board.getDimension().height * cellSize + 1);
+
+           this.setSize(d);
+
+           repaint();
+
+           //FIXME Adjust underlaying ScrollPane accordingly.
+       }
     }
 
 }

@@ -8,7 +8,7 @@ public class Agent {
     private Point position;
     private int vMax;
     private int vCurr;
-    private Direction direction;
+    private Direction direction = Direction.N;
 
     public Direction getDirection() {
         return direction;

@@ -2,31 +2,16 @@ package sim.model;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.Random;
 
 public class Board {
     private Cell[][] grid;
 
-    Board(Dimension dimension) {
+    public Board(Dimension dimension) {
         grid = new Cell[dimension.height][dimension.width];
 
         for (int y = 0; y < dimension.height; y++)
             for (int x = 0; x < dimension.width; x++)
-                grid[y][x] = new Cell(Cell.Type.FLOOR);
-
-        // XXX: TEST
-        test();
-    }
-
-    private void test() {
-        Random r = new Random();
-        for (int i = 0; i < 20; i++) {
-            Cell c = grid[r.nextInt(getDimension().height)][r
-                    .nextInt(getDimension().width)];
-
-            c.setAgent(new Agent());
-        }
-
+                grid[y][x] = new Cell();
     }
 
     public boolean isOnBoard(Point p) {
@@ -36,6 +21,13 @@ public class Board {
 
     public Dimension getDimension() {
         return new Dimension(grid[0].length, grid.length);
+    }
+
+    public void setCell(Point p, Cell cell) {
+        assert isOnBoard(p);
+        assert cell != null;
+
+        grid[p.y][p.x] = cell;
     }
 
     public Cell getCell(Point p) {

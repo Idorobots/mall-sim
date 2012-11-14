@@ -6,7 +6,7 @@ import javax.swing.UIManager;
 
 import sim.gui.MallFrame;
 
-import sim.model.Mall;
+import sim.control.ResourceManager;
 
 public class MallSim {
 
@@ -19,8 +19,9 @@ public class MallSim {
             public void run() {
                 try {
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                    Mall mall = new Mall();
-                    MallFrame frame = new MallFrame(mall.getBoard());
+                    ResourceManager resMgr = new ResourceManager();
+
+                    MallFrame frame = new MallFrame(resMgr.loadShoppingMall("./data/malls/1floor.bmp"));
                     frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();

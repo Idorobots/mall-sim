@@ -3,14 +3,19 @@ package sim.model;
 import sim.model.algo.MovementAlgorithm;
 
 public class Cell {
-    
+    public static Cell WALL = new Cell(Type.BLOCKED);
+
     public enum Type {
-        FLOOR, WALL
+        PASSABLE, BLOCKED
     }
     
     private final Type type;
-    private Agent agent;
-    private MovementAlgorithm algorithm;
+    private Agent agent = null;
+    private MovementAlgorithm algorithm = null;
+
+    public Cell() {
+        this(Type.PASSABLE);
+    }
 
     public Cell(Type type) {
         super();

@@ -16,7 +16,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
 import sim.gui.actions.ExitAction;
-import sim.model.Board;
+import sim.model.Mall;
 
 @SuppressWarnings("serial")
 public class MallFrame extends JFrame {
@@ -24,11 +24,10 @@ public class MallFrame extends JFrame {
     private JPanel contentPane;
     private GUIBoard guiBoard;
 
-
     /**
      * Create the frame.
      */
-    public MallFrame(Board board) {
+    public MallFrame(Mall mall) {
         setTitle("MallSim");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 650, 500);
@@ -91,7 +90,7 @@ public class MallFrame extends JFrame {
         JPanel boardPanel = new JPanel();
         boardScrollPane.setViewportView(boardPanel);
 
-        guiBoard = new GUIBoard(board);
+        guiBoard = new GUIBoard(mall.getBoard());
         boardPanel.add(guiBoard);
     }
 
