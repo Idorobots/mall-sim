@@ -38,9 +38,9 @@ Praca i związany z nią projekt dotyczą symulowania ruchu ludzi w centrum hand
     \label{sec:intro}
 
 \noindent
-Celem wykonywanego projektu jest stworzenie modelu oraz symulacja ruchu ludzi w centrum handlowym w oparciu m.in. o model \emph{Social Distances} (\cite{refs:social-distances-1, refs:social-distances-2}).
+Celem wykonywanego projektu jest stworzenie modelu oraz symulacja ruchu ludzi w centrum handlowym w oparciu między innymi o model \emph{Social Distances} (\cite{refs:social-distances-1, refs:social-distances-2}).
 
-Modelowanie ruchu dużych grup ludzi w środowisku zorganizowanym jest problemem złożonym i wymaga wykorzystania równie złożonych algorytmów celem dokładnego przybliżenia rzeczywistych zachowań. Dobrym podejściem jest dekompozycja problemu modelowania złożonego zjawiska na mniejsze, łatwiejsze do rozwiązania podproblemy, którymi zajmują się osobne, dobrze zdefiniowane i wyspecjalizowane algorytmy i ponowne połączenie wyników ich działania w spójną całość - metoda \emph{Divide and Conquer}.
+Modelowanie ruchu dużych grup ludzi w środowisku centrum handlowego jest problemem złożonym i wymaga wykorzystania równie złożonych algorytmów celem dokładnego przybliżenia rzeczywistych zachowań. Dobrym podejściem jest dekompozycja problemu modelowania złożonego zjawiska na mniejsze, łatwiejsze do rozwiązania podproblemy, którymi zajmują się osobne, dobrze zdefiniowane i wyspecjalizowane algorytmy, i ponowne połączenie wyników ich działania w spójną całość - metoda \emph{Divide and Conquer}.
 
     \begin{figure}[H]
         \centering
@@ -58,12 +58,34 @@ Na rysunku \ref{fig:decomp} została przedstawiona przykładowa dekompozycja pro
     \label{sec:sota}
 
 \noindent
-Zagadnienia modelowania ruchu ludzi są od długiego czasu postrzegane jako istotne z punktu widzenia usługowego. Już w latach 80 ubiegłego wieku Aloys Borgers i Harry Timmermans zajmowali się modelowaniem ruchu pieszych w środowisku centrum handlowego  (\cite{refs:route-choice-1}).
-Na przestrzeni lat modele te ewoluowały w wielu kierunkach, od automatów komórkowych (\cite{refs:cellural-movement}) przez systemy agentowe (\cite{refs:real-data-2}) aż do modeli probabilistycznych i opartych o algorytmy genetyczne (\cite{refs:pedestrian-behaviour-2}). \\
+Zagadnienia modelowania ruchu ludzi są od długiego czasu postrzegane jako istotne z punktu widzenia usługowego. Już w latach 80 ubiegłego wieku Aloys Borgers i Harry Timmermans zajmowali się modelowaniem ruchu pieszych w środowisku centrum handlowego w oparciu o modele probabilistyczne (\cite{refs:route-choice-1}).
+Na przestrzeni lat modele ruchu pieszych ewoluowały w wielu kierunkach, od dynamiki płnów (\cite{refs:fluid-dynamics}) przez automaty komórkowe (\cite{refs:cellular-movement}) i algorytmy genetyczne (\cite{refs:pedestrian-behaviour-2}) aż do modeli opartych o systemy wieloagentowe (\cite{refs:real-data-2}). \\
 
-% TODO Opisać refs:cellural-movement
-% TODO Opisać refs:pedestrian-behaviour-2
-% TODO Opisać refs:real-data-2
+\emph{Cellular automata macrosimulation for modeling bi-directional pedestrian walkways} \linebreak (\cite{refs:cellular-movement}) skupia się na modelowaniu dwukierunkowego ruchu ludzi z wykorzystaniem automatów komórkowych. Praca ta dowodzi, że stosunkowo nieskomplikowany automat komórkowy z małą liczbą reguł jest zdonly do symulowania skomplikowanych zachowań, które dobrze oddają rzeczywistość. Zaproponowany model i algorytm \textbf{CA-ped} pozwalają symulawać ruch ludzi w dwóch przeciwnych kierunkach na dwóch oddzielnych jak i mieszanych pasach ruchu, a także dynamicznych, wieloliniowych (\emph{dynamic multi-lane, DML}) pasach ruchu.
+
+Algorytm \textbf{CA-ped} wyróżnia dwie fazy ruchu, z których każda charakteryzuje się trzema prostymi zasadami:
+
+\begin{enumerate}
+    \item Zmiana pasa ruchu
+        \begin{itemize}
+            \item Eliminacja konfliktów - dwóch przechodniów nie może znajdować się na jednej komórce, w przypadku konfliktu wolna komórka oddzielająca dwóch przechodniów jest przyznawana jednemu z nich z równym prawdopodobieństwiem.
+            \item Identyfikacja wolnych przestrzeni - wybierany jest ten pas ruchu, który cechuje największa liczba wolnych komórek, co implikuje bezproblemowy ruch w przyszłości.
+            \item Zmiana pasa - każdy przechodzień jest poruszany na jeden z dwóch sąsiednich pasów, lub pozostaje na obecnym pasie ruchu.
+        \end{itemize}
+    \item Ruch do przodu
+        \begin{itemize}
+          \item Obliczanie szybkości ruchu - dla każdego przechodnia obliczana jest jego szybkość uzależniona od istnienia, bądź nie, wolnych komórek w jego otoczeniu.
+          \item Wymijanie - jeśli bezpośrednio przed przechodniem w niedużej odległości istnieje przeciwstawny przechodzień, to z zadanym prawdopodobieństwiem następuje wyminięcie obu przechodniów.
+          \item Ruch - każdy przechodzień jest przemieszczany do przodu zgodnie z szybkością jego ruchu.
+        \end{itemize}
+\end{enumerate}
+
+\emph{Pedestrian behaviour modelling - An application to Retail Movements using a Genetic Algorithm} (\cite{refs:pedestrian-behaviour-2}) identifikuje problemy i nieścisłości wynikające ze stosowania modeli opartych o najkrótsze ścieżki (\emph{shortest-paths}) i maksymalizację przydatności (\emph{utility-maximization}) do symulowania ruchu ludzi w centrum handlowym. Specjalnie zaprojektowany algorytm genetyczny wykorzystuje informacje o optymalnych ścieżkach i mapę routingu i atrybutów konkretnych miejsc centrum handlowego do znalezienia mniej optymalnych ścieżek prowadzących agentów do wybranych przez nich sklepów, które lepiej modelują zachowanie ludzi w środowisku centrum handlowego.
+
+Na podstawie socio-ekonomicznych atrybutów poszczególnych miejsc centrum handlowego i atrybutów ludzio przebywających w centrum handlowym, takich jak szybkość, wiek, płeć i przychód, oraz korzystając z mapy routing algorytm wyznacza listę miejsc zainteresowania, które kupujący planują odwiedzić. Następnie genetycznie wyznaczane są ścieżki obejmujące wszystkie miejsca zainteresowania konkretnego kupującego, które zostają wykorzystane w dalszej części symulacji.
+Istotnym jest wyszczególnienie fazy ruchu lokalnego, gdzie zachodzą dodatkowe zjawiska, których nie obejmuje zasięg zastosowanego algorytmu genetycznego. Wspomniane zjawiska to \emph{omijanie przeszkód} (\emph{collision avoidance}) występujących w lokalnym otoczeniu poruszającego się człowika oraz \emph{grupowanie się} (\emph{flocking}), czyli skomplikowane zjawisko przyciągania kupującego do grup innych kupujących zgodnie z jego socjologicznymi preferencjami. \\
+
+\emph{The Simulated Consumer - an Agent-based approach to Shopping Behaviour} \linebreak (\cite{refs:real-data-2}) identyfikuje istnienie dużej liczby różnych schematów zachowań i szeroki zakres problemu modelowania ruchu ludzi w centrum handlowym proponując podejście agentowe jako dostatecznie elastyczną metodę modelowania skomplikowanej dynamiki kupujących. W oparciu o niewielce skorelowane dane pochodzące z północy Szwecji i południa Niemiec autorzy definiują agentowy model wyboru miejsc zainteresowania, który następnie z powodzeniem aplikują do symulowania zachowania kupujących w dwóch różnych sektorach - spożywczym i odzieżowym, jednocześnie powtierdzając elastyczność zaproponowanego modelu. \\
 
 Więcej interesujących publikacji związanych z tematyką tego projektu zawarto w secji \ref{sec:refs}.
 
@@ -273,18 +295,17 @@ Faza operacyjna zachodzi w lokalnym otoczeniu każdego agenta, a jej celem jest 
     \begin{thebibliography}{9}
         \label{sec:refs}
 
-        \bibitem[Wąs, Gudowski, Matuszyk]{refs:social-distances-1} - Social Distances Model of Pedestrian Dynamics
-        \bibitem[Karakayali]{refs:social-distances-2} - Social Distance and affective orientation
-        \bibitem[Bogardus]{refs:group-relations} - Measurement of personal-group relations
-
-        \bibitem[Blue, Adler]{refs:4-way-movement} - Modelling Four Directional Pedestriam Movements
-        \bibitem[Blue, Adler]{refs:cellural-movement} - Cellural automata microsimulation for modeling bi-directional pedestrian walkways
-        \bibitem[Bitgood, Dukes]{refs:movement-economy} - Economy of Movement and Pedestrian Choice Point Behavior in Shopping Malls
-        \bibitem[Borgers, Timmermans]{refs:route-choice-1} - A Model of Pedestrian Route Choice and Demand for Retail Facilities within Inner-City Shopping Areas
-        \bibitem[Borgers, Timmermans]{refs:route-choice-2} - City centre entry points, store location, patterns and pedestrian route choice behaviour: a microlevel simulation model
-        \bibitem[Borgers, Timmermans]{refs:pedestrian-behaviour-1} - Modelling pedestrian behaviour in downtown shopping areas
-        \bibitem[Kitazawa, Batty]{refs:pedestrian-behaviour-2} - Pedestrian Behaviour Modelling
-        \bibitem[Zacharias]{refs:real-data-1} - Shopping behavior at Alexis-Nihion Plaza in Montreal
-        \bibitem[Rauh, Schenk, Schrődl]{refs:real-data-2} - The Simulated consumer - an agent-based approach to shopping behaviour
+        \bibitem[Wąs, Gudowski, Matuszyk 2006]{refs:social-distances-1} - Social Distances Model of Pedestrian Dynamics
+        \bibitem[Karakayali 2009]{refs:social-distances-2} - Social Distance and affective orientation
+        \bibitem[Blue, Adler 2000]{refs:4-way-movement} - Modelling Four Directional Pedestriam Movements
+        \bibitem[Blue, Adler 2001]{refs:cellular-movement} - Cellular automata microsimulation for modeling bi-directional pedestrian walkways
+        \bibitem[Bitgood, Dukes 2005]{refs:movement-economy} - Economy of Movement and Pedestrian Choice Point Behavior in Shopping Malls
+        \bibitem[Borgers, Timmermans 1986]{refs:route-choice-1} - A Model of Pedestrian Route Choice and Demand for Retail Facilities within Inner-City Shopping Areas
+        \bibitem[Borgers, Timmermans 1986]{refs:route-choice-2} - City centre entry points, store location, patterns and pedestrian route choice behaviour: a microlevel simulation model
+        \bibitem[Borgers, Timmermans 2005]{refs:pedestrian-behaviour-1} - Modelling pedestrian behaviour in downtown shopping areas
+        \bibitem[Kitazawa, Batty 2004]{refs:pedestrian-behaviour-2} - Pedestrian Behaviour Modelling - An Application to Retail Movements using a Genetic Algorithm
+        \bibitem[Zacharias 2000]{refs:real-data-1} - Shopping behavior at Alexis-Nihon Plaza in Montreal
+        \bibitem[Rauh, Schenk, Schrődl 2011]{refs:real-data-2} - The Simulated consumer - an agent-based approach to shopping behaviour
+        \bibitem[Helbing 1992]{refs:fluid-dynamics} - A Fluid Dynamic Model for the Movement of Pedestrians
     \end{thebibliography}
 \end{document}
