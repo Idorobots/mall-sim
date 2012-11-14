@@ -1,4 +1,4 @@
-package mallsim.gui;
+package sim.gui;
 
 import java.awt.BorderLayout;
 
@@ -15,7 +15,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
-import mallsim.gui.actions.ExitAction;
+import sim.gui.actions.ExitAction;
 import sim.model.Board;
 
 @SuppressWarnings("serial")

@@ -23,20 +23,20 @@
 	<target name="jar" depends="compile">
 		<mkdir dir="bin/jar" />
 
-		<manifestclasspath property="lib.list" jarfile="bin/jar/shopping-mall.jar">
+		<manifestclasspath property="lib.list" jarfile="bin/jar/MallSim.jar">
 			<classpath refid="external-libs" />
 		</manifestclasspath>
 
-		<jar destfile="bin/jar/shopping-mall.jar" basedir="bin/classes">
+		<jar destfile="bin/jar/MallSim.jar" basedir="bin/classes">
 			<manifest>
-				<attribute name="Main-Class" value="mallsim.gui.MallFrame" />
+				<attribute name="Main-Class" value="sim.MallSim" />
 				<attribute name="Class-Path" value="${lib.list}" />
 			</manifest>
 		</jar>
 	</target>
 
 	<target name="run" depends="jar">
-		<java jar="bin/jar/shopping-mall.jar" fork="true">
+		<java jar="bin/jar/MallSim.jar" fork="true">
 			<classpath refid="external-libs" />
 		</java>
 	</target>
@@ -45,7 +45,7 @@
 		<!-- Make JavaDoc -->
 	        <mkdir dir="docs/html" />
 		<javadoc sourcepath="src/"
-			 packagenames="mallsim.gui.*,mallsim.sim.*"
+			 packagenames="sim.*,sim.gui.*,sim.model.*,sim.model.algo.*,sim.model.helpers.*"
 			 destdir="docs/html">
 			 <classpath refid="external-libs" />
 		</javadoc>

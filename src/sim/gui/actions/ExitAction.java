@@ -1,4 +1,4 @@
-package mallsim.gui.actions;
+package sim.gui.actions;
 
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
