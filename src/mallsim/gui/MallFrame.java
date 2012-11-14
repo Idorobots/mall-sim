@@ -1,12 +1,7 @@
 package mallsim.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.UIManager;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -21,35 +16,19 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
 import mallsim.gui.actions.ExitAction;
+import sim.model.Board;
 
 @SuppressWarnings("serial")
 public class MallFrame extends JFrame {
 
     private JPanel contentPane;
-    private Board board;
-
-
-    // XXX: temp
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                    MallFrame frame = new MallFrame();
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
+    private GUIBoard guiBoard;
 
 
     /**
      * Create the frame.
      */
-    public MallFrame() {
+    public MallFrame(Board board) {
         setTitle("MallSim");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 650, 500);
@@ -112,8 +91,8 @@ public class MallFrame extends JFrame {
         JPanel boardPanel = new JPanel();
         boardScrollPane.setViewportView(boardPanel);
 
-        board = new Board(new Dimension(40, 20));
-        boardPanel.add(board);
+        guiBoard = new GUIBoard(board);
+        boardPanel.add(guiBoard);
     }
 
 }

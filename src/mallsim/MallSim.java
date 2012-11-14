@@ -1,6 +1,12 @@
-package mallsim.gui;
+package mallsim;
 
 import java.awt.EventQueue;
+
+import javax.swing.UIManager;
+
+import mallsim.gui.MallFrame;
+
+import sim.model.Mall;
 
 public class MallSim {
 
@@ -12,7 +18,9 @@ public class MallSim {
 
             public void run() {
                 try {
-                    MallFrame frame = new MallFrame();
+                	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                	Mall mall = new Mall();
+                    MallFrame frame = new MallFrame(mall.getBoard());
                     frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
