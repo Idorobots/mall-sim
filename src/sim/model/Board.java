@@ -2,8 +2,6 @@ package sim.model;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.Observable;
-import java.util.Observer;
 
 import sim.model.algo.Ped4;
 

@@ -3,8 +3,6 @@ package sim;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Point;
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Observable;
@@ -13,16 +11,14 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
+import sim.control.ResourceManager;
 import sim.gui.MallFrame;
 import sim.model.Agent;
 import sim.model.Board;
 import sim.model.Cell;
 import sim.model.Mall;
 import sim.model.helpers.Direction;
-
-import sim.control.ResourceManager;
 
 public class MallSim {
 
@@ -39,18 +35,20 @@ public class MallSim {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				// ResourceManager resMgr = new ResourceManager();
+				 ResourceManager resMgr = new ResourceManager();
+//				 Mall mall = resMgr.loadShoppingMall("./data/malls/1floor.bmp");
+				 Mall mall = resMgr.loadShoppingMall("./data/malls/simple.bmp");
+				 MallFrame frame = new MallFrame(mall);
 
-				Mall mall = new Mall();
-				test(mall.getBoard());
-
-				MallFrame frame = new MallFrame(mall);
+//				Mall mall = new Mall();
+//				test(mall.getBoard());
+//				MallFrame frame = new MallFrame(mall);
 				frame.setVisible(true);
 
 				SimLoop loop = new SimLoop(mall);
 				loop.addObserver(frame.getBoard());
 				Thread t = new Thread(loop);
-				t.start();
+//				t.start();
 			}
 		});
 	}
