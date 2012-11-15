@@ -1,19 +1,18 @@
 package sim.model.algo;
 
+import java.awt.Point;
+import java.util.Map;
+
+import sim.model.Agent;
 import sim.model.Board;
 
-public abstract class MovementAlgorithm {
+public interface MovementAlgorithm {
 
-    static enum Algorithm {
-        PED_4, SOCIAL_FORCE
-    }
+	public static enum Algorithm {
+		NONE, PED_4, SOCIAL_FORCE
+	}
 
-    protected final Board board;
+	public abstract void prepare(Board board, Point p);
 
-    protected MovementAlgorithm(Board board) {
-        super();
-        this.board = board;
-    }
-
-    abstract public void nextIterationStep();
+	public abstract void nextIterationStep(Board board, Point p, Map<Agent, Integer> mpLeft);
 }

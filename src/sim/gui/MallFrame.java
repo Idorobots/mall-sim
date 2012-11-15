@@ -94,4 +94,7 @@ public class MallFrame extends JFrame {
         boardPanel.add(guiBoard);
     }
 
+    public GUIBoard getBoard() {
+    	return guiBoard;
+    }
 }

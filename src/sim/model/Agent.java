@@ -5,29 +5,30 @@ import java.awt.Point;
 import sim.model.helpers.Direction;
 
 public class Agent {
-    private Point position;
-    private int vMax;
-    private int vCurr;
-    private Direction direction = Direction.N;
+	/**
+	 * The "absolute" maximum speed (number of tiles per second) a pedestrian
+	 * can cover in one iteration, currently ~6.5km/h.
+	 */
+	public static final int V_MAX = 6;
 
-    public Direction getDirection() {
-        return direction;
-    }
+	private Point position;
+	private int vMax;
+	private Direction direction = Direction.N;
 
-    public void setDirection(Direction direction) {
-        this.direction = direction;
-    }
+	public Agent() {
+		vMax = 2;
+	}
 
-    public int getvMax() {
-        return vMax;
-    }
+	public Direction getDirection() {
+		return direction;
+	}
 
-    public int getvCurr() {
-        return vCurr;
-    }
+	public void setDirection(Direction direction) {
+		this.direction = direction;
+	}
 
-    public void setvCurr(int vCurr) {
-        this.vCurr = vCurr;
-    }
+	public int getvMax() {
+		return vMax;
+	}
 
 }
