@@ -28,10 +28,11 @@ public class ResourceManager {
             int w = img.getWidth();
 
             board = new Board(new Dimension(w, h));
+            int[] pixel = new int[3];
 
             for(int i = 0; i < h; ++i) {
                 for(int j = 0; j < w; ++j) {
-                    int[] pixel = img.getData().getPixel(j, i, (int[]) null);
+                    img.getData().getPixel(j, i, pixel);
 
                     if(pixel[0] == 0) {
                         board.setCell(new Point(j, i), Cell.WALL);
