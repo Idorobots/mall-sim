@@ -36,8 +36,9 @@ public class MallSim {
                     e.printStackTrace();
                 }
                  ResourceManager resMgr = new ResourceManager();
+                 Mall mall = resMgr.loadShoppingMall("./data/malls/huge.bmp");
 //                 Mall mall = resMgr.loadShoppingMall("./data/malls/1floor.bmp");
-                 Mall mall = resMgr.loadShoppingMall("./data/malls/simple.bmp");
+//                 Mall mall = resMgr.loadShoppingMall("./data/malls/simple.bmp");
                  MallFrame frame = new MallFrame(mall);
 
 //                Mall mall = new Mall();

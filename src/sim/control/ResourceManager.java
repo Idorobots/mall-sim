@@ -6,36 +6,53 @@ import java.io.*;
 
 import java.awt.Point;
 import java.awt.Dimension;
+import java.awt.image.Raster;
 import java.awt.image.BufferedImage;
 
+import sim.util.Logger;
 import sim.model.Mall;
 import sim.model.Board;
 import sim.model.Cell;
 import sim.model.Agent;
+import sim.model.algo.Ped4;
 
 public class ResourceManager {
 
     /**
      * Loads shopping mall data from an image file.
+     * TODO: Needs some decent logging.
      */
     public Mall loadShoppingMall(String filename) {
-        BufferedImage img = null;
-        Board board = null;
+        Logger.log("Loading mall: " + filename);
+
+        BufferedImage bi = null;
+        Raster img = null;
+        Cell[][] grid = null;
+
+        int h = 0;
+        int w = 0;
 
         try {
-            img = ImageIO.read(new File(filename));
-            int h = img.getHeight();
-            int w = img.getWidth();
+            bi = ImageIO.read(new File(filename));
+            img = bi.getData();
 
-            board = new Board(new Dimension(w, h));
+            h = img.getHeight();
+            w = img.getWidth();
             int[] pixel = new int[3];
+
+            grid = new Cell[h][w];
+
+            Logger.log("Creating board...");
 
             for(int i = 0; i < h; ++i) {
                 for(int j = 0; j < w; ++j) {
-                    img.getData().getPixel(j, i, pixel);
+                    img.getPixel(j, i, pixel);
 
                     if(pixel[0] == 0) {
-                        board.setCell(new Point(j, i), Cell.WALL);
+                        grid[i][j] = Cell.WALL;
+                    }
+                    else {
+                        grid[i][j] = new Cell(Cell.Type.PASSABLE, Ped4.getInstance());
                     }
 
                     // TODO Dispatch on the pixel value:
@@ -45,14 +62,22 @@ public class ResourceManager {
 
                 }
             }
-
-            randomize(board);
         }
         catch (IOException e) {
             e.printStackTrace();
         }
 
-        return new Mall(board);
+        Board b = new Board(grid);
+        Logger.log("Board created!");
+
+        Logger.log("Randomizing board...");
+
+        randomize(b, h*w/15);
+
+        Logger.log("Board randomized!");
+
+        Logger.log("Mall loaded!");
+        return new Mall(b);
     }
 
     // TODO
@@ -60,11 +85,10 @@ public class ResourceManager {
         return new Agent();
     }
 
-
-    private void randomize(Board b) {
+    private void randomize(Board b, int n) {
         Random r = new Random();
         Dimension d = b.getDimension();
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < n; i++) {
             Cell c = b.getCell(new Point(r.nextInt(d.width), r.nextInt(d.height)));
 
             if(c != Cell.WALL)

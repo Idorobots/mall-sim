@@ -16,6 +16,12 @@ public class Board {
                 grid[y][x] = new Cell(Cell.Type.PASSABLE, Ped4.getInstance());
     }
 
+    public Board(Cell[][] grid) {
+        assert grid != null;
+
+        this.grid = grid;
+    }
+
     public boolean isOnBoard(Point p) {
         return p.x >= 0 && p.y >= 0 && p.x < grid[0].length
                 && p.y < grid.length;
@@ -34,6 +40,7 @@ public class Board {
 
     public Cell getCell(Point p) {
         assert isOnBoard(p);
+
         return grid[p.y][p.x];
     }
 

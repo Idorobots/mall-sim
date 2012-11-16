@@ -45,7 +45,7 @@
 		<!-- Make JavaDoc -->
 	        <mkdir dir="docs/html" />
 		<javadoc sourcepath="src/"
-			 packagenames="sim.*,sim.gui.*,sim.model.*,sim.model.algo.*,sim.control.*"
+			 packagenames="sim.*,sim.gui.*,sim.model.*,sim.model.algo.*,sim.control.*,sim.util.*"
 			 destdir="docs/html">
 			 <classpath refid="external-libs" />
 		</javadoc>
