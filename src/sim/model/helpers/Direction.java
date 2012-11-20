@@ -2,13 +2,15 @@ package sim.model.helpers;
 
 
 public enum Direction {
-    N(new MyPoint(0, -1)), E(new MyPoint(1, 0)), S(new MyPoint(0, 1)), W(new MyPoint(-1, 0));
+    N(new MyPoint(0, -1), 0.0d), E(new MyPoint(1, 0), 90.0d), S(new MyPoint(0, 1), 180.0d), W(new MyPoint(-1, 0), 270.0d);
 
     private final MyPoint coords;
+    private final double azimuth;
 
 
-    private Direction(MyPoint coords) {
+    private Direction(MyPoint coords, double azimuth) {
         this.coords = new MyPoint(coords);
+        this.azimuth = azimuth;
     }
 
 
@@ -60,4 +62,11 @@ public enum Direction {
 
         return (posThis - posDir);
     }
+
+
+    public double getAzimuth() {
+        return azimuth;
+    }
+    
+    
 }

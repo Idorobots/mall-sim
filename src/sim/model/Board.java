@@ -23,8 +23,7 @@ public class Board {
     }
 
     public boolean isOnBoard(Point p) {
-        return p.x >= 0 && p.y >= 0 && p.x < grid[0].length
-                && p.y < grid.length;
+        return p.x >= 0 && p.y >= 0 && p.x < grid[0].length && p.y < grid.length;
     }
 
     public Dimension getDimension() {
@@ -71,6 +70,19 @@ public class Board {
             System.out.println('|');
         }
         System.out.println('-');
+    }
+
+    /**
+     * Zamienia miejscami agentów z płytek określonych przez przekazane jako
+     * parametry współrzędne.
+     * 
+     * @param p1
+     * @param p2
+     */
+    public void swapAgent(Point p1, Point p2) {
+        Agent a = getCell(p1).getAgent();
+        getCell(p1).setAgent(getCell(p2).getAgent());
+        getCell(p2).setAgent(a);
     }
 
 }
