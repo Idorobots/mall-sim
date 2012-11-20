@@ -93,8 +93,7 @@ public final class Ped4 implements MovementAlgorithm {
                 && board.getCell(p).getAgent().getDirection().isHorizontal())
             candidates.add(board.getCell(p).getAgent());
 
-        return (candidates.size() == 0) ? null : candidates.get(r
-                .nextInt(candidates.size()));
+        return (candidates.size() == 0) ? null : candidates.get(r.nextInt(candidates.size()));
     }
 
     private void changeLane(Board board, MyPoint p) {
@@ -104,11 +103,9 @@ public final class Ped4 implements MovementAlgorithm {
 
         MyPoint pleft = p.add(w.getDirection().rotateLeft().getCoords());
         MyPoint pright = p.add(w.getDirection().rotateRight().getCoords());
-        GapReport gapLeft = board.isOnBoard(pleft) ? calculateGap(board, pleft,
-                w) : null;
+        GapReport gapLeft = (board.isOnBoard(pleft) && board.getCell(pleft).isPassable()) ? calculateGap(board, pleft, w) : null;
         GapReport gapCenter = calculateGap(board, p, w);
-        GapReport gapRight = board.isOnBoard(pright) ? calculateGap(board,
-                pright, w) : null;
+        GapReport gapRight = (board.isOnBoard(pright) && board.getCell(pright).isPassable()) ? calculateGap(board, pright, w) : null;
 
         if (gapLeft == null && gapRight == null)
             return;
@@ -127,15 +124,13 @@ public final class Ped4 implements MovementAlgorithm {
 
             // 2a-ii
             List<Point> lanes = new ArrayList<Point>();
-            if (gapLeft != null && 0 == gapLeft.gap
-                    && gapLeft.direction == Dir.SAME) {
+            if (gapLeft != null && 0 == gapLeft.gap && gapLeft.direction == Dir.SAME) {
                 lanes.add(pleft);
             }
-            if (gapRight != null && 0 == gapRight.gap
-                    && gapRight.direction == Dir.SAME) {
+            if (gapRight != null && 0 == gapRight.gap && gapRight.direction == Dir.SAME) {
                 lanes.add(pright);
             }
-
+            
             if (!lanes.isEmpty()) {
                 Point dest = lanes.get(r.nextInt(lanes.size()));
                 board.getCell(p).setAgent(null);
@@ -151,12 +146,10 @@ public final class Ped4 implements MovementAlgorithm {
 
         // 2b-i
         List<Point> lanes = new ArrayList<Point>();
-        if (gapLeft != null && gapMax == gapLeft.gap
-                && getCellAssignment(board, pleft) == w) {
+        if (gapLeft != null && gapMax == gapLeft.gap && getCellAssignment(board, pleft) == w) {
             lanes.add(pleft);
         }
-        if (gapRight != null && gapMax == gapRight.gap
-                && getCellAssignment(board, pright) == w) {
+        if (gapRight != null && gapMax == gapRight.gap && getCellAssignment(board, pright) == w) {
             lanes.add(pright);
         }
 
@@ -182,6 +175,11 @@ public final class Ped4 implements MovementAlgorithm {
                     return new GapReport(Dir.OUT, i, null);
                 else
                     break;
+            }
+
+            if (!board.getCell(np).isPassable()) {
+                gap_same = i - 1;
+                break;
             }
 
             op = board.getCell(np).getAgent();
@@ -222,20 +220,18 @@ public final class Ped4 implements MovementAlgorithm {
 
         // (2) : "walka" o wspólne pole
         if (report.gap > 0) {
-            MyPoint dest = curr.add(walk.getDirection().getCoords());
+            /*MyPoint dest = curr.add(walk.getDirection().getCoords());
 
-            MyPoint[] points = new MyPoint[] {
-                    dest.add(walk.getDirection().rotateLeft().getCoords()),
+            MyPoint[] points = new MyPoint[] { dest.add(walk.getDirection().rotateLeft().getCoords()),
                     dest.add(walk.getDirection().rotateRight().getCoords()) };
 
             for (MyPoint p : points) {
-                if (board.isOnBoard(p)) {
+                if (board.isOnBoard(p) && board.getCell(p).isPassable()) {
                     Agent walk_opp = board.getCell(p).getAgent();
                     if (walk_opp != null) {
                         // Zobacz, czy faktycznie dochodzi do
                         // konfliktu...
-                        if (p.add(walk_opp.getDirection().getCoords()).equals(
-                                dest)) {
+                        if (p.add(walk_opp.getDirection().getCoords()).equals(dest)) {
                             // konflikt
                             if (Math.random() < 0.5) {
                                 board.getCell(curr).setAgent(null);
@@ -256,18 +252,17 @@ public final class Ped4 implements MovementAlgorithm {
             // Brak konfliktu - zajmij pole.
             board.getCell(curr).setAgent(null);
             board.getCell(dest).setAgent(walk);
-            mpLeft.put(walk, mpLeft.get(walk) - 1);
+            mpLeft.put(walk, mpLeft.get(walk) - 1);*/
         } else {
 
-            // (3) : bi-directional
+    /*        // (3) : bi-directional
             if (report.direction == Dir.OPP) {
                 if (mpLeft.get(report.opponent) > 0 && Math.random() < p_exchg) {
                     MyPoint dest = curr.add(walk.getDirection().getCoords());
 
                     // wyzeruj oryginalne pole oponenta
                     if (board.getCell(dest).getAgent() == null) {
-                        MyPoint oppLoc = dest.add(walk.getDirection()
-                                .getCoords());
+                        MyPoint oppLoc = dest.add(walk.getDirection().getCoords());
                         board.getCell(oppLoc).setAgent(null);
                     }
 
@@ -277,23 +272,19 @@ public final class Ped4 implements MovementAlgorithm {
                     mpLeft.put(report.opponent, mpLeft.get(report.opponent) - 1);
                     return;
                 }
-            }
+            }*/
 
             // (4) : bi-diagonal
-            List<Point> l = new ArrayList<Point>();
+           /* List<Point> l = new ArrayList<Point>();
 
             MyPoint[] points = new MyPoint[] {
-                    curr.add(walk.getDirection().getCoords()).add(
-                            walk.getDirection().rotateLeft().getCoords()),
-                    curr.add(walk.getDirection().getCoords()).add(
-                            walk.getDirection().rotateRight().getCoords()) };
+                    curr.add(walk.getDirection().getCoords()).add(walk.getDirection().rotateLeft().getCoords()),
+                    curr.add(walk.getDirection().getCoords()).add(walk.getDirection().rotateRight().getCoords()) };
 
             for (Point p : points) {
-                if (board.isOnBoard(p)) {
+                if (board.isOnBoard(p) && board.getCell(p).isPassable()) {
                     Agent walk_opp = board.getCell(p).getAgent();
-                    if (walk_opp != null
-                            && getDir(walk.getDirection(),
-                                    walk_opp.getDirection()) == Dir.OPP
+                    if (walk_opp != null && getDir(walk.getDirection(), walk_opp.getDirection()) == Dir.OPP
                             && mpLeft.get(walk_opp) > 0)
                         l.add(p);
                 }
@@ -307,21 +298,17 @@ public final class Ped4 implements MovementAlgorithm {
                 mpLeft.put(walk, mpLeft.get(walk) - 1);
                 mpLeft.put(t, mpLeft.get(t) - 1);
                 return;
-            }
+            }*/
 
             // (5) : cross-diagonal
-            MyPoint frontTile = curr.add(walk.getDirection().getCoords());
-            points = new MyPoint[] {
-                    frontTile.add(walk.getDirection().rotateLeft().getCoords()),
-                    frontTile
-                            .add(walk.getDirection().rotateRight().getCoords()) };
+ /*           MyPoint frontTile = curr.add(walk.getDirection().getCoords());
+            points = new MyPoint[] { frontTile.add(walk.getDirection().rotateLeft().getCoords()),
+                    frontTile.add(walk.getDirection().rotateRight().getCoords()) };
 
             for (MyPoint p : points) {
-                if (board.isOnBoard(p)) {
+                if (board.isOnBoard(p) && board.getCell(p).isPassable()) {
                     Agent walk_opp = board.getCell(p).getAgent();
-                    if (walk_opp != null
-                            && p.add(walk_opp.getDirection().getCoords())
-                                    .equals(frontTile)
+                    if (walk_opp != null && p.add(walk_opp.getDirection().getCoords()).equals(frontTile)
                             && mpLeft.get(walk_opp) > 0)
                         l.add(p);
                 }
@@ -335,15 +322,14 @@ public final class Ped4 implements MovementAlgorithm {
                 mpLeft.put(walk, mpLeft.get(walk) - 1);
                 mpLeft.put(t, mpLeft.get(t) - 1);
                 return;
-            }
+            }*/
 
             // (6) : cross-forward-adjacent exchange
-            frontTile = curr.add(walk.getDirection().getCoords());
+ /*           frontTile = curr.add(walk.getDirection().getCoords());
 
-            if (board.isOnBoard(frontTile)) {
+            if (board.isOnBoard(frontTile) && board.getCell(frontTile).isPassable()) {
                 Agent walk_opp = board.getCell(frontTile).getAgent();
-                if (walk_opp != null
-                        && getDir(walk.getDirection(), walk_opp.getDirection()) == Dir.ORTHO
+                if (walk_opp != null && getDir(walk.getDirection(), walk_opp.getDirection()) == Dir.ORTHO
                         && mpLeft.get(walk_opp) > 0 && Math.random() < p_exchg) {
                     board.getCell(frontTile).setAgent(walk);
                     board.getCell(curr).setAgent(walk_opp);
@@ -351,13 +337,12 @@ public final class Ped4 implements MovementAlgorithm {
                     mpLeft.put(walk_opp, mpLeft.get(walk_opp) - 1);
                     return;
                 }
-            }
+            }*/
         }
     }
 
     @Override
-    public void nextIterationStep(Board board, Point p,
-            Map<Agent, Integer> mpLeft) {
+    public void nextIterationStep(Board board, Point p, Map<Agent, Integer> mpLeft) {
         stepForward(board, p, mpLeft);
     }
 

@@ -35,4 +35,8 @@ public class Cell {
     public MovementAlgorithm getAlgorithm() {
         return algorithm;
     }
+    
+    public boolean isPassable() {
+        return (type != Type.BLOCKED); 
+    }
 }
