@@ -14,10 +14,13 @@ public class Cell {
     private Agent agent = null;
     private MovementAlgorithm algorithm = null;
 
+    int forceValue;
+
     public Cell(Type type, MovementAlgorithm algo) {
         super();
         this.type = type;
         this.algorithm = algo;
+        forceValue = 0;
     }
 
     public Agent getAgent() {
@@ -35,8 +38,26 @@ public class Cell {
     public MovementAlgorithm getAlgorithm() {
         return algorithm;
     }
-    
+
     public boolean isPassable() {
-        return (type != Type.BLOCKED); 
+        return (type != Type.BLOCKED);
     }
+
+    public int getForceValue() {
+        return forceValue;
+    }
+
+    public void setForceValue(int forceValue) {
+        this.forceValue = forceValue;
+    }
+    
+    void changeForce(int forceValue) {
+        this.forceValue += forceValue;
+    }
+
+    // XXX: debug
+    public void setAlgorithm(MovementAlgorithm algorithm) {
+        this.algorithm = algorithm;
+    }
+
 }

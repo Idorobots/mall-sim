@@ -1,10 +1,14 @@
 package sim.model;
 
 import java.awt.Point;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import sim.model.helpers.Direction;
+import sim.model.helpers.MyPoint;
+import sim.model.helpers.Vec;
 
 public class Agent {
     /**
@@ -12,6 +16,8 @@ public class Agent {
      * can cover in one iteration, currently ~6.5km/h.
      */
     public static final int V_MAX = 6;
+    
+    public static final int FORCE_VALUE_MAX = -5;
 
     private Point position;
     private int vMax;
@@ -25,10 +31,57 @@ public class Agent {
      * Punkt, do którego aktualnie zmierza agent.
      */
     private List<Point> route;
+    
+    /**
+     * Mapowanie [punkt]->[wartość pola potencjału].
+     */
+    private Map<Vec, Integer> forceField;
 
     public Agent() {
-        vMax = 2;
+        vMax = 1;
         route = new LinkedList<Point>();
+        initForceField();
+    }
+    
+    private void initForceField() {
+        forceField = new HashMap<Vec, Integer>();
+
+        int level = Integer.MAX_VALUE;
+        
+        // za agentem
+        level = 1;
+        forceField.put(new Vec(-1, level), -2);
+        forceField.put(new Vec(0, level), -3);
+        forceField.put(new Vec(1, level), -2);
+
+        // obok agenta
+        level = 0;
+        forceField.put(new Vec(-2, level), -2);
+        forceField.put(new Vec(-1, level), -4);
+        forceField.put(new Vec(1, level), -4);
+        forceField.put(new Vec(2, level), -2);
+
+        // +1 przed agentem
+        level = -1;
+        forceField.put(new Vec(-2, level), -2);
+        forceField.put(new Vec(-1, level), -4);
+        forceField.put(new Vec(0, level), -5);
+        forceField.put(new Vec(1, level), -4);
+        forceField.put(new Vec(2, level), -2);
+
+        // +2 przed agentem
+        level = -2;
+        forceField.put(new Vec(-2, level), -1);
+        forceField.put(new Vec(-1, level), -3);
+        forceField.put(new Vec(0, level), -4);
+        forceField.put(new Vec(1, level), -3);
+        forceField.put(new Vec(2, level), -1);
+
+        // +3 przed agentem
+        level = -3;
+        forceField.put(new Vec(-1, level), -1);
+        forceField.put(new Vec(0, level), -2);
+        forceField.put(new Vec(1, level), -1);
     }
 
     public Direction getDirection() {
@@ -46,13 +99,18 @@ public class Agent {
     public Point getTarget() {
         return route.get(0);
     }
-
+    
     public void addTarget(Point target) {
         route.add(target);
     }
 
     public void reachTarget() {
-        assert (!route.isEmpty());
-        route.remove(0);
+        if (route.size() > 1)
+            route.remove(0);
+    }
+
+    public Map<Vec, Integer> getForceField() {
+        // TODO: immutable map?
+        return forceField;
     }
 }

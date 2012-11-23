@@ -55,10 +55,6 @@ public final class Ped4 implements MovementAlgorithm {
         LEFT, SAME, RIGHT
     }
 
-    enum Dir {
-        SAME, OPP, ORTHO, OUT
-    }
-
     /**
      * Dostosowuje kierunek ruchu agenta z zadanego pola tak, aby kąt między
      * kierunkiem ruchu, a kierunkiem celu nie przekraczał pewnej wartości progowej.

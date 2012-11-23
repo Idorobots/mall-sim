@@ -12,6 +12,10 @@ public interface MovementAlgorithm {
         NONE, PED_4, SOCIAL_FORCE
     }
 
+    enum Dir {
+        SAME, OPP, ORTHO, OUT
+    }
+
     /**
      * 
      * @param board
