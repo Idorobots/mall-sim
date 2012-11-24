@@ -18,11 +18,11 @@ public class Empty implements MovementAlgorithm {
 	}
 
 	@Override
-	public void prepare(Board board, Point p) {
+	public void prepare(Agent a) {
 	}
 
 	@Override
-	public void nextIterationStep(Board board, Point p, Map<Agent, Integer> mpLeft) {
+	public void nextIterationStep(Agent a, Map<Agent, Integer> mpLeft) {
 	}
 
 }

@@ -16,7 +16,7 @@ public interface MovementAlgorithm {
         NONE, PED_4, SOCIAL_FORCE
     }
 
-    enum Dir {
+    enum Orientation {
         SAME, OPP, ORTHO, OUT
     }
 
@@ -25,10 +25,10 @@ public interface MovementAlgorithm {
      * 
      * @param board
      *            plansza
-     * @param p
-     *            punkt na planszy, dla którego wykonujemy algorytm
+     * @param a
+     *            agent, dla którego wykonujemy algorytm
      */
-    public abstract void prepare(Board board, Point p);
+    public abstract void prepare(Agent a);
 
 
     /**
@@ -41,5 +41,5 @@ public interface MovementAlgorithm {
      *            mapa określająca ilość jeszcze niewykorzystanych punktów ruchu
      *            agentów
      */
-    public abstract void nextIterationStep(Board board, Point p, Map<Agent, Integer> mpLeft);
+    public abstract void nextIterationStep(Agent a, Map<Agent, Integer> mpLeft);
 }

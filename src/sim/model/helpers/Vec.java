@@ -32,4 +32,14 @@ public class Vec extends MyPoint {
     public Vec rotateCW() {
         return new Vec(-y, x);
     }
+
+
+    public Vec mul(int k) {
+        return new Vec(x * k, y * k);
+    }
+    
+    public Vec add(Vec v) {
+        return new Vec(x + v.x, y + v.y);
+    }
+    
 }

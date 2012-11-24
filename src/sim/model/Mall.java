@@ -5,14 +5,14 @@ import java.awt.Dimension;
 public class Mall {
 	private static Mall instance = new Mall();
 
-	private final Board board;
+	private Board board;
 
 	// Default ctor
-	public Mall() {
+	private Mall() {
 		board = new Board(new Dimension(15, 10));
 	}
 
-	public Mall(Board b) {
+	public void setBoard(Board b) {
 		board = b;
 	}
 

@@ -2,19 +2,26 @@ package sim.model.helpers;
 
 
 public enum Direction {
-    N(new MyPoint(0, -1), 0.0d), E(new MyPoint(1, 0), 90.0d), S(new MyPoint(0, 1), 180.0d), W(new MyPoint(-1, 0), 270.0d);
+    N(new Vec(0, -1), 0.0d), E(new Vec(1, 0), 90.0d), S(new Vec(0, 1), 180.0d), W(new Vec(-1, 0), 270.0d);
 
-    private final MyPoint coords;
+    /**
+     * Kierunek na planszy (zmiana współrzędnych płytki).
+     */
+    private final Vec coords;
+    
+    /**
+     * Kąt (w stopniach) między kierunkiem, a północą.
+     */
     private final double azimuth;
 
 
-    private Direction(MyPoint coords, double azimuth) {
-        this.coords = new MyPoint(coords);
+    private Direction(Vec coords, double azimuth) {
+        this.coords = new Vec(coords);
         this.azimuth = azimuth;
     }
 
 
-    public MyPoint getCoords() {
+    public Vec getVec() {
         return coords;
     }
 

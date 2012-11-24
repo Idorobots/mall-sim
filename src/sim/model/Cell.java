@@ -1,7 +1,10 @@
 package sim.model;
 
+import java.awt.Point;
+
 import sim.model.algo.Empty;
 import sim.model.algo.MovementAlgorithm;
+import sim.model.helpers.MyPoint;
 
 public class Cell {
     public static final Cell WALL = new Cell(Type.BLOCKED, Empty.getInstance());

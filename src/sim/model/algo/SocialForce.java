@@ -10,8 +10,10 @@ import java.util.Random;
 
 import sim.model.Agent;
 import sim.model.Board;
+import sim.model.Mall;
 import sim.model.algo.Ped4.GapReport;
 import sim.model.helpers.Direction;
+import sim.model.helpers.Misc;
 import sim.model.helpers.MyPoint;
 
 /* 
@@ -47,45 +49,53 @@ public class SocialForce implements MovementAlgorithm {
 
 
     @Override
-    public void prepare(Board board, Point p) {
+    public void prepare(Agent a) {
         // Social Force nie potrzebuje fazy wstępnej.
         return;
     }
 
 
     @Override
-    public void nextIterationStep(Board board, Point p, Map<Agent, Integer> mpLeft) {
-        board.modifyForceField(p, -1);
+    public void nextIterationStep(Agent a, Map<Agent, Integer> mpLeft) {
+        Board board = Mall.getInstance().getBoard();
+        
+        board.modifyForceField(a, -1);
 
-        Point hpt = getHighestPotentialTile(board, p);
+        Point hpt = getHighestPotentialTile(board, a.getPosition());
 
-        Agent a = board.getCell(p).getAgent();
         // Brak możliwości ruchu - agent "drepcze" w miejscu.
         if (hpt == null) {
             a.setDirection(a.getDirection().rotateRight());
             return;
         }
 
-        adjustDirection(a, p, hpt);
-        board.swapAgent(p, hpt);
+        MyPoint p = a.getPosition();
+        Misc.swapAgent(p, hpt);
+        adjustDirection(a, p);
 
         a.incrementFieldsMoved();
 
-        board.modifyForceField(hpt, 1);
+        board.modifyForceField(a, 1);
     }
 
 
-    private void adjustDirection(Agent a, Point prev, Point curr) {
+    /**
+     * Dostosowuje kierunek dalszego marszu do wykonanego ruchu.
+     * 
+     * @param a
+     * @param prev
+     */
+    private void adjustDirection(Agent a, Point prev) {
         if (a.getDirection() == Direction.N || a.getDirection() == Direction.S) {
-            if (curr.y == prev.y) {
-                if (curr.x < prev.x)
+            if (a.getPosition().y == prev.y) {
+                if (a.getPosition().x < prev.x)
                     a.setDirection(Direction.W);
                 else
                     a.setDirection(Direction.E);
             }
         } else {
-            if (curr.x == prev.x) {
-                if (curr.y < prev.y)
+            if (a.getPosition().x == prev.x) {
+                if (a.getPosition().y < prev.y)
                     a.setDirection(Direction.N);
                 else
                     a.setDirection(Direction.S);
@@ -102,7 +112,7 @@ public class SocialForce implements MovementAlgorithm {
      */
     private Point getHighestPotentialTile(Board b, Point agentPosition) {
 
-        List<Point> points = getAvailableTiles(b, agentPosition);
+        List<Point> points = getAvailableTiles(b, new MyPoint(agentPosition));
 
         // Brak możliwości ruchu - pozostań w miejscu.
         if (points.isEmpty())
@@ -167,19 +177,18 @@ public class SocialForce implements MovementAlgorithm {
      *            pozycja agenta
      * @return
      */
-    private List<Point> getAvailableTiles(Board b, Point p) {
+    private List<Point> getAvailableTiles(Board b, MyPoint p) {
 
         List<Point> points;
-        ;
 
         Agent a = b.getCell(p).getAgent();
         Direction d = getTargetDirection(a.getTarget(), p);
 
         // Punkty dopuszczalne ze względu na kierunek do celu.
         List<Point> targetPoints = new ArrayList<Point>();
-        MyPoint front = d.getCoords().add(p);
-        MyPoint left = d.rotateLeft().getCoords().add(p);
-        MyPoint right = d.rotateRight().getCoords().add(p);
+        MyPoint front = p.add(d.getVec());
+        MyPoint left = p.add(d.rotateLeft().getVec());
+        MyPoint right = p.add(d.rotateRight().getVec());
 
         if (testCell(b, left))
             targetPoints.add(left);
@@ -190,9 +199,9 @@ public class SocialForce implements MovementAlgorithm {
 
         // Punkty dopuszczalne ze względu na aktualny kierunek ruchu.
         List<Point> agentPoints = new ArrayList<Point>();
-        front = a.getDirection().getCoords().add(p);
-        left = a.getDirection().rotateLeft().getCoords().add(p);
-        right = a.getDirection().rotateRight().getCoords().add(p);
+        front = p.add(a.getDirection().getVec());
+        left = p.add(a.getDirection().rotateLeft().getVec());
+        right = p.add(a.getDirection().rotateRight().getVec());
 
         if (testCell(b, left))
             agentPoints.add(left);
@@ -203,14 +212,6 @@ public class SocialForce implements MovementAlgorithm {
 
         points = new ArrayList<Point>(targetPoints);
         points.retainAll(agentPoints);
-
-        // INFO: na chwilę obecną nie dopuszczamy ruchu na skos
-        // if (testCell(b, front) && testCell(b, left))
-        // points.add(left.add(d.getCoords()));
-        // if (testCell(b, front) && testCell(b, right))
-        // points.add(right.add(d.getCoords()));
-
-        // assert (!points.isEmpty());
 
         return points;
     }
@@ -241,11 +242,11 @@ public class SocialForce implements MovementAlgorithm {
     }
 
 
-    private Dir getDir(Direction dir1, Direction dir2) {
+    private Orientation getDir(Direction dir1, Direction dir2) {
         if (dir1 == dir2)
-            return Dir.SAME;
+            return Orientation.SAME;
 
-        return (Math.abs(dir1.diff(dir2)) == 1) ? Dir.ORTHO : Dir.OPP;
+        return (Math.abs(dir1.diff(dir2)) == 1) ? Orientation.ORTHO : Orientation.OPP;
     }
 
 
@@ -262,19 +263,19 @@ public class SocialForce implements MovementAlgorithm {
         GapReport report = calculateGap(board, curr, walk);
 
         // (3) : bi-directional
-        if (report.direction == Dir.OPP) {
+        if (report.direction == Orientation.OPP) {
             if (mpLeft.get(report.opponent) > 0 && Math.random() < p_exchg) {
-                MyPoint dest = curr.add(walk.getDirection().getCoords());
+                MyPoint dest = curr.add(walk.getDirection().getVec());
 
                 // wyzeruj oryginalne pole oponenta
                 if (board.getCell(dest).getAgent() == null) {
-                    MyPoint oppLoc = dest.add(walk.getDirection().getCoords());
-                    board.getCell(oppLoc).setAgent(null);
+                    MyPoint oppLoc = dest.add(walk.getDirection().getVec());
+                    Misc.setAgent(null, oppLoc);
                 }
 
                 // board.swapAgent(curr, dest);
-                board.getCell(dest).setAgent(walk);
-                board.getCell(curr).setAgent(report.opponent);
+                Misc.setAgent(walk, dest);
+                Misc.setAgent(report.opponent, curr);
                 mpLeft.put(walk, mpLeft.get(walk) - 1);
                 mpLeft.put(report.opponent, mpLeft.get(report.opponent) - 1);
                 return;
@@ -285,13 +286,13 @@ public class SocialForce implements MovementAlgorithm {
         List<Point> l = new ArrayList<Point>();
 
         MyPoint[] points = new MyPoint[] {
-                curr.add(walk.getDirection().getCoords()).add(walk.getDirection().rotateLeft().getCoords()),
-                curr.add(walk.getDirection().getCoords()).add(walk.getDirection().rotateRight().getCoords()) };
+                curr.add(walk.getDirection().getVec()).add(walk.getDirection().rotateLeft().getVec()),
+                curr.add(walk.getDirection().getVec()).add(walk.getDirection().rotateRight().getVec()) };
 
         for (Point p : points) {
             if (board.isOnBoard(p) && board.getCell(p).isPassable()) {
                 Agent walk_opp = board.getCell(p).getAgent();
-                if (walk_opp != null && getDir(walk.getDirection(), walk_opp.getDirection()) == Dir.OPP
+                if (walk_opp != null && getDir(walk.getDirection(), walk_opp.getDirection()) == Orientation.OPP
                         && mpLeft.get(walk_opp) > 0)
                     l.add(p);
             }
@@ -300,22 +301,22 @@ public class SocialForce implements MovementAlgorithm {
         if (!l.isEmpty() && Math.random() < p_exchg) {
             Point dest = l.get(r.nextInt(l.size()));
             Agent t = board.getCell(dest).getAgent();
-            board.getCell(dest).setAgent(walk);
-            board.getCell(curr).setAgent(t);
+            Misc.setAgent(walk, dest);
+            Misc.setAgent(t, curr);
             mpLeft.put(walk, mpLeft.get(walk) - 1);
             mpLeft.put(t, mpLeft.get(t) - 1);
             return;
         }
 
         // (5) : cross-diagonal
-        MyPoint frontTile = curr.add(walk.getDirection().getCoords());
-        points = new MyPoint[] { frontTile.add(walk.getDirection().rotateLeft().getCoords()),
-                frontTile.add(walk.getDirection().rotateRight().getCoords()) };
+        MyPoint frontTile = curr.add(walk.getDirection().getVec());
+        points = new MyPoint[] { frontTile.add(walk.getDirection().rotateLeft().getVec()),
+                frontTile.add(walk.getDirection().rotateRight().getVec()) };
 
         for (MyPoint p : points) {
             if (board.isOnBoard(p) && board.getCell(p).isPassable()) {
                 Agent walk_opp = board.getCell(p).getAgent();
-                if (walk_opp != null && p.add(walk_opp.getDirection().getCoords()).equals(frontTile)
+                if (walk_opp != null && p.add(walk_opp.getDirection().getVec()).equals(frontTile)
                         && mpLeft.get(walk_opp) > 0)
                     l.add(p);
             }
@@ -324,22 +325,22 @@ public class SocialForce implements MovementAlgorithm {
         if (!l.isEmpty() && Math.random() < p_exchg) {
             Point dest = l.get(r.nextInt(l.size()));
             Agent t = board.getCell(dest).getAgent();
-            board.getCell(dest).setAgent(walk);
-            board.getCell(curr).setAgent(t);
+            Misc.setAgent(walk, dest);
+            Misc.setAgent(t, curr);
             mpLeft.put(walk, mpLeft.get(walk) - 1);
             mpLeft.put(t, mpLeft.get(t) - 1);
             return;
         }
 
         // (6) : cross-forward-adjacent exchange
-        frontTile = curr.add(walk.getDirection().getCoords());
+        frontTile = curr.add(walk.getDirection().getVec());
 
         if (board.isOnBoard(frontTile) && board.getCell(frontTile).isPassable()) {
             Agent walk_opp = board.getCell(frontTile).getAgent();
-            if (walk_opp != null && getDir(walk.getDirection(), walk_opp.getDirection()) == Dir.ORTHO
+            if (walk_opp != null && getDir(walk.getDirection(), walk_opp.getDirection()) == Orientation.ORTHO
                     && mpLeft.get(walk_opp) > 0 && Math.random() < p_exchg) {
-                board.getCell(frontTile).setAgent(walk);
-                board.getCell(curr).setAgent(walk_opp);
+                Misc.setAgent(walk, frontTile);
+                Misc.setAgent(walk_opp, curr);
                 mpLeft.put(walk, mpLeft.get(walk) - 1);
                 mpLeft.put(walk_opp, mpLeft.get(walk_opp) - 1);
                 return;
@@ -351,16 +352,16 @@ public class SocialForce implements MovementAlgorithm {
     private GapReport calculateGap(Board board, MyPoint p, Agent w) {
         MyPoint np = new MyPoint(p);
 
-        Dir dir = Dir.SAME;
+        Orientation dir = Orientation.SAME;
         int gap_same = 2 * w.getvMax();
         int gap_opp = w.getvMax();
         Agent op = null;
 
         for (int i = 1; i <= 1; i++) {
-            np = np.add(w.getDirection().getCoords());
+            np = np.add(w.getDirection().getVec());
             if (!board.isOnBoard(np)) {
                 if (i <= w.getvMax())
-                    return new GapReport(Dir.OUT, i, null);
+                    return new GapReport(Orientation.OUT, i, null);
                 else
                     break;
             }
@@ -372,9 +373,9 @@ public class SocialForce implements MovementAlgorithm {
 
             op = board.getCell(np).getAgent();
             if (op != null) {
-                if (getDir(w.getDirection(), op.getDirection()) == Dir.OPP) {
+                if (getDir(w.getDirection(), op.getDirection()) == Orientation.OPP) {
                     gap_opp = (i - 1) / 2;
-                    dir = Dir.OPP;
+                    dir = Orientation.OPP;
                 } else {
                     // ORTHO też traktowane jak SAME, bo bez ryzyka kolizji
                     gap_same = i - 1;

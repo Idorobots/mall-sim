@@ -23,6 +23,7 @@ import sim.model.Mall;
 import sim.model.algo.Ped4;
 import sim.model.algo.SocialForce;
 import sim.model.helpers.Direction;
+import sim.model.helpers.Misc;
 
 public class MallSim {
 
@@ -54,10 +55,10 @@ public class MallSim {
      */
     private static void runResourceTest() {
         ResourceManager resMgr = new ResourceManager();
-        Mall mall = resMgr.loadShoppingMall("./data/malls/huge.bmp");
-        // Mall mall = resMgr.loadShoppingMall("./data/malls/1floor.bmp");
-        // Mall mall = resMgr.loadShoppingMall("./data/malls/simple.bmp");
-        MallFrame frame = new MallFrame(mall);
+        resMgr.loadShoppingMall("./data/malls/huge.bmp");
+        // resMgr.loadShoppingMall("./data/malls/1floor.bmp");
+        // resMgr.loadShoppingMall("./data/malls/simple.bmp");
+        MallFrame frame = new MallFrame(Mall.getInstance());
         frame.setVisible(true);
     }
 
@@ -66,7 +67,7 @@ public class MallSim {
      * Testuje działanie algotymów ruchu.
      */
     private static void runAlgoTest() {
-        Mall mall = new Mall();
+        Mall mall = Mall.getInstance();
         MallFrame frame = new MallFrame(mall);
         frame.setVisible(true);
 
@@ -140,7 +141,7 @@ public class MallSim {
 
                     if (a != null && a.getTargetCount() > 0) {
                         if (!a.getTarget().equals(p))
-                            board.getCell(p).getAlgorithm().prepare(board, p);
+                            board.getCell(p).getAlgorithm().prepare(a);
                     }
 
                 }
@@ -190,7 +191,7 @@ public class MallSim {
                             // równomierny rozkład wykonanych kroków w
                             // czasie)
 
-                            board.getCell(p).getAlgorithm().nextIterationStep(board, p, speedPointsLeft);
+                            board.getCell(p).getAlgorithm().nextIterationStep(a, speedPointsLeft);
                             speedPointsLeft.put(a, speedPointsLeft.get(a) - 1);
                         }
                     }
@@ -206,7 +207,7 @@ public class MallSim {
         public void run() {
             final int LOOPS = 50;
             final int STEPS = 40;
-            final int DELAY = 300;
+            final int DELAY = 10;
 
             // Liczba poprawnie zakończonych iteracji (wszystkie cele
             // osiągnięte).
@@ -273,7 +274,7 @@ public class MallSim {
         for (int y = 0; y < b.getDimension().height; y++)
             for (int x = 0; x < b.getDimension().width; x++) {
                 Point p = new Point(x, y);
-                b.getCell(p).setAgent(null);
+                Misc.setAgent(null, p);
                 b.getCell(p).setAlgorithm(SocialForce.getInstance());
             }
 
@@ -292,17 +293,17 @@ public class MallSim {
             Agent a1 = new Agent();
             a1.addTarget(new Point(3, 6));
             a1.setInitialDistanceToTarget(new Point(5, 6).distance(new Point(3, 6)));
-            b.getCell(new Point(5, 6)).setAgent(a1);
+            Misc.setAgent(a1, new Point(5, 6));
         } else if (mode == WALK_AROUND) {
             Agent a1 = new Agent();
             a1.addTarget(new Point(12, 3));
             a1.setInitialDistanceToTarget(new Point(2, 6).distance(new Point(12, 3)));
-            b.getCell(new Point(2, 6)).setAgent(a1);
+            Misc.setAgent(a1, new Point(2, 6));
 
             Agent a2 = new Agent();
             a2.addTarget(new Point(7, 5));
             a2.setInitialDistanceToTarget(new Point(7, 5).distance(new Point(7, 5)));
-            b.getCell(new Point(7, 5)).setAgent(a2);
+            Misc.setAgent(a2, new Point(7, 5));
         }
     }
 
@@ -320,7 +321,7 @@ public class MallSim {
                 a.addTarget(new Point(r.nextInt(d.width), r.nextInt(d.height)));
                 a.setInitialDistanceToTarget(p.distance(a.getTarget()));
                 a.setDirection(Direction.values()[r.nextInt(Direction.values().length)]);
-                c.setAgent(a);
+                Misc.setAgent(a, p);
             }
         }
     }
@@ -330,7 +331,7 @@ public class MallSim {
         for (int y = 0; y < b.getDimension().height; y++)
             for (int x = 0; x < b.getDimension().width; x++) {
                 Point p = new Point(x, y);
-                b.getCell(p).setAgent(null);
+                Misc.setAgent(null, p);
                 b.getCell(p).setAlgorithm(Ped4.getInstance());
             }
 
@@ -342,7 +343,7 @@ public class MallSim {
     private static void testPed4Individual(Board b) {
         for (int y = 0; y < b.getDimension().height; y++)
             for (int x = 0; x < b.getDimension().width; x++)
-                b.getCell(new Point(x, y)).setAgent(null);
+                Misc.setAgent(null, new Point(x, y));
 
         for (int y = 3; y < 8; y++)
             for (int x = 5; x < 10; x++)
@@ -353,7 +354,7 @@ public class MallSim {
         a.addTarget(new Point(8, 5));
         a.setInitialDistanceToTarget(new Point(0, 0).distance(new Point(8, 5)));
         a.addTarget(new Point(4, 1));
-        b.getCell(new Point(0, 0)).setAgent(a);
+        Misc.setAgent(a, new Point(0, 0));
     }
 
 
@@ -363,14 +364,13 @@ public class MallSim {
         Dimension d = b.getDimension();
         for (int i = 0; i < N_AGENTS; i++) {
             Point p = new Point(r.nextInt(d.width), r.nextInt(d.height));
-            Cell c = b.getCell(p);
 
-            if (c != Cell.WALL) {
+            if (b.getCell(p) != Cell.WALL) {
                 Agent a = new Agent();
                 a.addTarget(new Point(r.nextInt(d.width), r.nextInt(d.height)));
                 a.setInitialDistanceToTarget(p.distance(a.getTarget()));
                 a.setDirection(Direction.values()[r.nextInt(Direction.values().length)]);
-                c.setAgent(a);
+                Misc.setAgent(a, p);
             }
         }
     }

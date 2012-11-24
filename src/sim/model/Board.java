@@ -46,19 +46,6 @@ public class Board {
         return grid[p.y][p.x];
     }
 
-    /**
-     * Zamienia miejscami agentów z płytek określonych przez przekazane jako
-     * parametry współrzędne.
-     * 
-     * @param p1
-     * @param p2
-     */
-    public void swapAgent(Point p1, Point p2) {
-        Agent a = getCell(p1).getAgent();
-        getCell(p1).setAgent(getCell(p2).getAgent());
-        getCell(p2).setAgent(a);
-    }
-
     public void computeForceField() {
         // Clear force field.
         for (int y = 0; y < getDimension().height; y++) {
@@ -73,7 +60,7 @@ public class Board {
                 Point curr = new Point(x, y);
 
                 if (getCell(curr).getAgent() != null)
-                    modifyForceField(curr, 1);
+                    modifyForceField(getCell(curr).getAgent(), 1);
             }
         }
     }
@@ -86,14 +73,13 @@ public class Board {
      * @param sign
      *            <code>1</code> dla dodana siły, <code>-1</code> dla odjęcia
      */
-    public void modifyForceField(Point agentPosition, int sign) {
+    public void modifyForceField(Agent a, int sign) {
         assert (Math.abs(sign) == 1);
 
-        Cell c = getCell(agentPosition);
-        for (Map.Entry<Vec, Integer> entry : c.getAgent().getForceField().entrySet()) {
+        for (Map.Entry<Vec, Integer> entry : a.getForceField().entrySet()) {
             Vec v = entry.getKey();
 
-            switch (c.getAgent().getDirection()) {
+            switch (a.getDirection()) {
             case N:
                 v = v.rotate(0);
                 break;
@@ -108,7 +94,7 @@ public class Board {
                 break;
             }
 
-            MyPoint p = v.add(agentPosition);
+            MyPoint p = a.getPosition().add(v);
             if (isOnBoard(p)) {
                 getCell(p).changeForce(entry.getValue() * sign);
             }

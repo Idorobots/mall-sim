@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import sim.model.helpers.Direction;
+import sim.model.helpers.MyPoint;
 import sim.model.helpers.Vec;
 
 public class Agent {
@@ -20,6 +21,8 @@ public class Agent {
     public static final int FORCE_VALUE_MAX = -5;
 
     private int vMax;
+
+    private MyPoint position = null;
 
     /**
      * Kierunek ruchu.
@@ -156,6 +159,15 @@ public class Agent {
 
     public void setInitialDistanceToTarget(double initialDistanceToTarget) {
         this.initialDistanceToTarget = initialDistanceToTarget;
+    }
+    
+    public MyPoint getPosition() {
+        return new MyPoint(position);
+    }
+
+
+    public void setPosition(Point position) {
+        this.position = new MyPoint(position);
     }
 
 }

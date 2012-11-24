@@ -17,10 +17,6 @@ import javax.swing.border.EmptyBorder;
 
 import sim.gui.actions.ExitAction;
 import sim.model.Mall;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.factories.FormFactory;
 import javax.swing.JCheckBox;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;

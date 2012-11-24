@@ -15,6 +15,7 @@ import sim.model.Board;
 import sim.model.Cell;
 import sim.model.Agent;
 import sim.model.algo.Ped4;
+import sim.model.helpers.Misc;
 
 public class ResourceManager {
 
@@ -22,7 +23,7 @@ public class ResourceManager {
      * Loads shopping mall data from an image file.
      * TODO: Needs some decent logging.
      */
-    public Mall loadShoppingMall(String filename) {
+    public void loadShoppingMall(String filename) {
         Logger.log("Loading mall: " + filename);
 
         BufferedImage bi = null;
@@ -77,7 +78,7 @@ public class ResourceManager {
         Logger.log("Board randomized!");
 
         Logger.log("Mall loaded!");
-        return new Mall(b);
+        Mall.getInstance().setBoard(b);
     }
 
     // TODO
@@ -89,10 +90,10 @@ public class ResourceManager {
         Random r = new Random();
         Dimension d = b.getDimension();
         for (int i = 0; i < n; i++) {
-            Cell c = b.getCell(new Point(r.nextInt(d.width), r.nextInt(d.height)));
+            Point p = new Point(r.nextInt(d.width), r.nextInt(d.height));
 
-            if(c != Cell.WALL)
-              c.setAgent(new Agent());
+            if(b.getCell(p) != Cell.WALL)
+                Misc.setAgent(new Agent(), p);
         }
 
     }

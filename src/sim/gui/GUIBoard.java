@@ -165,12 +165,11 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
         if (c.getAgent() != null || forceValue == 0)
             return Color.WHITE;
 
-        // FIXME: docelowo zamiast 4 - 8 (każda z okolicznych płytek może
-        // dokładać "swoją cegiełkę")
         int maxSummedForceValue = 8 * Agent.FORCE_VALUE_MAX;
         int coef = 255 * forceValue / maxSummedForceValue;
-
-        return new Color(coef, 255 - coef, 0);
+        
+        // Ujemny współczynnik powstaje np. gdy ludzie długo chodzą w kółko.
+        return (coef > 0) ? new Color(coef, 255 - coef, 0) : new Color(-coef, 0, 255 + coef);
     }
 
 
@@ -206,8 +205,8 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
         g.fillOval(agentX - agentW / 2, agentY - agentH / 2, agentW, agentH);
 
         g.setColor(Color.GREEN);
-        g.drawLine(agentX, agentY, agentX + a.getDirection().getCoords().x * DIRECTION_MARKER_LENGTH, agentY
-                + a.getDirection().getCoords().y * DIRECTION_MARKER_LENGTH);
+        g.drawLine(agentX, agentY, agentX + a.getDirection().getVec().x * DIRECTION_MARKER_LENGTH, agentY
+                + a.getDirection().getVec().y * DIRECTION_MARKER_LENGTH);
 
         g.setColor(Color.YELLOW);
         g.fillOval(agentX - agentHeadSize / 2, agentY - agentHeadSize / 2, agentHeadSize, agentHeadSize);
