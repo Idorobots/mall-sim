@@ -72,7 +72,6 @@ public final class Ped4 implements MovementAlgorithm {
         double targetAngle = Math.toDegrees(Math.atan2(a.getTarget().x - p.x, p.y - a.getTarget().y));
         if (targetAngle < 0.0)
             targetAngle += 360.0;
-        System.out.println(targetAngle);
         assert (targetAngle >= 0.0d && targetAngle <= 360.0d);
         
         if (Math.abs(targetAngle - a.getDirection().getAzimuth()) > MAX_ANGLE_DIFF) {
@@ -87,8 +86,6 @@ public final class Ped4 implements MovementAlgorithm {
             else
                 a.setDirection(Direction.N);
         }
-        
-        System.out.println(a.getDirection().name());
     }
 
     private Dir getDir(Direction dir1, Direction dir2) {
@@ -272,11 +269,12 @@ public final class Ped4 implements MovementAlgorithm {
                             if (Math.random() < 0.5) {
                                 board.swapAgent(curr, dest);
                                 mpLeft.put(walk, mpLeft.get(walk) - 1);
+                                walk.incrementFieldsMoved();
                             } else {
                                 board.swapAgent(p, dest);
                                 mpLeft.put(walk_opp, mpLeft.get(walk_opp) - 1);
+                                walk_opp.incrementFieldsMoved();
                             }
-
                             return;
                         }
                     }
@@ -286,6 +284,7 @@ public final class Ped4 implements MovementAlgorithm {
             // Brak konfliktu - zajmij pole.
             board.swapAgent(curr, dest);
             mpLeft.put(walk, mpLeft.get(walk) - 1);
+            walk.incrementFieldsMoved();
         } else {
 
             // (3) : bi-directional
@@ -304,6 +303,8 @@ public final class Ped4 implements MovementAlgorithm {
                     board.getCell(curr).setAgent(report.opponent);
                     mpLeft.put(walk, mpLeft.get(walk) - 1);
                     mpLeft.put(report.opponent, mpLeft.get(report.opponent) - 1);
+                    walk.incrementFieldsMoved();
+                    report.opponent.incrementFieldsMoved();
                     return;
                 }
             }
@@ -331,6 +332,8 @@ public final class Ped4 implements MovementAlgorithm {
                 board.getCell(curr).setAgent(t);
                 mpLeft.put(walk, mpLeft.get(walk) - 1);
                 mpLeft.put(t, mpLeft.get(t) - 1);
+                walk.incrementFieldsMoved();
+                t.incrementFieldsMoved();
                 return;
             }
 
@@ -355,6 +358,8 @@ public final class Ped4 implements MovementAlgorithm {
                 board.getCell(curr).setAgent(t);
                 mpLeft.put(walk, mpLeft.get(walk) - 1);
                 mpLeft.put(t, mpLeft.get(t) - 1);
+                walk.incrementFieldsMoved();
+                t.incrementFieldsMoved();
                 return;
             }
 
@@ -369,6 +374,8 @@ public final class Ped4 implements MovementAlgorithm {
                     board.getCell(curr).setAgent(walk_opp);
                     mpLeft.put(walk, mpLeft.get(walk) - 1);
                     mpLeft.put(walk_opp, mpLeft.get(walk_opp) - 1);
+                    walk.incrementFieldsMoved();
+                    walk_opp.incrementFieldsMoved();
                     return;
                 }
             }
@@ -377,11 +384,13 @@ public final class Ped4 implements MovementAlgorithm {
 
     @Override
     public void nextIterationStep(Board board, Point p, Map<Agent, Integer> mpLeft) {
+        board.computeForceField();  // XXX: docelowo optymalniej
         stepForward(board, p, mpLeft);
     }
 
     @Override
     public void prepare(Board board, Point p) {
+        Agent a = board.getCell(p).getAgent();
         adjustDirection(board, p);
         changeLane(board, new MyPoint(p));
     }

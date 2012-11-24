@@ -6,6 +6,10 @@ import java.util.Map;
 import sim.model.Agent;
 import sim.model.Board;
 
+/*
+ * FIXME: problem, gdy dwóch agentów ma dokładnie tą samą płytkę-cel (jeden krąży wokół pola)
+ *  rozwiązanie: wyzwolenie akcji "reachTarget" gdy odległość od celu mniejsza niż pewien threshold
+ */
 public interface MovementAlgorithm {
 
     public static enum Algorithm {
@@ -16,6 +20,7 @@ public interface MovementAlgorithm {
         SAME, OPP, ORTHO, OUT
     }
 
+
     /**
      * 
      * @param board
@@ -24,6 +29,7 @@ public interface MovementAlgorithm {
      *            punkt na planszy, dla którego wykonujemy algorytm
      */
     public abstract void prepare(Board board, Point p);
+
 
     /**
      * 

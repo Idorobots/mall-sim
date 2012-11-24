@@ -46,35 +46,6 @@ public class Board {
         return grid[p.y][p.x];
     }
 
-    public void print() {
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[0].length; j++) {
-                Agent w = getCell(new Point(j, i)).getAgent();
-
-                if (w == null)
-                    System.out.print('.');
-                else {
-                    switch (w.getDirection()) {
-                    case N:
-                        System.out.print('u');
-                        break;
-                    case E:
-                        System.out.print('r');
-                        break;
-                    case S:
-                        System.out.print('d');
-                        break;
-                    case W:
-                        System.out.print('l');
-                        break;
-                    }
-                }
-            }
-            System.out.println('|');
-        }
-        System.out.println('-');
-    }
-
     /**
      * Zamienia miejscami agentów z płytek określonych przez przekazane jako
      * parametry współrzędne.
@@ -144,14 +115,23 @@ public class Board {
         }
     }
     
-    public void printForceField() {
+    public int countAgents() {
+        int nAgents = 0;
         for (int y = 0; y < getDimension().height; y++) {
             for (int x = 0; x < getDimension().width; x++) {
-                System.out.print(String.format("%3d", grid[y][x].getForceValue()));
+                Cell c = getCell(new Point(x, y));
+                if (c.getAgent() != null) {
+                    nAgents++;
+
+                }
+
+                // Agent nie może znajdować się na
+                // niedostępnym polu.
+                assert (!(!c.isPassable() && c.getAgent() != null));
             }
-            System.out.println();
-        }
-        System.out.print("\n\n");
+        }       
+        
+        return nAgents;
     }
     
 }

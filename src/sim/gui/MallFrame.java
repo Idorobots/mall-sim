@@ -17,6 +17,14 @@ import javax.swing.border.EmptyBorder;
 
 import sim.gui.actions.ExitAction;
 import sim.model.Mall;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.RowSpec;
+import com.jgoodies.forms.factories.FormFactory;
+import javax.swing.JCheckBox;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.BoxLayout;
 
 @SuppressWarnings("serial")
 public class MallFrame extends JFrame {
@@ -70,7 +78,30 @@ public class MallFrame extends JFrame {
 //         splitPane.setDividerLocation(0.8); // XXX: docelowa wersja
 
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane.setSelectedIndex(-1);
         splitPane.setRightComponent(tabbedPane);
+        
+        JPanel tabDisplay = new JPanel();
+        tabbedPane.addTab("Display", null, tabDisplay, null);
+        
+        JCheckBox chckbxShowSocialForce = new JCheckBox("show social force field");
+        chckbxShowSocialForce.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                JCheckBox cb = (JCheckBox) arg0.getSource();
+                guiBoard.setShowForceField(cb.isSelected());
+            }
+        });
+        tabDisplay.setLayout(new BoxLayout(tabDisplay, BoxLayout.Y_AXIS));
+        tabDisplay.add(chckbxShowSocialForce);
+        
+        JCheckBox chckbxShowTargetLines = new JCheckBox("show target lines");
+        chckbxShowTargetLines.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                JCheckBox cb = (JCheckBox) arg0.getSource();
+                guiBoard.setShowTargetLines(cb.isSelected());
+            }
+        });
+        tabDisplay.add(chckbxShowTargetLines);
 
         JPanel panel = new JPanel();
         tabbedPane.addTab("Properties", null, panel, null);

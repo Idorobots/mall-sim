@@ -29,8 +29,4 @@ public class MyPoint extends Point {
     public MyPoint mul(int k) {
         return new MyPoint(x * k, y * k);
     }
-
-    public double dist(Point p) {
-        return Math.sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y));
-    }
 }

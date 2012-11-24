@@ -1,15 +1,20 @@
 package sim.gui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.Stroke;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -17,9 +22,9 @@ import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
 import sim.gui.helpers.Helpers;
+import sim.model.Agent;
 import sim.model.Board;
 import sim.model.Cell;
-import sim.model.Agent;
 
 @SuppressWarnings("serial")
 public class GUIBoard extends JComponent implements MouseInputListener, MouseWheelListener, ComponentListener, Observer {
@@ -31,10 +36,35 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
 
     private int resizeDelta = 1; // Used for dynamic resizing.
 
+    boolean showForceField = false;
+    boolean showTargetLines = false;
+
+
     public GUIBoard(Board board) {
         this.board = board;
         initialize();
     }
+
+
+    public boolean isShowForceField() {
+        return showForceField;
+    }
+
+
+    public void setShowForceField(boolean showForceField) {
+        this.showForceField = showForceField;
+    }
+
+
+    public boolean isShowTargetLines() {
+        return showTargetLines;
+    }
+
+
+    public void setShowTargetLines(boolean showTargetLines) {
+        this.showTargetLines = showTargetLines;
+    }
+
 
     private void initialize() {
         addMouseListener(this);
@@ -48,6 +78,7 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
                 * cellSize + 1));
     }
 
+
     protected void paintComponent(Graphics g) {
         if (isOpaque()) {
             g.setColor(getBackground());
@@ -57,6 +88,7 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
         g.setColor(Color.GRAY);
         drawNetting(g, cellSize);
     }
+
 
     private void drawNetting(Graphics g, int gridSpace) {
         Insets insets = getInsets();
@@ -77,13 +109,18 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
             y += gridSpace;
         }
 
+        Map<Point, Point> targets = new HashMap<Point, Point>();
+
         for (y = 0; y < board.getDimension().height; y++) {
             for (x = 0; x < board.getDimension().width; x++) {
                 Cell c = board.getCell(new Point(x, y));
 
                 switch (c.getType()) {
                 case PASSABLE:
-                    g.setColor(getPassableColor(c));
+                    if (showForceField)
+                        g.setColor(getPassableColor(c));
+                    else
+                        g.setColor(Color.WHITE);
                     break;
                 case BLOCKED:
                     g.setColor(Color.BLACK);
@@ -96,11 +133,31 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
 
                 if (a != null) {
                     drawAgent(g, a, x, y);
+
+                    if (a.getTargetCount() > 0)
+                        targets.put(new Point(x, y), a.getTarget());
                 }
             }
         }
 
+        // Draw target lines.
+        if (showTargetLines) {
+            g.setColor(Color.CYAN);
+            Graphics2D g2d = (Graphics2D) g;
+            Stroke s = g2d.getStroke();
+            g2d.setStroke(new BasicStroke(3f));  // set stroke width of 10
+            for (Map.Entry<Point, Point> entry : targets.entrySet()) {
+                int x1 = entry.getKey().x * cellSize + cellSize / 2;
+                int y1 = entry.getKey().y * cellSize + cellSize / 2;
+                int x2 = entry.getValue().x * cellSize + cellSize / 2;
+                int y2 = entry.getValue().y * cellSize + cellSize / 2;
+
+                g.drawLine(x1, y1, x2, y2);
+            }
+            g2d.setStroke(s);
+        }
     }
+
 
     private Color getPassableColor(Cell c) {
         int forceValue = c.getForceValue();
@@ -110,11 +167,12 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
 
         // FIXME: docelowo zamiast 4 - 8 (każda z okolicznych płytek może
         // dokładać "swoją cegiełkę")
-        int maxSummedForceValue = 4 * Agent.FORCE_VALUE_MAX;
+        int maxSummedForceValue = 8 * Agent.FORCE_VALUE_MAX;
         int coef = 255 * forceValue / maxSummedForceValue;
 
         return new Color(coef, 255 - coef, 0);
     }
+
 
     // Convinience method for the soon to be lengthy Agent drawing code.
     private void drawAgent(Graphics g, Agent a, int x, int y) {
@@ -155,6 +213,7 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
         g.fillOval(agentX - agentHeadSize / 2, agentY - agentHeadSize / 2, agentHeadSize, agentHeadSize);
     }
 
+
     public void mouseClicked(MouseEvent e) {
         /*
          * int x = e.getX() / size; int y = e.getY() / size; if ((x <
@@ -163,8 +222,10 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
          */
     }
 
+
     public void componentResized(ComponentEvent e) {
     }
+
 
     public void mouseDragged(MouseEvent e) {
         /*
@@ -174,29 +235,38 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
          */
     }
 
+
     public void mouseExited(MouseEvent e) {
     }
+
 
     public void mouseEntered(MouseEvent e) {
     }
 
+
     public void componentShown(ComponentEvent e) {
     }
+
 
     public void componentMoved(ComponentEvent e) {
     }
 
+
     public void mouseReleased(MouseEvent e) {
     }
+
 
     public void mouseMoved(MouseEvent e) {
     }
 
+
     public void componentHidden(ComponentEvent e) {
     }
 
+
     public void mousePressed(MouseEvent e) {
     }
+
 
     // Half-assed dynamic resizing. Still needs some work. FIXME
     public void mouseWheelMoved(MouseWheelEvent e) {
@@ -216,6 +286,7 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
             // FIXME Adjust underlaying ScrollPane accordingly.
         }
     }
+
 
     @Override
     public void update(Observable o, Object arg) {
