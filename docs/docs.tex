@@ -103,7 +103,7 @@ Zgodnie z metodą \emph{Divide and Conquer} zaproponowaną we \hyperref[sec:intr
         \label{fig:overview}
     \end{figure}
 
-Model centrum handlowego przewiduje istnienie specjalnych stref, wewnątrz których algorytmy odpowiedzialne za poruszanie agentów są modyfikowane lub zastępowane celem modelowania dobrze zdefiniowanych elementarnych zachowań, takich jak \emph{kolejkowanie}, czy \emph{grupowanie się}. W wyniku obserwacji stwierdzono istnienie czterech rodzajów stref specjalnych - strefy przyciągania uwagi (atraktory), kolejki, przejścia i miejsca przeznaczone do czekania. 
+Model centrum handlowego przewiduje istnienie specjalnych stref, wewnątrz których algorytmy odpowiedzialne za poruszanie agentów są modyfikowane lub zastępowane celem modelowania dobrze zdefiniowanych elementarnych zachowań, takich jak \emph{kolejkowanie}, czy \emph{grupowanie się}. W wyniku obserwacji stwierdzono istnienie czterech rodzajów stref specjalnych - strefy przyciągania uwagi (atraktory), kolejki, przejścia i miejsca przeznaczone do czekania.
 
     \subsection{Atraktory}
     \label{sec:attractors}
@@ -171,9 +171,6 @@ W zastosowanym algorytmie można wyszczególnieć dwie główne, wzajemnie od si
         \label{fig:actor-activity}
     \end{figure}
 
-    % TODO Więcej szczegółów na temat generowania aktora i zestawu jego parametrów.
-    % TODO Więcej szczegółów na temat algorytmu wybierania miejsc docelonych.
-
 Algorytm rozpoczyna pracę od wygenerowania agenta na podstawie wcześniej zdefiniowanych archetypów.
 Dla każdego agenta wybierana jest wstępna lista miejsc docelowych, które zostaną przez niego odwiedzone w czasie działania symulacji, oraz obliczana jest optymalna ścieżka wiodące do pierwszego wybranego w poprzednim kroku miejsca docelowego. Algorytm następnie modyfikuje ścieżkę w oparciu o mapę rozkładu stref specjalnych centrum handlowego by lepiej modelować faktyczne zamiary danego aktora.
 
@@ -192,10 +189,8 @@ W przypadku osiągnięcia miejsca docelowego algorytm przechodzi do rozpatrywani
             \label{fig:tactical}
         \end{figure}
 
-        % TODO Linki do opisu atraktorów, kolejek itd.
-
 \noindent
-Faza taktyczna zachodzi globalnie dla każdego agenta bez uwzględnienia jego lokalnego otoczenia, innych agentów, czy fizycznych właściwości centrum handlowego - nie jest istotnym, czy dany korytarz został zablokowany przez grupę ludzi i nie umożliwia przejścia. Faza ta modeluje abstrakcyjne zamiary agenta i jej celem jest przede wszystkim wybór listy miejsc docelowych oraz wyznaczenie dróg do nich prowadzących, co zostało osiągnięte dzięki \hyperref[sec:path-finding]{algorytmowi znajdowania ścieżek} oraz \hyperref[sec:mall-impl]{mapie rozkładu stref specjalnych} centrum handlowego. Pod uwagę brane są \hyperref[sec:attractors]{atraktory}, \hyperref[sec:queues]{kolejki} i \hyperref[sec:entrance-exits]{przejścia}, które algorytm stara się osiągnąć modyfikując wcześniej wyznaczoną, optymalną ścieżkę prowadzącą do aktualnego celu podróży.
+Faza taktyczna zachodzi globalnie dla każdego agenta bez uwzględnienia jego lokalnego otoczenia, innych agentów, czy fizycznych właściwości centrum handlowego - nie jest istotnym, czy dany korytarz został zablokowany przez grupę ludzi i nie umożliwia przejścia. Faza ta modeluje abstrakcyjne zamiary agenta i jej celem jest przede wszystkim wybór listy miejsc docelowych oraz wyznaczenie dróg do nich prowadzących, co zostało osiągnięte dzięki \hyperref[sec:path-finding]{algorytmowi znajdowania ścieżek} oraz \hyperref[sec:mall-impl]{mapie rozkładu stref specjalnych} centrum handlowego. Cele podróży agentów wybierane są ze zbioru punktów szczególnego zainteresowania - punktów graniczących ze ścianami centrum handlowego. Przy wyznaczaniu ścieżek pod uwagę brane są \hyperref[sec:attractors]{atraktory}, \hyperref[sec:queues]{kolejki} i \hyperref[sec:entrance-exits]{przejścia}, które algorytm stara się osiągnąć modyfikując wcześniej wyznaczoną, optymalną ścieżkę prowadzącą do aktualnego celu podróży.
 
         \subsection{Faza operacyjna}
         \label{sec:operational}
@@ -210,7 +205,17 @@ Faza taktyczna zachodzi globalnie dla każdego agenta bez uwzględnienia jego lo
         % TODO Potrzeba większego opisu, który bardziej zagłębia się w wybrany algorytm operacyjny.
 
 \noindent
-Faza operacyjna zachodzi w lokalnym otoczeniu każdego agenta, a jej celem jest wykonanie właściwego ruchu agenta. Faza ta jest odpowiedzialna za unikanie kolizji i omijanie przeszkód. Pod uwagę brani są inni agenci oraz metadane dotyczące drogi prowadzącej do aktualnego celu podróży wygenerowane w taktyczniej fazie działania algorytmu.
+Faza operacyjna zachodzi w lokalnym otoczeniu każdego agenta, a jej celem jest wykonanie właściwego ruchu agenta. Faza ta jest odpowiedzialna za unikanie kolizji i omijanie przeszkód. Pod uwagę brani są inni agenci oraz metadane dotyczące drogi prowadzącej do aktualnego celu podróży wygenerowane w taktyczniej fazie działania algorytmu. W implementacji fazy operacyjnej wykorzystano algorytmy \hyperref[sec:ped-4-impl]{Ped-4} i \hyperref[sec:social-force-impl]{Social-Force}. \\
+
+\noindent
+Algorytm \textbf{Ped-4} przebiega następująco:
+
+TODO
+
+\noindent
+Algorytm \textbf{Social-Force} przebiega zgodnie z poniższym opisem:
+
+TODO
 
 \newpage
     \section{Implementacja}
@@ -261,12 +266,11 @@ Faza operacyjna zachodzi w lokalnym otoczeniu każdego agenta, a jej celem jest 
         \subsection{Ruch agentów}
         \label{sec:movement-impl}
 
-        % TODO Opisać konkretny algorytm poruszania się agentów (czy to CA-ped czy ped-4).
+        \subsection{Ped-4}
+        \label{sec:ped-4-impl}
 
-        \subsection{Preferencje odległościowe agentów}
-        \label{sec:social-dist}
-
-        % TODO Opisać implementację Social Distances w tym projekcie.
+        \subsection{Social Force}
+        \label{sec:social-force-impl}
 
 \newpage
     \section{Symulacja i analiza wyników}
