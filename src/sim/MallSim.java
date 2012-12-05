@@ -22,6 +22,7 @@ import sim.model.Cell;
 import sim.model.Mall;
 import sim.model.algo.Ped4;
 import sim.model.algo.SocialForce;
+import sim.model.algo.Tactical;
 import sim.model.helpers.Direction;
 import sim.model.helpers.Misc;
 
@@ -43,7 +44,9 @@ public class MallSim {
                     e.printStackTrace();
                 }
 
-                // runResourceTest();
+                //runResourceTest();
+                ResourceManager resMgr = new ResourceManager();
+                resMgr.loadShoppingMall("./data/malls/simple.bmp");
                 runAlgoTest();
             }
         });
@@ -55,9 +58,9 @@ public class MallSim {
      */
     private static void runResourceTest() {
         ResourceManager resMgr = new ResourceManager();
-        resMgr.loadShoppingMall("./data/malls/huge.bmp");
-        // resMgr.loadShoppingMall("./data/malls/1floor.bmp");
-        // resMgr.loadShoppingMall("./data/malls/simple.bmp");
+        //resMgr.loadShoppingMall("./data/malls/huge.bmp");
+        //resMgr.loadShoppingMall("./data/malls/1floor.bmp");
+        resMgr.loadShoppingMall("./data/malls/simple.bmp");
         MallFrame frame = new MallFrame(Mall.getInstance());
         frame.setVisible(true);
     }
@@ -205,8 +208,8 @@ public class MallSim {
 
         @Override
         public void run() {
-            final int LOOPS = 50;
-            final int STEPS = 40;
+            final int LOOPS = 10;
+            final int STEPS = 500;
             final int DELAY = 10;
 
             // Liczba poprawnie zakończonych iteracji (wszystkie cele
@@ -218,8 +221,9 @@ public class MallSim {
 
             loop: for (int lp = 0; lp < LOOPS; lp++) {
 
-                testSocialForce(board);
+//                testSocialForce(board);
 //                testPed4(board);
+                testTactical(board);
 
                 board.computeForceField();
 
@@ -374,4 +378,28 @@ public class MallSim {
             }
         }
     }
+
+     private static void testTactical(Board board) {
+         Tactical tactical = new Tactical(board);
+
+         if(board.countAgents() == 0) {
+             Misc.setAgent(new Agent(), new Point(2, 2));
+         }
+
+         for (int y = 0; y < board.getDimension().height; y++) {
+             for (int x = 0; x < board.getDimension().width; x++) {
+                 Point p = new Point(x, y);
+                 Agent a = board.getCell(p).getAgent();
+
+                 if(a != null) {
+                     tactical.innitializeTargets(a);
+                 }
+
+//                 board.getCell(p).setAlgorithm(SocialForce.getInstance()); // FIXME Bugged.
+                   board.getCell(p).setAlgorithm(Ped4.getInstance());
+             }
+         }
+     }
+
+
 }

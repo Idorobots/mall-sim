@@ -73,7 +73,7 @@ public class ResourceManager {
 
         Logger.log("Randomizing board...");
 
-        randomize(b, h*w/15);
+        randomize(b, h*w/100);
 
         Logger.log("Board randomized!");
 
@@ -92,8 +92,11 @@ public class ResourceManager {
         for (int i = 0; i < n; i++) {
             Point p = new Point(r.nextInt(d.width), r.nextInt(d.height));
 
-            if(b.getCell(p) != Cell.WALL)
-                Misc.setAgent(new Agent(), p);
+            if(b.getCell(p) != Cell.WALL) {
+                Agent a = new Agent();
+                a.setPosition(p);
+                b.getCell(p).setAgent(a);
+            }
         }
 
     }

@@ -76,10 +76,10 @@ public class MallFrame extends JFrame {
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         tabbedPane.setSelectedIndex(-1);
         splitPane.setRightComponent(tabbedPane);
-        
+
         JPanel tabDisplay = new JPanel();
         tabbedPane.addTab("Display", null, tabDisplay, null);
-        
+
         JCheckBox chckbxShowSocialForce = new JCheckBox("show social force field");
         chckbxShowSocialForce.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
@@ -89,7 +89,7 @@ public class MallFrame extends JFrame {
         });
         tabDisplay.setLayout(new BoxLayout(tabDisplay, BoxLayout.Y_AXIS));
         tabDisplay.add(chckbxShowSocialForce);
-        
+
         JCheckBox chckbxShowTargetLines = new JCheckBox("show target lines");
         chckbxShowTargetLines.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {

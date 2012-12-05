@@ -53,7 +53,7 @@ public class Cell {
     public void setForceValue(int forceValue) {
         this.forceValue = forceValue;
     }
-    
+
     void changeForce(int forceValue) {
         this.forceValue += forceValue;
     }

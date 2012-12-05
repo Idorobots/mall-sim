@@ -100,7 +100,7 @@ public class Board {
             }
         }
     }
-    
+
     public int countAgents() {
         int nAgents = 0;
         for (int y = 0; y < getDimension().height; y++) {
@@ -115,9 +115,8 @@ public class Board {
                 // niedostępnym polu.
                 assert (!(!c.isPassable() && c.getAgent() != null));
             }
-        }       
-        
+        }
+
         return nAgents;
     }
-    
 }

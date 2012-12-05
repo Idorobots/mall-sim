@@ -160,7 +160,7 @@ public class Agent {
     public void setInitialDistanceToTarget(double initialDistanceToTarget) {
         this.initialDistanceToTarget = initialDistanceToTarget;
     }
-    
+
     public MyPoint getPosition() {
         return new MyPoint(position);
     }
