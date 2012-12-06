@@ -392,11 +392,12 @@ public class MallSim {
                  Agent a = board.getCell(p).getAgent();
 
                  if(a != null) {
+                     a.clearTargets();
                      tactical.innitializeTargets(a);
                  }
 
-//                 board.getCell(p).setAlgorithm(SocialForce.getInstance()); // FIXME Bugged.
-                   board.getCell(p).setAlgorithm(Ped4.getInstance());
+                 board.getCell(p).setAlgorithm(SocialForce.getInstance());
+                 // board.getCell(p).setAlgorithm(Ped4.getInstance());
              }
          }
      }

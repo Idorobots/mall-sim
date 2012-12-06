@@ -136,6 +136,11 @@ public class Agent {
     }
 
 
+    public void clearTargets() {
+        route.clear();
+        fieldsMoved = 0;
+    }
+
     public Map<Vec, Integer> getForceField() {
         // TODO: immutable map?
         return forceField;

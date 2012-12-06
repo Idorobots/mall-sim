@@ -169,13 +169,14 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
         int coef = 255 * forceValue / maxSummedForceValue;
 
         // Ujemny współczynnik powstaje np. gdy ludzie długo chodzą w kółko.
-        // FIXME Bugs like crazy.
         try {
             return (coef > 0) ? new Color(coef, 255 - coef, 0) : new Color(-coef, 0, 255 + coef);
         }
         catch(Exception e) {
-            //System.out.println(String.format("%d, %d, %d", coef, 255-coef, 0));
-            //System.out.println(String.format("%d, %d, %d", -coef, 0, 255+coef));
+            // FIXME Bugs like crazy.
+            System.out.println("Niewłaściwe wartości kolorów: ");
+            System.out.println(String.format("%d, %d, %d", coef, 255-coef, 0));
+            System.out.println(String.format("%d, %d, %d", -coef, 0, 255+coef));
         }
         return Color.MAGENTA;
     }
