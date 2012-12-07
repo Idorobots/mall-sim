@@ -26,7 +26,7 @@ public class Board {
     }
 
     public boolean isOnBoard(Point p) {
-        return p.x >= 0 && p.y >= 0 && p.x < grid[0].length && p.y < grid.length;
+        return p.x >= 0 && p.y >= 0 && p.x < getDimension().width && p.y < getDimension().height;
     }
 
     public Dimension getDimension() {
@@ -42,7 +42,7 @@ public class Board {
 
     public Cell getCell(Point p) {
         assert isOnBoard(p);
-
+        
         return grid[p.y][p.x];
     }
 
@@ -69,7 +69,7 @@ public class Board {
      * Modyfikuje rozkład pola potencjału usuwając lub dodając wartości pola
      * danego agenta.
      * 
-     * @param agentPosition
+     * @param a
      * @param sign
      *            <code>1</code> dla dodana siły, <code>-1</code> dla odjęcia
      */
@@ -97,6 +97,11 @@ public class Board {
             MyPoint p = a.getPosition().add(v);
             if (isOnBoard(p)) {
                 getCell(p).changeForce(entry.getValue() * sign);
+                
+                if (getCell(p).getForceValue() > 0) {
+                    System.err.println(p.toString() + " : " + getCell(p).getForceValue());
+                    throw new AssertionError();
+                }
             }
         }
     }

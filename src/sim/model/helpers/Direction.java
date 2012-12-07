@@ -26,7 +26,7 @@ public enum Direction {
     }
 
 
-    public Direction rotateLeft() {
+    public Direction nextCCW() {
         int len = Direction.values().length;
         for (int pos = 0; pos < len; pos++)
             if (Direction.values()[pos] == this)
@@ -35,7 +35,7 @@ public enum Direction {
     }
 
 
-    public Direction rotateRight() {
+    public Direction nextCW() {
         int len = Direction.values().length;
         for (int pos = 0; pos < len; pos++)
             if (Direction.values()[pos] == this)

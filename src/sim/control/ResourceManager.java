@@ -69,6 +69,7 @@ public class ResourceManager {
         }
 
         Board b = new Board(grid);
+        Mall.getInstance().setBoard(b);
         Logger.log("Board created!");
 
         Logger.log("Randomizing board...");
@@ -78,7 +79,6 @@ public class ResourceManager {
         Logger.log("Board randomized!");
 
         Logger.log("Mall loaded!");
-        Mall.getInstance().setBoard(b);
     }
 
     // TODO
@@ -86,16 +86,15 @@ public class ResourceManager {
         return new Agent();
     }
 
-    private void randomize(Board b, int n) {
+    private void randomize(Board b, int nAgents) {
         Random r = new Random();
         Dimension d = b.getDimension();
-        for (int i = 0; i < n; i++) {
+        
+        for (int i = 0; i < nAgents; i++) {
             Point p = new Point(r.nextInt(d.width), r.nextInt(d.height));
 
-            if(b.getCell(p) != Cell.WALL) {
-                Agent a = new Agent();
-                a.setPosition(p);
-                b.getCell(p).setAgent(a);
+            if(b.getCell(p).isPassable()) {
+                Misc.setAgent(new Agent(), p);
             }
         }
 

@@ -161,8 +161,8 @@ public final class Ped4 implements MovementAlgorithm {
 
         assert (w != null);
 
-        MyPoint pleft = p.add(w.getDirection().rotateLeft().getVec());
-        MyPoint pright = p.add(w.getDirection().rotateRight().getVec());
+        MyPoint pleft = p.add(w.getDirection().nextCCW().getVec());
+        MyPoint pright = p.add(w.getDirection().nextCW().getVec());
         GapReport gapLeft = (board.isOnBoard(pleft) && board.getCell(pleft).isPassable()) ? calculateGap(board, pleft,
                 w) : null;
         GapReport gapCenter = calculateGap(board, p, w);
@@ -292,8 +292,8 @@ public final class Ped4 implements MovementAlgorithm {
         if (report.gap > 0) {
             MyPoint dest = curr.add(agent.getDirection().getVec());
 
-            MyPoint[] points = new MyPoint[] { dest.add(agent.getDirection().rotateLeft().getVec()),
-                    dest.add(agent.getDirection().rotateRight().getVec()) };
+            MyPoint[] points = new MyPoint[] { dest.add(agent.getDirection().nextCCW().getVec()),
+                    dest.add(agent.getDirection().nextCW().getVec()) };
 
             for (MyPoint p : points) {
                 if (board.isOnBoard(p) && board.getCell(p).isPassable()) {
@@ -350,8 +350,8 @@ public final class Ped4 implements MovementAlgorithm {
             List<Point> l = new ArrayList<Point>();
 
             MyPoint[] points = new MyPoint[] {
-                    curr.add(agent.getDirection().getVec()).add(agent.getDirection().rotateLeft().getVec()),
-                    curr.add(agent.getDirection().getVec()).add(agent.getDirection().rotateRight().getVec()) };
+                    curr.add(agent.getDirection().getVec()).add(agent.getDirection().nextCCW().getVec()),
+                    curr.add(agent.getDirection().getVec()).add(agent.getDirection().nextCW().getVec()) };
 
             for (Point p : points) {
                 if (board.isOnBoard(p) && board.getCell(p).isPassable()) {
@@ -377,8 +377,8 @@ public final class Ped4 implements MovementAlgorithm {
 
             // (5) : cross-diagonal
             MyPoint frontTile = curr.add(agent.getDirection().getVec());
-            points = new MyPoint[] { frontTile.add(agent.getDirection().rotateLeft().getVec()),
-                    frontTile.add(agent.getDirection().rotateRight().getVec()) };
+            points = new MyPoint[] { frontTile.add(agent.getDirection().nextCCW().getVec()),
+                    frontTile.add(agent.getDirection().nextCW().getVec()) };
 
             for (MyPoint p : points) {
                 if (board.isOnBoard(p) && board.getCell(p).isPassable()) {
@@ -418,6 +418,33 @@ public final class Ped4 implements MovementAlgorithm {
                     return;
                 }
             }
+
+            // Żadne z pól nie jest dostępne (same ściany): spróbuj obrócić się
+            // i pójść w bok.
+            MyPoint pleft = curr.add(agent.getDirection().nextCCW().getVec()).add(agent.getDirection().getVec());
+            MyPoint pright = curr.add(agent.getDirection().nextCW().getVec()).add(agent.getDirection().getVec());
+            MyPoint pcurr = curr.add(agent.getDirection().getVec());
+            boolean gapLeft = (board.isOnBoard(pleft) && board.getCell(pleft).isPassable());
+            boolean gapCenter = (board.isOnBoard(pcurr) && board.getCell(pcurr).isPassable());
+            boolean gapRight = (board.isOnBoard(pright) && board.getCell(pright).isPassable());
+
+            if (!gapLeft && !gapCenter && !gapRight) {
+                // dostosuj kierunek
+
+                // Trzeba pamiętać, że oś OY ma w programie przeciwny zwrot.
+                double targetAngle = Math.toDegrees(Math.atan2(agent.getTarget().x - agent.getPosition().x,
+                        agent.getPosition().y - agent.getTarget().y));
+
+                MyPoint dirDest = agent.getPosition().add(agent.getDirection().getVec());
+                double directionAngle = Math.toDegrees(Math.atan2(dirDest.x - agent.getPosition().x,
+                        agent.getPosition().y - dirDest.y));
+                
+                if (targetAngle > directionAngle) {
+                    agent.setDirection(agent.getDirection().nextCW());
+                } else {
+                    agent.setDirection(agent.getDirection().nextCCW());
+                }
+            }
         }
     }
 
@@ -425,8 +452,8 @@ public final class Ped4 implements MovementAlgorithm {
     @Override
     public void nextIterationStep(Agent a, Map<Agent, Integer> mpLeft) {
         Board board = Mall.getInstance().getBoard();
-        board.computeForceField();  // XXX: docelowo optymalniej
         stepForward(board, a.getPosition(), mpLeft);
+        board.computeForceField();  // XXX: docelowo optymalniej
     }
 
 
@@ -435,6 +462,7 @@ public final class Ped4 implements MovementAlgorithm {
         Board b = Mall.getInstance().getBoard();
         adjustDirection(a);
         changeLane(b, a);
+        Mall.getInstance().getBoard().computeForceField();  // XXX: docelowo optymalniej
     }
 
 }

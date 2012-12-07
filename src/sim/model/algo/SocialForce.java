@@ -59,13 +59,17 @@ public class SocialForce implements MovementAlgorithm {
     public void nextIterationStep(Agent a, Map<Agent, Integer> mpLeft) {
         Board board = Mall.getInstance().getBoard();
         
-        board.modifyForceField(a, -1);
+        // XXX: mało wydajne, ale przynajmniej działa skutecznie
+        board.computeForceField();
+        
+        // XXX: tymczasowo okomentowane
+//        board.modifyForceField(a, -1);
 
         Point hpt = getHighestPotentialTile(board, a.getPosition());
 
         // Brak możliwości ruchu - agent "drepcze" w miejscu.
         if (hpt == null) {
-            a.setDirection(a.getDirection().rotateRight());
+            a.setDirection(a.getDirection().nextCW());
             return;
         }
 
@@ -75,7 +79,8 @@ public class SocialForce implements MovementAlgorithm {
 
         a.incrementFieldsMoved();
 
-        board.modifyForceField(a, 1);
+        // XXX: tymczasowo okomentowane
+//        board.modifyForceField(a, 1);
     }
 
 
@@ -187,8 +192,8 @@ public class SocialForce implements MovementAlgorithm {
         // Punkty dopuszczalne ze względu na kierunek do celu.
         List<Point> targetPoints = new ArrayList<Point>();
         MyPoint front = p.add(d.getVec());
-        MyPoint left = p.add(d.rotateLeft().getVec());
-        MyPoint right = p.add(d.rotateRight().getVec());
+        MyPoint left = p.add(d.nextCCW().getVec());
+        MyPoint right = p.add(d.nextCW().getVec());
 
         if (testCell(b, left))
             targetPoints.add(left);
@@ -200,8 +205,8 @@ public class SocialForce implements MovementAlgorithm {
         // Punkty dopuszczalne ze względu na aktualny kierunek ruchu.
         List<Point> agentPoints = new ArrayList<Point>();
         front = p.add(a.getDirection().getVec());
-        left = p.add(a.getDirection().rotateLeft().getVec());
-        right = p.add(a.getDirection().rotateRight().getVec());
+        left = p.add(a.getDirection().nextCCW().getVec());
+        right = p.add(a.getDirection().nextCW().getVec());
 
         if (testCell(b, left))
             agentPoints.add(left);
@@ -286,8 +291,8 @@ public class SocialForce implements MovementAlgorithm {
         List<Point> l = new ArrayList<Point>();
 
         MyPoint[] points = new MyPoint[] {
-                curr.add(walk.getDirection().getVec()).add(walk.getDirection().rotateLeft().getVec()),
-                curr.add(walk.getDirection().getVec()).add(walk.getDirection().rotateRight().getVec()) };
+                curr.add(walk.getDirection().getVec()).add(walk.getDirection().nextCCW().getVec()),
+                curr.add(walk.getDirection().getVec()).add(walk.getDirection().nextCW().getVec()) };
 
         for (Point p : points) {
             if (board.isOnBoard(p) && board.getCell(p).isPassable()) {
@@ -310,8 +315,8 @@ public class SocialForce implements MovementAlgorithm {
 
         // (5) : cross-diagonal
         MyPoint frontTile = curr.add(walk.getDirection().getVec());
-        points = new MyPoint[] { frontTile.add(walk.getDirection().rotateLeft().getVec()),
-                frontTile.add(walk.getDirection().rotateRight().getVec()) };
+        points = new MyPoint[] { frontTile.add(walk.getDirection().nextCCW().getVec()),
+                frontTile.add(walk.getDirection().nextCW().getVec()) };
 
         for (MyPoint p : points) {
             if (board.isOnBoard(p) && board.getCell(p).isPassable()) {

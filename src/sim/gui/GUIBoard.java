@@ -21,6 +21,8 @@ import java.util.Observer;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
+import sim.control.GuiState;
+import sim.control.GuiState.DrawTargetLinePolicy;
 import sim.gui.helpers.Helpers;
 import sim.model.Agent;
 import sim.model.Board;
@@ -36,8 +38,7 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
 
     private int resizeDelta = 1; // Used for dynamic resizing.
 
-    boolean showForceField = false;
-    boolean showTargetLines = false;
+    boolean showForceField = true;
 
 
     public GUIBoard(Board board) {
@@ -53,16 +54,6 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
 
     public void setShowForceField(boolean showForceField) {
         this.showForceField = showForceField;
-    }
-
-
-    public boolean isShowTargetLines() {
-        return showTargetLines;
-    }
-
-
-    public void setShowTargetLines(boolean showTargetLines) {
-        this.showTargetLines = showTargetLines;
     }
 
 
@@ -134,28 +125,35 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
                 if (a != null) {
                     drawAgent(g, a, x, y);
 
-                    if (a.getTargetCount() > 0)
-                        targets.put(new Point(x, y), a.getTarget());
+                    if (GuiState.targetLinePolicy != DrawTargetLinePolicy.NONE) {
+                        if (a.getTargetCount() > 0) {
+                            if (GuiState.targetLinePolicy == DrawTargetLinePolicy.ALL
+                                    || GuiState.targetLinePolicy == DrawTargetLinePolicy.SELECTION
+                                    && a == GuiState.getSelectedAgent()) {
+                                targets.put(new Point(x, y), a.getTarget());
+                            }
+                        }
+                    }
                 }
             }
         }
 
         // Draw target lines.
-        if (showTargetLines) {
-            g.setColor(Color.CYAN);
-            Graphics2D g2d = (Graphics2D) g;
-            Stroke s = g2d.getStroke();
-            g2d.setStroke(new BasicStroke(3f));  // set stroke width of 10
-            for (Map.Entry<Point, Point> entry : targets.entrySet()) {
-                int x1 = entry.getKey().x * cellSize + cellSize / 2;
-                int y1 = entry.getKey().y * cellSize + cellSize / 2;
-                int x2 = entry.getValue().x * cellSize + cellSize / 2;
-                int y2 = entry.getValue().y * cellSize + cellSize / 2;
+        final float TARGET_VECTOR_WIDTH = 3f;
+        g.setColor(Color.CYAN);
+        Graphics2D g2d = (Graphics2D) g;
+        Stroke s = g2d.getStroke();
+        g2d.setStroke(new BasicStroke(TARGET_VECTOR_WIDTH));  // set stroke
+                                                             // width of 10
+        for (Map.Entry<Point, Point> entry : targets.entrySet()) {
+            int x1 = entry.getKey().x * cellSize + cellSize / 2;
+            int y1 = entry.getKey().y * cellSize + cellSize / 2;
+            int x2 = entry.getValue().x * cellSize + cellSize / 2;
+            int y2 = entry.getValue().y * cellSize + cellSize / 2;
 
-                g.drawLine(x1, y1, x2, y2);
-            }
-            g2d.setStroke(s);
+            g.drawLine(x1, y1, x2, y2);
         }
+        g2d.setStroke(s);
     }
 
 
@@ -171,12 +169,11 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
         // Ujemny współczynnik powstaje np. gdy ludzie długo chodzą w kółko.
         try {
             return (coef > 0) ? new Color(coef, 255 - coef, 0) : new Color(-coef, 0, 255 + coef);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             // FIXME Bugs like crazy.
             System.out.println("Niewłaściwe wartości kolorów: ");
-            System.out.println(String.format("%d, %d, %d", coef, 255-coef, 0));
-            System.out.println(String.format("%d, %d, %d", -coef, 0, 255+coef));
+            System.out.println(String.format("%d, %d, %d", coef, 255 - coef, 0));
+            System.out.println(String.format("%d, %d, %d", -coef, 0, 255 + coef));
         }
         return Color.MAGENTA;
     }
@@ -189,7 +186,8 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
         assert a != null;
         assert g != null;
 
-        g.setColor(Color.BLUE);
+        Color torsoColor = (a == GuiState.getSelectedAgent()) ? Color.MAGENTA : Color.BLUE;
+        g.setColor(torsoColor);
 
         int agentH = 0;
         int agentW = 0;
@@ -223,11 +221,11 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
 
 
     public void mouseClicked(MouseEvent e) {
-        /*
-         * int x = e.getX() / size; int y = e.getY() / size; if ((x <
-         * points.length) && (x > 0) && (y < points[x].length) && (y > 0)) {
-         * points[x][y].clicked(); this.repaint(); }
-         */
+        int x = e.getX() / cellSize;
+        int y = e.getY() / cellSize;
+
+        Agent a = board.getCell(new Point(x, y)).getAgent();
+        GuiState.setSelectedAgent(a);
     }
 
 
@@ -287,11 +285,10 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
             Dimension d = new Dimension(board.getDimension().width * cellSize + 1, board.getDimension().height
                     * cellSize + 1);
 
-            this.setSize(d);
+            setPreferredSize(d);
 
             repaint();
-
-            // FIXME Adjust underlaying ScrollPane accordingly.
+            revalidate();
         }
     }
 

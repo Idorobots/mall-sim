@@ -47,6 +47,7 @@ public class MallSim {
                 //runResourceTest();
                 ResourceManager resMgr = new ResourceManager();
                 resMgr.loadShoppingMall("./data/malls/simple.bmp");
+//                resMgr.loadShoppingMall("./data/malls/small.bmp");
                 runAlgoTest();
             }
         });
@@ -60,7 +61,8 @@ public class MallSim {
         ResourceManager resMgr = new ResourceManager();
         //resMgr.loadShoppingMall("./data/malls/huge.bmp");
         //resMgr.loadShoppingMall("./data/malls/1floor.bmp");
-        resMgr.loadShoppingMall("./data/malls/simple.bmp");
+//        resMgr.loadShoppingMall("./data/malls/simple.bmp");
+        resMgr.loadShoppingMall("./data/malls/small.bmp");
         MallFrame frame = new MallFrame(Mall.getInstance());
         frame.setVisible(true);
     }
@@ -210,7 +212,7 @@ public class MallSim {
         public void run() {
             final int LOOPS = 10;
             final int STEPS = 500;
-            final int DELAY = 10;
+            final int DELAY = 1000;
 
             // Liczba poprawnie zakończonych iteracji (wszystkie cele
             // osiągnięte).
@@ -218,6 +220,8 @@ public class MallSim {
 
             int nTotalAgents = 0;
             int nAgentSuccesses = 0;
+            
+            System.out.println(board.countAgents());
 
             loop: for (int lp = 0; lp < LOOPS; lp++) {
 
@@ -255,12 +259,6 @@ public class MallSim {
                 }
 
                 nAgentSuccesses += targetsReached;
-
-                // try {
-                // // XXX: debug
-                // System.in.read();
-                // } catch (IOException e) {
-                // }
             }
 
             System.out.println(String.format("Sukcesy pętli:  \t %d / %d\t (%d%%)", nSuccesses, LOOPS, nSuccesses * 100
@@ -385,7 +383,7 @@ public class MallSim {
          if(board.countAgents() == 0) {
              Misc.setAgent(new Agent(), new Point(2, 2));
          }
-
+         
          for (int y = 0; y < board.getDimension().height; y++) {
              for (int x = 0; x < board.getDimension().width; x++) {
                  Point p = new Point(x, y);
@@ -396,10 +394,12 @@ public class MallSim {
                      tactical.innitializeTargets(a);
                  }
 
-                 board.getCell(p).setAlgorithm(SocialForce.getInstance());
-                 // board.getCell(p).setAlgorithm(Ped4.getInstance());
+//                 board.getCell(p).setAlgorithm(SocialForce.getInstance());
+                  board.getCell(p).setAlgorithm(Ped4.getInstance());
              }
          }
+         
+         
      }
 
 
