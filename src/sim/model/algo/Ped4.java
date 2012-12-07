@@ -198,6 +198,19 @@ public final class Ped4 implements MovementAlgorithm {
                 Misc.swapAgent(p, dest);
                 return;
             }
+            
+            if (gapLeft != null && gapLeft.gap > 0 && gapLeft.direction == Orientation.SAME) {
+                lanes.add(pleft);
+            }
+            if (gapRight != null && gapRight.gap > 0 && gapRight.direction == Orientation.SAME) {
+                lanes.add(pright);
+            }
+            
+            if (!lanes.isEmpty()) {
+                Point dest = lanes.get(r.nextInt(lanes.size()));
+                Misc.swapAgent(p, dest);
+                return;
+            }
         }
 
         // 2b-ii, 2b-iii
