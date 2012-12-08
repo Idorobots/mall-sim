@@ -14,6 +14,7 @@ import java.util.WeakHashMap;
 
 import javax.swing.UIManager;
 
+import sim.control.GuiState;
 import sim.control.ResourceManager;
 import sim.gui.MallFrame;
 import sim.model.Agent;
@@ -212,7 +213,6 @@ public class MallSim {
         public void run() {
             final int LOOPS = 10;
             final int STEPS = 500;
-            final int DELAY = 500;
 
             // Liczba poprawnie zakończonych iteracji (wszystkie cele
             // osiągnięte).
@@ -247,7 +247,7 @@ public class MallSim {
                     }
 
                     try {
-                        Thread.sleep(DELAY);
+                        Thread.sleep(GuiState.animationSpeed);
                     } catch (InterruptedException e) {
                     }
 

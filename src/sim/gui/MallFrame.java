@@ -34,6 +34,10 @@ import java.awt.GridLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import javax.swing.JSlider;
+import javax.swing.border.EtchedBorder;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 @SuppressWarnings("serial")
 public class MallFrame extends JFrame {
@@ -95,9 +99,9 @@ public class MallFrame extends JFrame {
         tabbedPane.addTab("Display", null, tabDisplay, null);
         GridBagLayout gbl_tabDisplay = new GridBagLayout();
         gbl_tabDisplay.columnWidths = new int[] { 306, 0 };
-        gbl_tabDisplay.rowHeights = new int[] { 0, 205, 0 };
-        gbl_tabDisplay.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
-        gbl_tabDisplay.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
+        gbl_tabDisplay.rowHeights = new int[] {0, 0, 0, 0, 0};
+        gbl_tabDisplay.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
+        gbl_tabDisplay.rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
         tabDisplay.setLayout(gbl_tabDisplay);
 
         JCheckBox chckbxShowSocialForce = new JCheckBox("show social force field");
@@ -121,6 +125,7 @@ public class MallFrame extends JFrame {
         targetVectorsPanel.setBorder(new TitledBorder(null, "Target vectors", TitledBorder.LEADING, TitledBorder.TOP,
                 null, null));
         GridBagConstraints gbc_targetVectorsPanel = new GridBagConstraints();
+        gbc_targetVectorsPanel.insets = new Insets(0, 0, 5, 0);
         gbc_targetVectorsPanel.fill = GridBagConstraints.BOTH;
         gbc_targetVectorsPanel.gridx = 0;
         gbc_targetVectorsPanel.gridy = 1;
@@ -151,6 +156,30 @@ public class MallFrame extends JFrame {
         targetLinesGroup.add(rdbtnSelection);
         targetLinesGroup.add(rdbtnSelectionRoute);
         targetLinesGroup.add(rdbtnAll);
+        
+        JPanel speedPanel = new JPanel();
+        speedPanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Animation speed [ms/f]", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        GridBagConstraints gbc_speedPanel = new GridBagConstraints();
+        gbc_speedPanel.insets = new Insets(0, 0, 5, 0);
+        gbc_speedPanel.fill = GridBagConstraints.BOTH;
+        gbc_speedPanel.gridx = 0;
+        gbc_speedPanel.gridy = 2;
+        tabDisplay.add(speedPanel, gbc_speedPanel);
+        
+        JSlider sldSimulationSpeed = new JSlider();
+        sldSimulationSpeed.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                GuiState.animationSpeed = ((JSlider) e.getSource()).getValue();
+            }
+        });
+        sldSimulationSpeed.setMajorTickSpacing(150);
+        sldSimulationSpeed.setValue(GuiState.animationSpeed);
+        sldSimulationSpeed.setPaintLabels(true);
+        sldSimulationSpeed.setPaintTicks(true);
+        sldSimulationSpeed.setMaximum(1000);
+        sldSimulationSpeed.setMinimum(50);
+        speedPanel.add(sldSimulationSpeed);
+        sldSimulationSpeed.setName("Simulation speed");
 
         switch (GuiState.targetLinePolicy) {
         case NONE:
