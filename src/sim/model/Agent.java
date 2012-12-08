@@ -118,6 +118,10 @@ public class Agent {
         return route.get(0);
     }
 
+    public List<Point> getRoute() {
+        return route;
+    }
+
 
     public void addTarget(Point target) {
         route.add(target);

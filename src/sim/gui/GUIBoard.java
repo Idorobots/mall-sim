@@ -43,6 +43,8 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
 
     public GUIBoard(Board board) {
         this.board = board;
+        setDoubleBuffered(true);
+
         initialize();
     }
 
@@ -78,6 +80,11 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
 
         g.setColor(Color.GRAY);
         drawNetting(g, cellSize);
+
+        // XXX
+        Agent a = GuiState.getSelectedAgent();
+        if(a != null)
+          drawRoute(g, a);
     }
 
 
@@ -178,6 +185,29 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
         return Color.MAGENTA;
     }
 
+
+    private void drawRoute(Graphics g, Agent a) {
+        final float TARGET_VECTOR_WIDTH = 3f;
+        g.setColor(Color.CYAN);
+        Graphics2D g2d = (Graphics2D) g;
+        Stroke s = g2d.getStroke();
+        g2d.setStroke(new BasicStroke(TARGET_VECTOR_WIDTH));
+
+        Point last = a.getPosition();
+
+        for(Point p : a.getRoute()) {
+            int x1 = last.x * cellSize + cellSize / 2;
+            int y1 = last.y * cellSize + cellSize / 2;
+            int x2 = p.x * cellSize + cellSize / 2;
+            int y2 = p.y * cellSize + cellSize / 2;
+
+            g.drawLine(x1, y1, x2, y2);
+
+            last = p;
+        }
+
+        g2d.setStroke(s);
+    }
 
     // Convinience method for the soon to be lengthy Agent drawing code.
     private void drawAgent(Graphics g, Agent a, int x, int y) {

@@ -19,12 +19,14 @@ import sim.model.Board;
 import sim.model.Cell;
 
 public class Tactical {
+    public static final int HEURISTIC_FACTOR = 3;
+    public static final int SCORE_FACTOR = 100;
     public static final int MAX_TARGETS = 15;
     public static final int MIN_TARGETS = 1;
-    public static final int MIDPOINT_INTERVAL = 10;
-    public static final int MIDPOINT_THRESHOLD = 25;
-    public static final int SEGMENT_SIZE = 20;
+    public static final int MIDPOINT_THRESHOLD = 75;
+    public static final int SEGMENT_SIZE = 10;
 
+    private boolean useMoore = true;
     private Random r;
     private Board board;
 
@@ -34,6 +36,10 @@ public class Tactical {
         r = new Random();
     }
 
+
+    public void useMooreNeighbourhood(boolean yn) {
+        useMoore = yn;
+    }
 
     public void innitializeTargets(Agent agent) {
         Logger.log(String.format("Initializing targets for %s...", agent));
@@ -75,9 +81,8 @@ public class Tactical {
             }
         }
 
-        // Uses the stability of Collections.sort to our advantage.
-        Collections.sort(targets, new PointComparator(true));
-        Collections.sort(targets, new PointComparator(false));
+        // Sort by distance to the Agent.
+        //Collections.sort(targets, new PointComparator(agent.getPosition()));
 
         return targets;
     }
@@ -105,7 +110,16 @@ public class Tactical {
                 break;
             }
 
-            for(Point neighbour : getNeighbours(current.point)) {
+            List<Point> neighbours = null;
+
+            if(useMoore) {
+                neighbours = getNeighboursMoore(current.point);
+            }
+            else {
+                neighbours = getNeighboursVonNeumann(current.point);
+            }
+
+            for(Point neighbour : neighbours) {
                 node.point = neighbour;
 
                 if(closed.contains(node)) {
@@ -146,8 +160,19 @@ public class Tactical {
             current = current.prev;
         }
 
-        int size = allpoints.size();
-        if(allpoints.size() > 1.5 * SEGMENT_SIZE) {
+        return selectMidpoints(allpoints);
+    }
+
+
+    private List<Point> selectMidpoints(List<Point> points) {
+        return points;
+    }
+
+
+    private List<Point> selectMidpoints2(List<Point> points) {
+        int size = points.size();
+
+        if(points.size() > 1.5 * SEGMENT_SIZE) {
             List<Point> midpoints = new ArrayList<Point>();
 
             int numSegments = size / SEGMENT_SIZE;
@@ -155,40 +180,32 @@ public class Tactical {
             for(int i = 0; i < numSegments; ++i) {
                 int s = i * SEGMENT_SIZE;
                 int e = Math.min((i+1) * SEGMENT_SIZE - 1, size-1);
-                int m = (i * SEGMENT_SIZE + e) / 2;
 
-                midpoints.addAll(selectMidpoints(allpoints, s, m, e));
+                midpoints.addAll(selectMidpoints(points, s, e));
             }
 
             return midpoints;
         }
         else {
-            return allpoints;
+            return points;
         }
     }
 
-    private List<Point> selectMidpoints(List<Point> points, int start, int middle, int end) {
-        // XXX
-        // System.out.println(String.format("%d: %d, %d, %d", points.size(), start, middle, end));
 
+    private List<Point> selectMidpoints(List<Point> points, int start, int end) {
         List<Point> result = new ArrayList<Point>();
 
-        if(end - start < 4) {
+        if(end - start < 3) {
             result.add(points.get(start));
-            result.add(points.get(middle));
-            result.add(points.get(middle));
+            result.add(points.get(end));
         }
         else {
-            int dot = dotProduct(points.get(start), points.get(middle),
-                                 points.get(middle), points.get(end));
+            int middle = (start + end) / 2;
+            int dot = dotProduct(points.get(start), points.get(middle), points.get(end));
 
             if(Math.abs(dot) < MIDPOINT_THRESHOLD) {
-
-                int m1 = (start + middle) / 2;
-                int m2 = (middle + end) / 2;
-
-                List<Point> a = selectMidpoints(points, start, m1, middle-1);
-                List<Point> b = selectMidpoints(points, middle, m2, end);
+                List<Point> a = selectMidpoints(points, start, middle-1);
+                List<Point> b = selectMidpoints(points, middle, end);
 
                 result.addAll(a);
                 result.addAll(b);
@@ -202,28 +219,62 @@ public class Tactical {
         return result;
     }
 
-    private int dotProduct(Point a, Point b, Point c, Point d) {
+
+    private int dotProduct(Point a, Point b, Point c) {
         int Ax = (b.x - a.x);
         int Ay = (b.y - a.y);
 
-        int Bx = (d.x - c.x);
-        int By = (d.y - c.y);
+        int Bx = (c.x - b.x);
+        int By = (c.y - b.y);
 
         int dot = Ax * Bx + Ay * By;
-
-        // XXX
-        // System.out.println(dot);
 
         return dot;
     }
 
+
     private int heuristicCostEstimate(Point p, Point target) {
-        // TODO Take atractors into account.
-        return (int) p.distanceSq(target);
+        int score = (int) (SCORE_FACTOR * HEURISTIC_FACTOR *  p.distance(target));
+
+        return score;
     }
 
 
-    private List<Point> getNeighbours(Point point) {
+    private List<Point> getNeighboursVonNeumann(Point point) {
+        int x = point.x;
+        int y = point.y;
+
+        Dimension dim = board.getDimension();
+        int w = dim.width;
+        int h = dim.height;
+
+        Point p = new Point(); // For lookups.
+
+        ArrayList<Point> neighbours = new ArrayList<Point>();
+
+        for(int j = -1; j <= 1 ; ++j) {
+            for(int i = -1; i <= 1 ; ++i) {
+                if(Math.abs(i) == Math.abs(j)) continue;
+
+                p.x = x+i;
+                p.y = y+j;
+
+                if(p.x < 0) continue;
+                if(p.x >= w) continue;
+                if(p.y < 0) continue;
+                if(p.y >= h) continue;
+
+                if(board.getCell(p) != Cell.WALL) {
+                    neighbours.add(new Point(p.x, p.y));
+                }
+            }
+        }
+
+        return neighbours;
+    }
+
+
+    private List<Point> getNeighboursMoore(Point point) {
         int x = point.x;
         int y = point.y;
 
@@ -256,7 +307,7 @@ public class Tactical {
 
     private int getScoreDelta(Point a, Point b) {
         // TODO Take attractors into account.
-        return 1;
+        return SCORE_FACTOR;
     }
 
 
@@ -319,22 +370,19 @@ public class Tactical {
     }
 
     private static class PointComparator implements Comparator {
-        private boolean xy = true;
+        private Point p = null;
 
-        public PointComparator(boolean xy) {
-            this.xy = xy;
+        public PointComparator(Point p) {
+            this.p = p;
         }
 
         public int compare(Object a, Object b) {
             Point pa = (Point) a;
             Point pb = (Point) b;
 
-            if(xy) {
-                return pa.x - pb.x;
-            }
-            else {
-                return pa.y - pb.y;
-            }
+            if(pa.distance(pb) < 20) return 0;
+
+            return (int) (p.distanceSq(pa) - p.distanceSq(pb));
         }
 
         public boolean equals(Object o) {

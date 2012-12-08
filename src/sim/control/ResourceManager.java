@@ -15,13 +15,13 @@ import sim.model.Board;
 import sim.model.Cell;
 import sim.model.Agent;
 import sim.model.algo.Ped4;
+import sim.model.algo.SocialForce;
 import sim.model.helpers.Misc;
 
 public class ResourceManager {
 
     /**
      * Loads shopping mall data from an image file.
-     * TODO: Needs some decent logging.
      */
     public void loadShoppingMall(String filename) {
         Logger.log("Loading mall: " + filename);
@@ -49,18 +49,16 @@ public class ResourceManager {
                 for(int j = 0; j < w; ++j) {
                     img.getPixel(j, i, pixel);
 
-                    if(pixel[0] == 0) {
-                        grid[i][j] = Cell.WALL;
+                    switch(pixel[0]) {
+                        case 0:
+                            grid[i][j] = Cell.WALL;
+                        break;
+                        case 127:
+                            grid[i][j] = new Cell(Cell.Type.PASSABLE, Ped4.getInstance());
+                        break;
+                        default:
+                            grid[i][j] = new Cell(Cell.Type.PASSABLE, SocialForce.getInstance());
                     }
-                    else {
-                        grid[i][j] = new Cell(Cell.Type.PASSABLE, Ped4.getInstance());
-                    }
-
-                    // TODO Dispatch on the pixel value:
-                    // TODO Holders
-                    // TODO Queues
-                    // TODO Attractors
-
                 }
             }
         }
@@ -89,7 +87,7 @@ public class ResourceManager {
     private void randomize(Board b, int nAgents) {
         Random r = new Random();
         Dimension d = b.getDimension();
-        
+
         for (int i = 0; i < nAgents; i++) {
             Point p = new Point(r.nextInt(d.width), r.nextInt(d.height));
 

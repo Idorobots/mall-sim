@@ -46,7 +46,7 @@ public class MallSim {
 
                 //runResourceTest();
                 ResourceManager resMgr = new ResourceManager();
-                resMgr.loadShoppingMall("./data/malls/simple.bmp");
+                resMgr.loadShoppingMall("./data/malls/simple2.bmp");
 //                resMgr.loadShoppingMall("./data/malls/small.bmp");
                 runAlgoTest();
             }
@@ -115,7 +115,7 @@ public class MallSim {
                             if (a.getTargetCount() > 0)
                                 a.setInitialDistanceToTarget(curr.distanceSq(a.getTarget()));
                         } else {
-                            final double maxDistanceFromTarget = 3;
+                            final double maxDistanceFromTarget = 2;
                             double dist = a.getTarget().distance(curr);
                             if (dist < maxDistanceFromTarget) {
                                 // TODO: metoda probabilistyczna
@@ -212,7 +212,7 @@ public class MallSim {
         public void run() {
             final int LOOPS = 10;
             final int STEPS = 500;
-            final int DELAY = 1000;
+            final int DELAY = 500;
 
             // Liczba poprawnie zakończonych iteracji (wszystkie cele
             // osiągnięte).
@@ -220,7 +220,7 @@ public class MallSim {
 
             int nTotalAgents = 0;
             int nAgentSuccesses = 0;
-            
+
             System.out.println(board.countAgents());
 
             loop: for (int lp = 0; lp < LOOPS; lp++) {
@@ -379,11 +379,12 @@ public class MallSim {
 
      private static void testTactical(Board board) {
          Tactical tactical = new Tactical(board);
+         //tactical.useMooreNeighbourhood(false);
 
          if(board.countAgents() == 0) {
              Misc.setAgent(new Agent(), new Point(2, 2));
          }
-         
+
          for (int y = 0; y < board.getDimension().height; y++) {
              for (int x = 0; x < board.getDimension().width; x++) {
                  Point p = new Point(x, y);
@@ -393,13 +394,8 @@ public class MallSim {
                      a.clearTargets();
                      tactical.innitializeTargets(a);
                  }
-
-//                 board.getCell(p).setAlgorithm(SocialForce.getInstance());
-                  board.getCell(p).setAlgorithm(Ped4.getInstance());
              }
          }
-         
-         
      }
 
 

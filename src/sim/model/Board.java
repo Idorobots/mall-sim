@@ -42,7 +42,7 @@ public class Board {
 
     public Cell getCell(Point p) {
         assert isOnBoard(p);
-        
+
         return grid[p.y][p.x];
     }
 
@@ -97,7 +97,7 @@ public class Board {
             MyPoint p = a.getPosition().add(v);
             if (isOnBoard(p)) {
                 getCell(p).changeForce(entry.getValue() * sign);
-                
+
                 if (getCell(p).getForceValue() > 0) {
                     System.err.println(p.toString() + " : " + getCell(p).getForceValue());
                     throw new AssertionError();
