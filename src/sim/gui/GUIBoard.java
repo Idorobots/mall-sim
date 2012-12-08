@@ -331,4 +331,11 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
         repaint();
     }
 
+
+    
+    public void setBoard(Board board) {
+        this.board = board;
+    }
+
+    
 }

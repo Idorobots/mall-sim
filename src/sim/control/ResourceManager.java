@@ -10,6 +10,7 @@ import java.awt.image.Raster;
 import java.awt.image.BufferedImage;
 
 import sim.util.Logger;
+import sim.model.Agent.MovementBehavior;
 import sim.model.Mall;
 import sim.model.Board;
 import sim.model.Cell;
@@ -81,7 +82,7 @@ public class ResourceManager {
 
     // TODO
     public Agent loadAgent(String filename) {
-        return new Agent();
+        return new Agent(MovementBehavior.DYNAMIC);
     }
 
     private void randomize(Board b, int nAgents) {
@@ -92,7 +93,7 @@ public class ResourceManager {
             Point p = new Point(r.nextInt(d.width), r.nextInt(d.height));
 
             if(b.getCell(p).isPassable()) {
-                Misc.setAgent(new Agent(), p);
+                Misc.setAgent(new Agent(MovementBehavior.DYNAMIC), p);
             }
         }
 

@@ -62,9 +62,6 @@ public class SocialForce implements MovementAlgorithm {
         // XXX: mało wydajne, ale przynajmniej działa skutecznie
         board.computeForceField();
         
-        // XXX: tymczasowo okomentowane
-//        board.modifyForceField(a, -1);
-
         Point hpt = getHighestPotentialTile(board, a.getPosition());
 
         // Brak możliwości ruchu - agent "drepcze" w miejscu.
@@ -78,9 +75,6 @@ public class SocialForce implements MovementAlgorithm {
         adjustDirection(a, p);
 
         a.incrementFieldsMoved();
-
-        // XXX: tymczasowo okomentowane
-//        board.modifyForceField(a, 1);
     }
 
 

@@ -11,8 +11,12 @@ public class Misc {
     public static void setAgent(Agent a, Point p) {
         Mall.getInstance().getBoard().getCell(p).setAgent(a);
 
-        if (a != null)
+        if (a == null) {
+//            Mall.getInstance().getBoard().modifyForceField(a, -1);
+        } else {
             a.setPosition(p);
+//            Mall.getInstance().getBoard().modifyForceField(a, 1);
+        }
     }
 
 

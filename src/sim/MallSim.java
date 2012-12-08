@@ -3,8 +3,6 @@ package sim;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Point;
-import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Observable;
@@ -12,12 +10,14 @@ import java.util.Random;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+import javax.swing.JFrame;
 import javax.swing.UIManager;
 
 import sim.control.GuiState;
 import sim.control.ResourceManager;
 import sim.gui.MallFrame;
 import sim.model.Agent;
+import sim.model.Agent.MovementBehavior;
 import sim.model.Board;
 import sim.model.Cell;
 import sim.model.Mall;
@@ -30,6 +30,8 @@ import sim.model.helpers.Misc;
 public class MallSim {
 
     static Random r = new Random();
+    static Thread simThread = null;
+    static MallFrame frame = null;
 
 
     /**
@@ -49,6 +51,12 @@ public class MallSim {
                 ResourceManager resMgr = new ResourceManager();
                 resMgr.loadShoppingMall("./data/malls/simple2.bmp");
 //                resMgr.loadShoppingMall("./data/malls/small.bmp");
+
+                Mall mall = Mall.getInstance();
+                if (frame == null)
+                    frame = new MallFrame(mall);
+                frame.setVisible(true);
+                
                 runAlgoTest();
             }
         });
@@ -72,15 +80,13 @@ public class MallSim {
     /**
      * Testuje działanie algotymów ruchu.
      */
-    private static void runAlgoTest() {
-        Mall mall = Mall.getInstance();
-        MallFrame frame = new MallFrame(mall);
-        frame.setVisible(true);
-
-        SimLoop loop = new SimLoop(mall);
+    public static void runAlgoTest() {
+        SimLoop loop = new SimLoop(Mall.getInstance());
         loop.addObserver(frame.getBoard());
-        Thread t = new Thread(loop);
-        t.start();
+        if (simThread != null)
+            simThread.stop();
+        simThread = new Thread(loop);
+        simThread.start();
     }
 
     private static class SimLoop extends Observable implements Runnable {
@@ -176,11 +182,13 @@ public class MallSim {
 
 
         private void moveAgents(Map<Agent, Integer> speedPointsLeft) {
+            Point p = new Point();
+            Set<Agent> moved = new HashSet<Agent>();
             for (int step = 0; step < Agent.V_MAX; step++) {
-                Set<Agent> moved = new HashSet<Agent>();
+                moved.clear();
                 for (int y = 0; y < board.getDimension().height; y++) {
                     for (int x = 0; x < board.getDimension().width; x++) {
-                        Point p = new Point(x, y);
+                        p.setLocation(x, y);
                         Agent a = board.getCell(p).getAgent();
 
                         if (a == null || moved.contains(a))
@@ -222,6 +230,8 @@ public class MallSim {
             int nAgentSuccesses = 0;
 
             System.out.println(board.countAgents());
+            
+            long msecs = 0;
 
             loop: for (int lp = 0; lp < LOOPS; lp++) {
 
@@ -238,6 +248,7 @@ public class MallSim {
                 int targetsReached = 0;
 
                 for (int i = 0; i < STEPS; i++) {
+                    msecs = System.currentTimeMillis();
                     targetsReached = computeTargetReached();
 
                     if (targetsReached == nAgentsBegin) {
@@ -247,15 +258,22 @@ public class MallSim {
                     }
 
                     try {
+                        System.out.println(GuiState.animationSpeed);
                         Thread.sleep(GuiState.animationSpeed);
                     } catch (InterruptedException e) {
                     }
 
+                    System.out.println(String.format("dt[REACH] = %d", System.currentTimeMillis() - msecs));
+                    msecs = System.currentTimeMillis();
                     prepareAgents();
+                    System.out.println(String.format("dt[PREPARE] = %d", System.currentTimeMillis() - msecs));
+                    msecs = System.currentTimeMillis();
                     Map<Agent, Integer> speedPointsLeft = computeMovementPointsLeft();
                     moveAgents(speedPointsLeft);
 
                     assert (nAgentsBegin == board.countAgents());
+                    
+                    System.out.println(String.format("dt[MOVED] = %d", System.currentTimeMillis() - msecs));
                 }
 
                 nAgentSuccesses += targetsReached;
@@ -292,17 +310,17 @@ public class MallSim {
         int mode = TARGET_BEHIND;
 
         if (mode == TARGET_BEHIND) {
-            Agent a1 = new Agent();
+            Agent a1 = new Agent(MovementBehavior.DYNAMIC);
             a1.addTarget(new Point(3, 6));
             a1.setInitialDistanceToTarget(new Point(5, 6).distance(new Point(3, 6)));
             Misc.setAgent(a1, new Point(5, 6));
         } else if (mode == WALK_AROUND) {
-            Agent a1 = new Agent();
+            Agent a1 = new Agent(MovementBehavior.DYNAMIC);
             a1.addTarget(new Point(12, 3));
             a1.setInitialDistanceToTarget(new Point(2, 6).distance(new Point(12, 3)));
             Misc.setAgent(a1, new Point(2, 6));
 
-            Agent a2 = new Agent();
+            Agent a2 = new Agent(MovementBehavior.DYNAMIC);
             a2.addTarget(new Point(7, 5));
             a2.setInitialDistanceToTarget(new Point(7, 5).distance(new Point(7, 5)));
             Misc.setAgent(a2, new Point(7, 5));
@@ -319,7 +337,7 @@ public class MallSim {
             Cell c = b.getCell(p);
 
             if (c != Cell.WALL) {
-                Agent a = new Agent();
+                Agent a = new Agent(MovementBehavior.DYNAMIC);
                 a.addTarget(new Point(r.nextInt(d.width), r.nextInt(d.height)));
                 a.setInitialDistanceToTarget(p.distance(a.getTarget()));
                 a.setDirection(Direction.values()[r.nextInt(Direction.values().length)]);
@@ -352,7 +370,7 @@ public class MallSim {
                 ;
         // b.setCell(new Point(x, y), Cell.WALL);
 
-        Agent a = new Agent();
+        Agent a = new Agent(MovementBehavior.DYNAMIC);
         a.addTarget(new Point(8, 5));
         a.setInitialDistanceToTarget(new Point(0, 0).distance(new Point(8, 5)));
         a.addTarget(new Point(4, 1));
@@ -368,7 +386,7 @@ public class MallSim {
             Point p = new Point(r.nextInt(d.width), r.nextInt(d.height));
 
             if (b.getCell(p) != Cell.WALL) {
-                Agent a = new Agent();
+                Agent a = new Agent(MovementBehavior.DYNAMIC);
                 a.addTarget(new Point(r.nextInt(d.width), r.nextInt(d.height)));
                 a.setInitialDistanceToTarget(p.distance(a.getTarget()));
                 a.setDirection(Direction.values()[r.nextInt(Direction.values().length)]);
@@ -382,7 +400,7 @@ public class MallSim {
          //tactical.useMooreNeighbourhood(false);
 
          if(board.countAgents() == 0) {
-             Misc.setAgent(new Agent(), new Point(2, 2));
+             Misc.setAgent(new Agent(MovementBehavior.DYNAMIC), new Point(2, 2));
          }
 
          for (int y = 0; y < board.getDimension().height; y++) {
@@ -398,5 +416,7 @@ public class MallSim {
          }
      }
 
-
+     public static Thread getThread() {
+         return simThread;
+     }
 }

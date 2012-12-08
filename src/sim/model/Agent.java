@@ -1,16 +1,43 @@
 package sim.model;
 
 import java.awt.Point;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import sim.model.helpers.Direction;
 import sim.model.helpers.MyPoint;
 import sim.model.helpers.Vec;
 
 public class Agent {
+
+    /**
+     * Parametry agenta w odniesieniu do modelu ruchu (prędkość, zwinność itp.)
+     * 
+     * @author Pawel Kleczek
+     * 
+     */
+    public static enum MovementBehavior {
+        DYNAMIC("dynamic"), NORMAL("normal"), PENSIONER("pensioner");
+
+        private final String filename;
+
+
+        private MovementBehavior(String filename) {
+            this.filename = filename;
+        }
+
+
+        public String getFilename() {
+            return filename;
+        }
+
+    }
 
     /**
      * The "absolute" maximum speed (number of tiles per second) a pedestrian
@@ -21,6 +48,11 @@ public class Agent {
     public static final int FORCE_VALUE_MAX = -5;
 
     private int vMax;
+
+    /**
+     * Prawdopodobieństwo wystąpienia zamiany.
+     */
+    private double agility;
 
     private MyPoint position = null;
 
@@ -50,10 +82,29 @@ public class Agent {
     private double initialDistanceToTarget = 0;
 
 
-    public Agent() {
-        vMax = 1;
+    public Agent(MovementBehavior movementBehavior) {
+
+        try {
+            loadProperties(movementBehavior);
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            // ustaw wartości domyślne
+            vMax = 1;
+            agility = 0.5;
+        }
+
         route = new LinkedList<Point>();
         initForceField();
+    }
+
+
+    private void loadProperties(MovementBehavior movementBehavior) throws FileNotFoundException, IOException {
+        Properties prop = new Properties();
+        prop.load(new FileInputStream(String.format("./data/agents/%s.agent", movementBehavior.getFilename())));
+
+        vMax = Integer.valueOf(prop.getProperty("speed"));
+        agility = Double.valueOf(prop.getProperty("agility"));
     }
 
 
@@ -118,6 +169,7 @@ public class Agent {
         return route.get(0);
     }
 
+
     public List<Point> getRoute() {
         return route;
     }
@@ -145,6 +197,7 @@ public class Agent {
         fieldsMoved = 0;
     }
 
+
     public Map<Vec, Integer> getForceField() {
         // TODO: immutable map?
         return forceField;
@@ -170,6 +223,7 @@ public class Agent {
         this.initialDistanceToTarget = initialDistanceToTarget;
     }
 
+
     public MyPoint getPosition() {
         return new MyPoint(position);
     }
@@ -177,6 +231,11 @@ public class Agent {
 
     public void setPosition(Point position) {
         this.position = new MyPoint(position);
+    }
+
+
+    public double getAgility() {
+        return agility;
     }
 
 }

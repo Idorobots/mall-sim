@@ -16,6 +16,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
+import sim.MallSim;
 import sim.control.GuiState;
 import sim.control.Listeners;
 import sim.control.GuiState.DrawTargetLinePolicy;
@@ -38,6 +39,7 @@ import javax.swing.JSlider;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.JToggleButton;
 
 @SuppressWarnings("serial")
 public class MallFrame extends JFrame {
@@ -69,6 +71,14 @@ public class MallFrame extends JFrame {
 
         JMenuItem mntmLoadMall = new JMenuItem("Load mall...");
         mnSimulation.add(mntmLoadMall);
+        
+        JMenuItem mntmRestart = new JMenuItem("Restart");
+        mntmRestart.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                MallSim.runAlgoTest();
+            }
+        });
+        mnSimulation.add(mntmRestart);
 
         JMenu mnHelp = new JMenu("Help");
         mnHelp.setMnemonic('H');
@@ -180,6 +190,25 @@ public class MallFrame extends JFrame {
         sldSimulationSpeed.setMinimum(50);
         speedPanel.add(sldSimulationSpeed);
         sldSimulationSpeed.setName("Simulation speed");
+        
+        JToggleButton tglbtnPause = new JToggleButton("Pause");
+        tglbtnPause.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JToggleButton button = (JToggleButton) e.getSource();
+                
+                if (button.isSelected()) {
+                    button.setText("Resume");
+                    MallSim.getThread().suspend();
+                } else {
+                    button.setText("Pause");
+                    MallSim.getThread().resume();
+                }
+            }
+        });
+        GridBagConstraints gbc_tglbtnPause = new GridBagConstraints();
+        gbc_tglbtnPause.gridx = 0;
+        gbc_tglbtnPause.gridy = 3;
+        tabDisplay.add(tglbtnPause, gbc_tglbtnPause);
 
         switch (GuiState.targetLinePolicy) {
         case NONE:
