@@ -18,6 +18,7 @@ public class Cell {
     private MovementAlgorithm algorithm = null;
 
     int forceValue;
+    int forceValue4Rendering;
 
     public Cell(Type type, MovementAlgorithm algo) {
         super();
@@ -50,8 +51,17 @@ public class Cell {
         return forceValue;
     }
 
+    public int getForceValue4Rendering() {
+        return forceValue4Rendering;
+    }
+
+
     public void setForceValue(int forceValue) {
         this.forceValue = forceValue;
+    }
+
+    public void flipForceValue() {
+        forceValue4Rendering = forceValue;
     }
 
     void changeForce(int forceValue) {

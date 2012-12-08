@@ -5,7 +5,7 @@ import sim.model.Agent;
 public class GuiState {
 
     public static enum DrawTargetLinePolicy {
-        NONE, SELECTION, ALL
+        NONE, SELECTION, SELECTION_ROUTE, ALL
     }
 
     private static Agent selectedAgent = null;

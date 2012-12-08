@@ -137,12 +137,19 @@ public class MallFrame extends JFrame {
         rdbtnSelection.addActionListener(Listeners.targetLineListener);
         targetVectorsPanel.add(rdbtnSelection);
 
+        JRadioButton rdbtnSelectionRoute = new JRadioButton("selection route");
+        rdbtnSelectionRoute.setActionCommand(DrawTargetLinePolicy.SELECTION_ROUTE.name());
+        rdbtnSelectionRoute.addActionListener(Listeners.targetLineListener);
+        targetVectorsPanel.add(rdbtnSelectionRoute);
+
         JRadioButton rdbtnAll = new JRadioButton("all");
         rdbtnAll.setActionCommand(DrawTargetLinePolicy.ALL.name());
         rdbtnAll.addActionListener(Listeners.targetLineListener);
+
         targetVectorsPanel.add(rdbtnAll);
         targetLinesGroup.add(rdbtnNone);
         targetLinesGroup.add(rdbtnSelection);
+        targetLinesGroup.add(rdbtnSelectionRoute);
         targetLinesGroup.add(rdbtnAll);
 
         switch (GuiState.targetLinePolicy) {

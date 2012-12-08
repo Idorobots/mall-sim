@@ -48,19 +48,32 @@ public class Board {
 
     public void computeForceField() {
         // Clear force field.
+        Point curr = new Point();
+
         for (int y = 0; y < getDimension().height; y++) {
             for (int x = 0; x < getDimension().width; x++) {
-                Point curr = new Point(x, y);
+                curr.x = x;
+                curr.y = y;
                 getCell(curr).setForceValue(0);
             }
         }
 
         for (int y = 0; y < getDimension().height; y++) {
             for (int x = 0; x < getDimension().width; x++) {
-                Point curr = new Point(x, y);
+                curr.x = x;
+                curr.y = y;
 
                 if (getCell(curr).getAgent() != null)
                     modifyForceField(getCell(curr).getAgent(), 1);
+            }
+        }
+
+        for (int y = 0; y < getDimension().height; y++) {
+            for (int x = 0; x < getDimension().width; x++) {
+                curr.x = x;
+                curr.y = y;
+
+                getCell(curr).flipForceValue();
             }
         }
     }

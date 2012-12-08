@@ -38,7 +38,7 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
 
     private int resizeDelta = 1; // Used for dynamic resizing.
 
-    boolean showForceField = true;
+    boolean showForceField = false;
 
 
     public GUIBoard(Board board) {
@@ -81,10 +81,11 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
         g.setColor(Color.GRAY);
         drawNetting(g, cellSize);
 
-        // XXX
-        Agent a = GuiState.getSelectedAgent();
-        if(a != null)
-          drawRoute(g, a);
+        if(GuiState.targetLinePolicy == DrawTargetLinePolicy.SELECTION_ROUTE) {
+            Agent a = GuiState.getSelectedAgent();
+            if(a != null)
+                drawRoute(g, a);
+        }
     }
 
 
@@ -165,9 +166,9 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
 
 
     private Color getPassableColor(Cell c) {
-        int forceValue = c.getForceValue();
+        int forceValue = c.getForceValue4Rendering();
 
-        if (c.getAgent() != null || forceValue == 0)
+        if (forceValue == 0)
             return Color.WHITE;
 
         int maxSummedForceValue = 8 * Agent.FORCE_VALUE_MAX;
@@ -187,6 +188,8 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
 
 
     private void drawRoute(Graphics g, Agent a) {
+        // FIXME Throws java.util.ConcurrentModificationException sometimes.
+
         final float TARGET_VECTOR_WIDTH = 3f;
         g.setColor(Color.CYAN);
         Graphics2D g2d = (Graphics2D) g;
