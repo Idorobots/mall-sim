@@ -14,6 +14,7 @@ import java.util.ListIterator;
 
 import sim.util.Logger;
 
+import sim.model.algo.MallFeature;
 import sim.model.Agent;
 import sim.model.Board;
 import sim.model.Cell;
@@ -40,6 +41,7 @@ public class Tactical {
     public void useMooreNeighbourhood(boolean yn) {
         useMoore = yn;
     }
+
 
     public void innitializeTargets(Agent agent) {
         Logger.log(String.format("Initializing targets for %s...", agent));
@@ -164,12 +166,12 @@ public class Tactical {
     }
 
 
-    private List<Point> selectMidpoints(List<Point> points) {
+    private List<Point> selectMidpoints2(List<Point> points) {
         return points;
     }
 
 
-    private List<Point> selectMidpoints2(List<Point> points) {
+    private List<Point> selectMidpoints(List<Point> points) {
         int size = points.size();
 
         if(points.size() > 1.5 * SEGMENT_SIZE) {
@@ -235,6 +237,12 @@ public class Tactical {
 
     private int heuristicCostEstimate(Point p, Point target) {
         int score = (int) (SCORE_FACTOR * HEURISTIC_FACTOR *  p.distance(target));
+
+        MallFeature mf = board.getCell(p).getFeature();
+
+        if(mf != null) {
+            return mf.modifyHeuristicEstimate(score);
+        }
 
         return score;
     }

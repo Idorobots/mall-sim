@@ -49,14 +49,16 @@ public class MallSim {
 
                 //runResourceTest();
                 ResourceManager resMgr = new ResourceManager();
-                resMgr.loadShoppingMall("./data/malls/simple2.bmp");
-//                resMgr.loadShoppingMall("./data/malls/small.bmp");
+                resMgr.loadShoppingMall("./data/malls/simple2.bmp", "./data/malls/simple2map.bmp");
 
                 Mall mall = Mall.getInstance();
-                if (frame == null)
+
+                if (frame == null) {
                     frame = new MallFrame(mall);
+                }
+
                 frame.setVisible(true);
-                
+
                 runAlgoTest();
             }
         });
@@ -68,10 +70,13 @@ public class MallSim {
      */
     private static void runResourceTest() {
         ResourceManager resMgr = new ResourceManager();
-        //resMgr.loadShoppingMall("./data/malls/huge.bmp");
+
+        //resMgr.loadShoppingMall("./data/malls/small.bmp");
+        //resMgr.loadShoppingMall("./data/malls/simple.bmp");
+        resMgr.loadShoppingMall("./data/malls/simple2.bmp", "./data/malls/simple2map.bmp");
         //resMgr.loadShoppingMall("./data/malls/1floor.bmp");
-//        resMgr.loadShoppingMall("./data/malls/simple.bmp");
-        resMgr.loadShoppingMall("./data/malls/small.bmp");
+        //resMgr.loadShoppingMall("./data/malls/huge.bmp");
+
         MallFrame frame = new MallFrame(Mall.getInstance());
         frame.setVisible(true);
     }
@@ -122,7 +127,7 @@ public class MallSim {
                             if (a.getTargetCount() > 0)
                                 a.setInitialDistanceToTarget(curr.distanceSq(a.getTarget()));
                         } else {
-                            final double maxDistanceFromTarget = 2;
+                            final double maxDistanceFromTarget = 3;
                             double dist = a.getTarget().distance(curr);
                             if (dist < maxDistanceFromTarget) {
                                 // TODO: metoda probabilistyczna
@@ -230,7 +235,7 @@ public class MallSim {
             int nAgentSuccesses = 0;
 
             System.out.println(board.countAgents());
-            
+
             long msecs = 0;
 
             loop: for (int lp = 0; lp < LOOPS; lp++) {
@@ -272,7 +277,7 @@ public class MallSim {
                     moveAgents(speedPointsLeft);
 
                     assert (nAgentsBegin == board.countAgents());
-                    
+
                     System.out.println(String.format("dt[MOVED] = %d", System.currentTimeMillis() - msecs));
                 }
 

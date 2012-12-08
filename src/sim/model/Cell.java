@@ -4,6 +4,7 @@ import java.awt.Point;
 
 import sim.model.algo.Empty;
 import sim.model.algo.MovementAlgorithm;
+import sim.model.algo.MallFeature;
 import sim.model.helpers.MyPoint;
 
 public class Cell {
@@ -16,9 +17,15 @@ public class Cell {
     private final Type type;
     private Agent agent = null;
     private MovementAlgorithm algorithm = null;
+    private MallFeature feature = null;
 
-    int forceValue;
-    int forceValue4Rendering;
+    private int forceValue;
+    private int forceValue4Rendering;
+
+    public Cell(Type type, MovementAlgorithm algo, MallFeature feature) {
+        this(type, algo);
+        setFeature(feature);
+    }
 
     public Cell(Type type, MovementAlgorithm algo) {
         super();
@@ -33,6 +40,14 @@ public class Cell {
 
     public void setAgent(Agent agent) {
         this.agent = agent;
+    }
+
+    public MallFeature getFeature() {
+        return feature;
+    }
+
+    public void setFeature(MallFeature feature) {
+        this.feature = feature;
     }
 
     public Type getType() {
