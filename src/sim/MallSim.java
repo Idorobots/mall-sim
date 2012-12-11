@@ -127,7 +127,7 @@ public class MallSim {
                             if (a.getTargetCount() > 0)
                                 a.setInitialDistanceToTarget(curr.distanceSq(a.getTarget()));
                         } else {
-                            final double maxDistanceFromTarget = 3;
+                            final double maxDistanceFromTarget = 2;
                             double dist = a.getTarget().distance(curr);
                             if (dist < maxDistanceFromTarget) {
                                 // TODO: metoda probabilistyczna
@@ -415,7 +415,7 @@ public class MallSim {
 
                  if(a != null) {
                      a.clearTargets();
-                     tactical.innitializeTargets(a);
+                     tactical.initializeTargets(a);
                  }
              }
          }
