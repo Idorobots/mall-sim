@@ -476,7 +476,9 @@ public final class Ped4 implements MovementAlgorithm {
     public void nextIterationStep(Agent a, Map<Agent, Integer> mpLeft) {
         Board board = Mall.getInstance().getBoard();
         stepForward(board, a.getPosition(), mpLeft);
-        board.computeForceField();  // XXX: docelowo optymalniej
+        long msecs = System.currentTimeMillis();
+//        board.computeForceField();  // XXX: docelowo optymalniej
+//        System.out.println(System.currentTimeMillis() - msecs);
     }
 
 
@@ -484,8 +486,9 @@ public final class Ped4 implements MovementAlgorithm {
     public void prepare(Agent a) {
         Board b = Mall.getInstance().getBoard();
         adjustDirection(a);
-        changeLane(b, a);
-        Mall.getInstance().getBoard().computeForceField();  // XXX: docelowo
+        
+//        changeLane(b, a);
+//        Mall.getInstance().getBoard().computeForceField();  // XXX: docelowo
                                                            // optymalniej
     }
 

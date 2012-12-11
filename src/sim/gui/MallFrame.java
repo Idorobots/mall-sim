@@ -71,9 +71,10 @@ public class MallFrame extends JFrame {
 
         JMenuItem mntmLoadMall = new JMenuItem("Load mall...");
         mnSimulation.add(mntmLoadMall);
-        
+
         JMenuItem mntmRestart = new JMenuItem("Restart");
         mntmRestart.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent arg0) {
                 MallSim.runAlgoTest();
             }
@@ -109,7 +110,7 @@ public class MallFrame extends JFrame {
         tabbedPane.addTab("Display", null, tabDisplay, null);
         GridBagLayout gbl_tabDisplay = new GridBagLayout();
         gbl_tabDisplay.columnWidths = new int[] { 306, 0 };
-        gbl_tabDisplay.rowHeights = new int[] {0, 0, 0, 0, 0};
+        gbl_tabDisplay.rowHeights = new int[] { 0, 0, 0, 0, 0 };
         gbl_tabDisplay.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
         gbl_tabDisplay.rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
         tabDisplay.setLayout(gbl_tabDisplay);
@@ -166,36 +167,39 @@ public class MallFrame extends JFrame {
         targetLinesGroup.add(rdbtnSelection);
         targetLinesGroup.add(rdbtnSelectionRoute);
         targetLinesGroup.add(rdbtnAll);
-        
+
         JPanel speedPanel = new JPanel();
-        speedPanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Animation speed [ms/f]", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        speedPanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null),
+                "Animation speed [ms/f]", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         GridBagConstraints gbc_speedPanel = new GridBagConstraints();
         gbc_speedPanel.insets = new Insets(0, 0, 5, 0);
         gbc_speedPanel.fill = GridBagConstraints.BOTH;
         gbc_speedPanel.gridx = 0;
         gbc_speedPanel.gridy = 2;
         tabDisplay.add(speedPanel, gbc_speedPanel);
-        
+
         JSlider sldSimulationSpeed = new JSlider();
         sldSimulationSpeed.addChangeListener(new ChangeListener() {
+
             public void stateChanged(ChangeEvent e) {
                 GuiState.animationSpeed = ((JSlider) e.getSource()).getValue();
             }
         });
         sldSimulationSpeed.setMajorTickSpacing(150);
-        sldSimulationSpeed.setValue(GuiState.animationSpeed);
         sldSimulationSpeed.setPaintLabels(true);
         sldSimulationSpeed.setPaintTicks(true);
         sldSimulationSpeed.setMaximum(1000);
         sldSimulationSpeed.setMinimum(50);
         speedPanel.add(sldSimulationSpeed);
         sldSimulationSpeed.setName("Simulation speed");
-        
+        sldSimulationSpeed.setValue(800);
+
         JToggleButton tglbtnPause = new JToggleButton("Pause");
         tglbtnPause.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 JToggleButton button = (JToggleButton) e.getSource();
-                
+
                 if (button.isSelected()) {
                     button.setText("Resume");
                     MallSim.getThread().suspend();
@@ -239,6 +243,8 @@ public class MallFrame extends JFrame {
 
         guiBoard = new GUIBoard(mall.getBoard());
         boardPanel.add(guiBoard);
+        
+        chckbxShowSocialForce.doClick();
     }
 
 

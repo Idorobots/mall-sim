@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,7 +70,7 @@ public class Agent {
     /**
      * Mapowanie [punkt]->[wartość pola potencjału].
      */
-    private Map<Vec, Integer> forceField;
+    private final Map<Vec, Integer> forceField;
 
     /**
      * Ilość płytek przebytych, by dotrzeć do obecnego celu.
@@ -95,7 +96,9 @@ public class Agent {
         }
 
         route = new LinkedList<Point>();
-        initForceField();
+        forceField = Collections.unmodifiableMap(initForceField());
+        
+        assert forceField != null;
     }
 
 
@@ -108,45 +111,47 @@ public class Agent {
     }
 
 
-    private void initForceField() {
-        forceField = new HashMap<Vec, Integer>();
+    private Map<Vec, Integer> initForceField() {
+        Map<Vec, Integer> tForceField = new HashMap<Vec, Integer>();
 
         int level = Integer.MAX_VALUE;
 
         // za agentem
         level = 1;
-        forceField.put(new Vec(-1, level), -2);
-        forceField.put(new Vec(0, level), -3);
-        forceField.put(new Vec(1, level), -2);
+        tForceField.put(new Vec(-1, level), -2);
+        tForceField.put(new Vec(0, level), -3);
+        tForceField.put(new Vec(1, level), -2);
 
         // obok agenta
         level = 0;
-        forceField.put(new Vec(-2, level), -2);
-        forceField.put(new Vec(-1, level), -4);
-        forceField.put(new Vec(1, level), -4);
-        forceField.put(new Vec(2, level), -2);
+        tForceField.put(new Vec(-2, level), -2);
+        tForceField.put(new Vec(-1, level), -4);
+        tForceField.put(new Vec(1, level), -4);
+        tForceField.put(new Vec(2, level), -2);
 
         // +1 przed agentem
         level = -1;
-        forceField.put(new Vec(-2, level), -2);
-        forceField.put(new Vec(-1, level), -4);
-        forceField.put(new Vec(0, level), -5);
-        forceField.put(new Vec(1, level), -4);
-        forceField.put(new Vec(2, level), -2);
+        tForceField.put(new Vec(-2, level), -2);
+        tForceField.put(new Vec(-1, level), -4);
+        tForceField.put(new Vec(0, level), -5);
+        tForceField.put(new Vec(1, level), -4);
+        tForceField.put(new Vec(2, level), -2);
 
         // +2 przed agentem
         level = -2;
-        forceField.put(new Vec(-2, level), -1);
-        forceField.put(new Vec(-1, level), -3);
-        forceField.put(new Vec(0, level), -4);
-        forceField.put(new Vec(1, level), -3);
-        forceField.put(new Vec(2, level), -1);
+        tForceField.put(new Vec(-2, level), -1);
+        tForceField.put(new Vec(-1, level), -3);
+        tForceField.put(new Vec(0, level), -4);
+        tForceField.put(new Vec(1, level), -3);
+        tForceField.put(new Vec(2, level), -1);
 
         // +3 przed agentem
         level = -3;
-        forceField.put(new Vec(-1, level), -1);
-        forceField.put(new Vec(0, level), -2);
-        forceField.put(new Vec(1, level), -1);
+        tForceField.put(new Vec(-1, level), -1);
+        tForceField.put(new Vec(0, level), -2);
+        tForceField.put(new Vec(1, level), -1);
+        
+        return tForceField;
     }
 
 
@@ -156,7 +161,10 @@ public class Agent {
 
 
     public void setDirection(Direction direction) {
+        Mall.getInstance().getBoard().modifyForceField(this, getPosition(), -1);
         this.direction = direction;
+        Mall.getInstance().getBoard().modifyForceField(this, getPosition(), 1);
+        
     }
 
 

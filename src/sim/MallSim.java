@@ -10,7 +10,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import javax.swing.JFrame;
 import javax.swing.UIManager;
 
 import sim.control.GuiState;
@@ -47,9 +46,10 @@ public class MallSim {
                     e.printStackTrace();
                 }
 
-                //runResourceTest();
+                // runResourceTest();
                 ResourceManager resMgr = new ResourceManager();
                 resMgr.loadShoppingMall("./data/malls/simple2.bmp", "./data/malls/simple2map.bmp");
+                // resMgr.loadShoppingMall("./data/malls/small.bmp");
 
                 Mall mall = Mall.getInstance();
 
@@ -71,11 +71,11 @@ public class MallSim {
     private static void runResourceTest() {
         ResourceManager resMgr = new ResourceManager();
 
-        //resMgr.loadShoppingMall("./data/malls/small.bmp");
-        //resMgr.loadShoppingMall("./data/malls/simple.bmp");
+        // resMgr.loadShoppingMall("./data/malls/small.bmp");
+        // resMgr.loadShoppingMall("./data/malls/simple.bmp");
         resMgr.loadShoppingMall("./data/malls/simple2.bmp", "./data/malls/simple2map.bmp");
-        //resMgr.loadShoppingMall("./data/malls/1floor.bmp");
-        //resMgr.loadShoppingMall("./data/malls/huge.bmp");
+        // resMgr.loadShoppingMall("./data/malls/1floor.bmp");
+        // resMgr.loadShoppingMall("./data/malls/huge.bmp");
 
         MallFrame frame = new MallFrame(Mall.getInstance());
         frame.setVisible(true);
@@ -240,11 +240,11 @@ public class MallSim {
 
             loop: for (int lp = 0; lp < LOOPS; lp++) {
 
-//                testSocialForce(board);
-//                testPed4(board);
+                // testSocialForce(board);
+                // testPed4(board);
                 testTactical(board);
 
-                board.computeForceField();
+                // board.computeForceField();
 
                 int nAgentsBegin = board.countAgents();
                 nTotalAgents += nAgentsBegin;
@@ -263,7 +263,6 @@ public class MallSim {
                     }
 
                     try {
-                        System.out.println(GuiState.animationSpeed);
                         Thread.sleep(GuiState.animationSpeed);
                     } catch (InterruptedException e) {
                     }
@@ -271,6 +270,7 @@ public class MallSim {
                     System.out.println(String.format("dt[REACH] = %d", System.currentTimeMillis() - msecs));
                     msecs = System.currentTimeMillis();
                     prepareAgents();
+
                     System.out.println(String.format("dt[PREPARE] = %d", System.currentTimeMillis() - msecs));
                     msecs = System.currentTimeMillis();
                     Map<Agent, Integer> speedPointsLeft = computeMovementPointsLeft();
@@ -400,28 +400,30 @@ public class MallSim {
         }
     }
 
-     private static void testTactical(Board board) {
-         Tactical tactical = new Tactical(board);
-         //tactical.useMooreNeighbourhood(false);
 
-         if(board.countAgents() == 0) {
-             Misc.setAgent(new Agent(MovementBehavior.DYNAMIC), new Point(2, 2));
-         }
+    private static void testTactical(Board board) {
+        Tactical tactical = new Tactical(board);
+        // tactical.useMooreNeighbourhood(false);
 
-         for (int y = 0; y < board.getDimension().height; y++) {
-             for (int x = 0; x < board.getDimension().width; x++) {
-                 Point p = new Point(x, y);
-                 Agent a = board.getCell(p).getAgent();
+        if (board.countAgents() == 0) {
+            Misc.setAgent(new Agent(MovementBehavior.DYNAMIC), new Point(2, 2));
+        }
 
-                 if(a != null) {
-                     a.clearTargets();
-                     tactical.innitializeTargets(a);
-                 }
-             }
-         }
-     }
+        for (int y = 0; y < board.getDimension().height; y++) {
+            for (int x = 0; x < board.getDimension().width; x++) {
+                Point p = new Point(x, y);
+                Agent a = board.getCell(p).getAgent();
 
-     public static Thread getThread() {
-         return simThread;
-     }
+                if (a != null) {
+                    a.clearTargets();
+                    tactical.innitializeTargets(a);
+                }
+            }
+        }
+    }
+
+
+    public static Thread getThread() {
+        return simThread;
+    }
 }

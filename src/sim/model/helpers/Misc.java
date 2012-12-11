@@ -4,20 +4,31 @@ import java.awt.Point;
 
 import sim.model.Agent;
 import sim.model.Board;
+import sim.model.Cell;
 import sim.model.Mall;
 
 public class Misc {
 
     public static void setAgent(Agent a, Point p) {
-        Mall.getInstance().getBoard().getCell(p).setAgent(a);
+        Cell c = Mall.getInstance().getBoard().getCell(p);
 
-        if (a == null) {
-//            Mall.getInstance().getBoard().modifyForceField(a, -1);
-        } else {
+        if (c.getAgent() != null)
+            Mall.getInstance().getBoard().modifyForceField(c.getAgent(), new MyPoint(p), -1);
+
+        Mall.getInstance().getBoard().getCell(p).setAgent(a);
+//        Mall.getInstance().getBoard().printForceField();
+        
+        if (a != null) {
             a.setPosition(p);
-//            Mall.getInstance().getBoard().modifyForceField(a, 1);
+            Mall.getInstance().getBoard().modifyForceField(a, new MyPoint(p), 1);
         }
     }
+
+//    public static void setAgentDirection(Agent a, Direction d) {
+//        Mall.getInstance().getBoard().modifyForceField(a, a.-1);
+//        a.setDirection(d);
+//        Mall.getInstance().getBoard().modifyForceField(a, 1);
+//    }
 
 
     /**

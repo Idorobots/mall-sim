@@ -127,12 +127,84 @@ public class ResourceManager {
 
         Logger.log("Randomizing board...");
 
-        randomize(b, h*w/25);
+        randomize(b, h*w/80);
 
         Logger.log("Board randomized!");
 
         Logger.log("Mall loaded!");
     }
+    
+    public void loadShoppingMall(String mallFile) {
+        BufferedImage mallImage = null;
+
+        Raster mall = null;
+
+        Cell[][] grid = null;
+
+        int h = 0;
+        int w = 0;
+
+        try {
+            mallImage = ImageIO.read(new File(mallFile));
+            mall = mallImage.getData();
+
+            h = mall.getHeight();
+            w = mall.getWidth();
+
+            int[] pixel = new int[3];
+            grid = new Cell[h][w];
+
+            // Used to cache Attractors
+            HashMap<Integer, MallFeature> attractors = new HashMap<Integer, MallFeature>();
+
+            Logger.log("Creating board...");
+
+            for(int i = 0; i < h; ++i) {
+                for(int j = 0; j < w; ++j) {
+                    mall.getPixel(j, i, pixel);
+
+                    // [type][context data 0][contex data 1]
+                    switch(pixel[0]) {
+                        case MALL_WALL:
+                            grid[i][j] = Cell.WALL;
+                        continue; // Skips also the feature map dispatch.
+
+                        case MALL_PED4:
+                            grid[i][j] = new Cell(Cell.Type.PASSABLE, Ped4.getInstance());
+                        break;
+
+                        case MALL_SOCIAL_FORCE:
+                            grid[i][j] = new Cell(Cell.Type.PASSABLE, SocialForce.getInstance());
+                        break;
+
+                        default: grid[i][j] = new Cell(Cell.Type.PASSABLE, Ped4.getInstance());
+//                        default: throw new RuntimeException("Invalid mall file value.");
+                    }
+                }
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Board b = new Board(grid);
+        Mall.getInstance().setBoard(b);
+
+        Logger.log("Board created!");
+
+        Logger.log("Randomizing board...");
+
+        randomize(b, h*w/25);
+        
+//        Point p = new Point(3, 2);
+//        Agent a = new Agent(MovementBehavior.DYNAMIC);
+//        a.addTarget(new Point(10, 8));
+//        Misc.setAgent(a, p);
+            
+        Logger.log("Board randomized!");
+
+        Logger.log("Mall loaded!");
+    }    
 
 
     public Agent loadAgent(String agentFile) {

@@ -64,7 +64,7 @@ public class Board {
                 curr.y = y;
 
                 if (getCell(curr).getAgent() != null)
-                    modifyForceField(getCell(curr).getAgent(), 1);
+                    modifyForceField(getCell(curr).getAgent(), getCell(curr).getAgent().getPosition(), 1);
             }
         }
 
@@ -77,6 +77,21 @@ public class Board {
             }
         }
     }
+    
+    public void printForceField() {
+        // Clear force field.
+        Point curr = new Point();
+
+        for (int y = 0; y < getDimension().height; y++) {
+            for (int x = 0; x < getDimension().width; x++) {
+                curr.x = x;
+                curr.y = y;
+                System.out.print(String.format("%3d", getCell(curr).getForceValue()));
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
 
     /**
      * Modyfikuje rozkład pola potencjału usuwając lub dodając wartości pola
@@ -86,7 +101,7 @@ public class Board {
      * @param sign
      *            <code>1</code> dla dodana siły, <code>-1</code> dla odjęcia
      */
-    public void modifyForceField(Agent a, int sign) {
+    public void modifyForceField(Agent a, MyPoint pos, int sign) {
         assert (Math.abs(sign) == 1);
 
         for (Map.Entry<Vec, Integer> entry : a.getForceField().entrySet()) {
@@ -107,7 +122,7 @@ public class Board {
                 break;
             }
 
-            MyPoint p = a.getPosition().add(v);
+            MyPoint p = pos.add(v);
             if (isOnBoard(p)) {
                 getCell(p).changeForce(entry.getValue() * sign);
 
@@ -115,8 +130,12 @@ public class Board {
                     System.err.println(p.toString() + " : " + getCell(p).getForceValue());
                     throw new AssertionError();
                 }
+                
+                getCell(p).flipForceValue();
             }
         }
+        
+//        Mall.getInstance().getBoard().printForceField();
     }
 
     public int countAgents() {
