@@ -24,8 +24,8 @@ public class Tactical {
     public static final int SCORE_FACTOR = 100;
     public static final int MAX_TARGETS = 15;
     public static final int MIN_TARGETS = 1;
-    public static final int MIDPOINT_THRESHOLD = 75;
-    public static final int SEGMENT_SIZE = 10;
+    public static final int MAX_SEGMENT_SIZE = 7;
+    public static final int PATH_SMOOTHING = 3;
 
     private boolean useMoore = true;
     private Random r;
@@ -43,12 +43,18 @@ public class Tactical {
     }
 
 
-    public void innitializeTargets(Agent agent) {
+    public void initializeTargets(Agent agent) {
+        int numTargets = MIN_TARGETS + r.nextInt(MAX_TARGETS - MIN_TARGETS);
+
+        initializeTargets(agent, numTargets);
+    }
+
+    public void initializeTargets(Agent agent, int numTargets) {
         Logger.log(String.format("Initializing targets for %s...", agent));
 
-        List<Point> targets = computeTargets(agent);
+        Point[] targets = computeTargets(agent, numTargets);
 
-        Logger.log(String.format("Picked %d target positions.", targets.size()));
+        Logger.log(String.format("Picked %d target positions.", targets.length));
         Logger.log("Generating paths...");
 
         Point last = agent.getPosition();
@@ -67,15 +73,12 @@ public class Tactical {
     }
 
 
-    public List<Point> computeTargets(Agent agent) {
-        int numTargets = MIN_TARGETS + r.nextInt(MAX_TARGETS - MIN_TARGETS);
+    public Point[] computeTargets(Agent agent, int numTargets) {
         Dimension dim = board.getDimension();
 
         ArrayList<Point> targets = new ArrayList<Point>();
 
         while(targets.size() < numTargets) {
-            // TODO Select targets more sensibly.
-            // TODO Take queues, holders and passages into account.
             Point p = new Point(r.nextInt(dim.width), r.nextInt(dim.height));
 
             if(board.getCell(p) != Cell.WALL) {
@@ -83,14 +86,25 @@ public class Tactical {
             }
         }
 
-        // Sort by distance to the Agent.
-        //Collections.sort(targets, new PointComparator(agent.getPosition()));
+        // Sort by overal distance:
+        Point[] targetArray = new Point[targets.size()];
+        targets.toArray(targetArray);
 
-        return targets;
+        Arrays.sort(targetArray, new PointComparator(agent.getPosition()));
+
+        int size = targetArray.length;
+
+        for(int i = 1; i < size; ++i) {
+            Arrays.sort(targetArray, i, size, new PointComparator(targetArray[i-1]));
+        }
+
+        return targetArray;
     }
 
 
     public List<Point> computePath(Point start, Point target) {
+        // NOTE O(N log N log H(target)) :(
+
         ArrayList<Node> closed = new ArrayList<Node>();
         ArrayList<Node> open = new ArrayList<Node>();
 
@@ -165,73 +179,99 @@ public class Tactical {
         return selectMidpoints(allpoints);
     }
 
-
-    private List<Point> selectMidpoints2(List<Point> points) {
-        return points;
-    }
-
-
     private List<Point> selectMidpoints(List<Point> points) {
         int size = points.size();
 
-        if(points.size() > 1.5 * SEGMENT_SIZE) {
+        if(size > MAX_SEGMENT_SIZE) {
             List<Point> midpoints = new ArrayList<Point>();
 
-            int numSegments = size / SEGMENT_SIZE;
+            int numSegments = size / MAX_SEGMENT_SIZE;
 
             for(int i = 0; i < numSegments; ++i) {
-                int s = i * SEGMENT_SIZE;
-                int e = Math.min((i+1) * SEGMENT_SIZE - 1, size-1);
+                int s = i * MAX_SEGMENT_SIZE;
+                int e = Math.min((i+1) * MAX_SEGMENT_SIZE, size-1);
 
-                midpoints.addAll(selectMidpoints(points, s, e));
+                List<Point> segment = selectMidpoints(points, s, e);
+
+                // NOTE For the first segment its starting point is the Agent position,
+                // NOTE which is not a part of the path.
+                // NOTE For all other segments their starting points are the same as the ending
+                // NOTE points of the previous segments, so we can safely remove them.
+
+                segment.remove(0);
+                midpoints.addAll(segment);
             }
 
             return midpoints;
         }
         else {
-            return points;
+            return selectMidpoints(points, 0, size-1);
         }
     }
 
-
     private List<Point> selectMidpoints(List<Point> points, int start, int end) {
+        // NOTE O(N log N) :(
+
         List<Point> result = new ArrayList<Point>();
 
-        if(end - start < 3) {
-            result.add(points.get(start));
-            result.add(points.get(end));
+        Point s = points.get(start);
+        Point e = points.get(end);
+
+        if(end == start) {
+            result.add(s);
+        }
+        if(end - start < PATH_SMOOTHING) {
+            for(int i = start; i <= end; ++i) {
+                result.add(points.get(i));
+            }
+        }
+        else if(lineClear(s, e)) {
+            result.add(s);
+            result.add(e);
         }
         else {
             int middle = (start + end) / 2;
-            int dot = dotProduct(points.get(start), points.get(middle), points.get(end));
 
-            if(Math.abs(dot) < MIDPOINT_THRESHOLD) {
-                List<Point> a = selectMidpoints(points, start, middle-1);
-                List<Point> b = selectMidpoints(points, middle, end);
+            List<Point> a = selectMidpoints(points, start, middle);
+            List<Point> b = selectMidpoints(points, middle, end);
+            b.remove(0); // NOTE We don't wart midpoint duplication.
 
-                result.addAll(a);
-                result.addAll(b);
-            }
-            else {
-                result.add(points.get(start));
-                result.add(points.get(middle));
-                result.add(points.get(end));
-            }
+            result.addAll(a);
+            result.addAll(b);
         }
+
         return result;
     }
 
 
-    private int dotProduct(Point a, Point b, Point c) {
-        int Ax = (b.x - a.x);
-        int Ay = (b.y - a.y);
+    private boolean lineClear(Point a, Point b) {
+        // NOTE O(N) :(
 
-        int Bx = (c.x - b.x);
-        int By = (c.y - b.y);
+        if(a.equals(b)) return true;
 
-        int dot = Ax * Bx + Ay * By;
+        Point iter = new Point(a);
 
-        return dot;
+        double x = a.x;
+        double y = a.y;
+        double dx = b.x - a.x;
+        double dy = b.y - a.y;
+
+        double len = Math.sqrt(dx * dx + dy * dy);
+
+        dx /= len;
+        dy /= len;
+
+        while(!iter.equals(b)) {
+            iter.x = (int) x;
+            iter.y = (int) y;
+
+            if(board.getCell(iter) == Cell.WALL) return false;
+
+            x += dx;
+            y += dy;
+        }
+
+        return true;
     }
 
 
@@ -314,19 +354,7 @@ public class Tactical {
 
 
     private int getScoreDelta(Point a, Point b) {
-        // TODO Take attractors into account.
         return SCORE_FACTOR;
-    }
-
-
-    private String pathToString(List<Point> path) {
-        String s = "";
-
-        for(Point p : path) {
-            s += String.format("(%d, %d) -> ", p.x, p.y);
-        }
-
-        return s;
     }
 
 

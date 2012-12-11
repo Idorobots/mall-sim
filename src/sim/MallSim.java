@@ -127,7 +127,7 @@ public class MallSim {
                             if (a.getTargetCount() > 0)
                                 a.setInitialDistanceToTarget(curr.distanceSq(a.getTarget()));
                         } else {
-                            final double maxDistanceFromTarget = 3;
+                            final double maxDistanceFromTarget = 2;
                             double dist = a.getTarget().distance(curr);
                             if (dist < maxDistanceFromTarget) {
                                 // TODO: metoda probabilistyczna
@@ -413,14 +413,13 @@ public class MallSim {
             for (int x = 0; x < board.getDimension().width; x++) {
                 Point p = new Point(x, y);
                 Agent a = board.getCell(p).getAgent();
-
-                if (a != null) {
-                    a.clearTargets();
-                    tactical.innitializeTargets(a);
-                }
-            }
-        }
-    }
+                 if(a != null) {
+                     a.clearTargets();
+                     tactical.initializeTargets(a);
+                 }
+             }
+         }
+     }
 
 
     public static Thread getThread() {

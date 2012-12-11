@@ -191,14 +191,16 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
         // FIXME Throws java.util.ConcurrentModificationException sometimes.
 
         final float TARGET_VECTOR_WIDTH = 3f;
-        g.setColor(Color.CYAN);
         Graphics2D g2d = (Graphics2D) g;
         Stroke s = g2d.getStroke();
         g2d.setStroke(new BasicStroke(TARGET_VECTOR_WIDTH));
 
         Point last = a.getPosition();
+        boolean toggle = true;
 
         for(Point p : a.getRoute()) {
+            g.setColor(toggle ? Color.CYAN : Color.GREEN);
+
             int x1 = last.x * cellSize + cellSize / 2;
             int y1 = last.y * cellSize + cellSize / 2;
             int x2 = p.x * cellSize + cellSize / 2;
@@ -207,6 +209,7 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
             g.drawLine(x1, y1, x2, y2);
 
             last = p;
+            toggle = !toggle;
         }
 
         g2d.setStroke(s);
@@ -219,7 +222,7 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
         assert a != null;
         assert g != null;
 
-        Color torsoColor = (a == GuiState.getSelectedAgent()) ? Color.MAGENTA : Color.BLUE;
+        Color torsoColor = (a == GuiState.getSelectedAgent()) ? Color.RED : Color.BLUE;
         g.setColor(torsoColor);
 
         int agentH = 0;
@@ -259,6 +262,7 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
 
         Agent a = board.getCell(new Point(x, y)).getAgent();
         GuiState.setSelectedAgent(a);
+        repaint();
     }
 
 
