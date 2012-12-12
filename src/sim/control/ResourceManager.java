@@ -33,7 +33,7 @@ public class ResourceManager {
      * Loads shopping mall data from an image file.
      */
 
-    public void loadShoppingMall(String mallFile, String featureMap) {
+    public static void loadShoppingMall(String mallFile, String featureMap) {
         Logger.log("Loading mall: " + mallFile + " with featuremap: " + featureMap);
 
         BufferedImage mallImage = null;
@@ -134,7 +134,8 @@ public class ResourceManager {
         Logger.log("Mall loaded!");
     }
 
-    public void loadShoppingMall(String mallFile) {
+
+    public static void loadShoppingMall(String mallFile) {
         BufferedImage mallImage = null;
 
         Raster mall = null;
@@ -201,12 +202,12 @@ public class ResourceManager {
     }
 
 
-    public Agent loadAgent(String agentFile) {
+    public static Agent loadAgent(String agentFile) {
         return new Agent(MovementBehavior.DYNAMIC);
     }
 
 
-    private void randomize(Board b, int nAgents) {
+    public static void randomize(Board b, int nAgents) {
         Random r = new Random();
         Dimension d = b.getDimension();
 

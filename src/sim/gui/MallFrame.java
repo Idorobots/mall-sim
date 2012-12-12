@@ -1,46 +1,43 @@
 package sim.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JToggleButton;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import sim.MallSim;
 import sim.control.GuiState;
 import sim.control.GuiState.BackgroundPolicy;
-import sim.control.Listeners;
 import sim.control.GuiState.DrawTargetLinePolicy;
+import sim.control.Listeners;
 import sim.gui.actions.ExitAction;
 import sim.model.Mall;
-import javax.swing.JCheckBox;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.BoxLayout;
-import java.awt.Component;
-import java.awt.FlowLayout;
-import javax.swing.border.TitledBorder;
-import javax.swing.JRadioButton;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import javax.swing.JSlider;
-import javax.swing.border.EtchedBorder;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.JToggleButton;
 
 @SuppressWarnings("serial")
 public class MallFrame extends JFrame {
@@ -48,14 +45,21 @@ public class MallFrame extends JFrame {
     private JPanel contentPane;
     private GUIBoard guiBoard;
 
-
     /**
      * Create the frame.
      */
     public MallFrame(Mall mall) {
         setTitle("MallSim");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 650, 500);
+
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Dimension screenSize = toolkit.getScreenSize();
+
+        final double TRIM = 0.05;
+        setBounds((int) (screenSize.width * TRIM),
+                (int) (screenSize.height * TRIM),
+                (int) (screenSize.getWidth() * (1 - 2 * TRIM)),
+                (int) (screenSize.getHeight() * (1 - 2 * TRIM)));
 
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
@@ -94,14 +98,14 @@ public class MallFrame extends JFrame {
         contentPane.setLayout(new BorderLayout(0, 0));
 
         JPanel statusBar = new JPanel();
-        statusBar.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+        statusBar.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null,
+                null, null));
         contentPane.add(statusBar, BorderLayout.SOUTH);
 
         JSplitPane splitPane = new JSplitPane();
         splitPane.setResizeWeight(1.0);
         contentPane.add(splitPane, BorderLayout.CENTER);
-        splitPane.setDividerLocation(this.getBounds().width / 2);  // XXX: temp
-        // splitPane.setDividerLocation(0.8); // XXX: docelowa wersja
+         splitPane.setDividerLocation(0.8);
 
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         tabbedPane.setSelectedIndex(-1);
@@ -113,18 +117,22 @@ public class MallFrame extends JFrame {
         gbl_tabDisplay.columnWidths = new int[] { 306, 0 };
         gbl_tabDisplay.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
         gbl_tabDisplay.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-        gbl_tabDisplay.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE };
+        gbl_tabDisplay.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0,
+                1.0, Double.MIN_VALUE };
         tabDisplay.setLayout(gbl_tabDisplay);
 
         JPanel backgroundContentPanel = new JPanel();
-        backgroundContentPanel.setBorder(new TitledBorder(null, "Background content", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        backgroundContentPanel.setBorder(new TitledBorder(null,
+                "Background content", TitledBorder.LEADING, TitledBorder.TOP,
+                null, null));
         GridBagConstraints gbc_backgroundContentPanel = new GridBagConstraints();
         gbc_backgroundContentPanel.insets = new Insets(0, 0, 5, 0);
         gbc_backgroundContentPanel.fill = GridBagConstraints.BOTH;
         gbc_backgroundContentPanel.gridx = 0;
         gbc_backgroundContentPanel.gridy = 0;
         tabDisplay.add(backgroundContentPanel, gbc_backgroundContentPanel);
-        backgroundContentPanel.setLayout(new BoxLayout(backgroundContentPanel, BoxLayout.Y_AXIS));
+        backgroundContentPanel.setLayout(new BoxLayout(backgroundContentPanel,
+                BoxLayout.Y_AXIS));
 
         JRadioButton rdbtnBgNone = new JRadioButton("none");
         rdbtnBgNone.setActionCommand(BackgroundPolicy.NONE.name());
@@ -132,7 +140,8 @@ public class MallFrame extends JFrame {
         backgroundContentPanel.add(rdbtnBgNone);
 
         JRadioButton rdbtnBgSocialField = new JRadioButton("social field");
-        rdbtnBgSocialField.setActionCommand(BackgroundPolicy.SOCIAL_FIELD.name());
+        rdbtnBgSocialField.setActionCommand(BackgroundPolicy.SOCIAL_FIELD
+                .name());
         rdbtnBgSocialField.addActionListener(Listeners.backgroundListener);
         backgroundContentPanel.add(rdbtnBgSocialField);
 
@@ -140,8 +149,6 @@ public class MallFrame extends JFrame {
         rdbtnBgVisits.setActionCommand(BackgroundPolicy.VISITS.name());
         rdbtnBgVisits.addActionListener(Listeners.backgroundListener);
         backgroundContentPanel.add(rdbtnBgVisits);
-
-
         JRadioButton rdbtnBgMovement = new JRadioButton("movement algorithm");
         rdbtnBgMovement.setActionCommand(BackgroundPolicy.MOVEMENT_ALGORITHM.name());
         rdbtnBgMovement.addActionListener(Listeners.backgroundListener);
@@ -169,20 +176,27 @@ public class MallFrame extends JFrame {
         case VISITS:
             rdbtnBgVisits.doClick();
             break;
+        case MOVEMENT_ALGORITHM:
+            rdbtnBgMovement.doClick();
+            break;
+        case FEATURES:
+            rdbtnBgFeatures.doClick();
+            break;
         }
 
         ButtonGroup targetLinesGroup = new ButtonGroup();
 
         JPanel targetVectorsPanel = new JPanel();
-        targetVectorsPanel.setBorder(new TitledBorder(null, "Target vectors", TitledBorder.LEADING, TitledBorder.TOP,
-                null, null));
+        targetVectorsPanel.setBorder(new TitledBorder(null, "Target vectors",
+                TitledBorder.LEADING, TitledBorder.TOP, null, null));
         GridBagConstraints gbc_targetVectorsPanel = new GridBagConstraints();
         gbc_targetVectorsPanel.insets = new Insets(0, 0, 5, 0);
         gbc_targetVectorsPanel.fill = GridBagConstraints.BOTH;
         gbc_targetVectorsPanel.gridx = 0;
         gbc_targetVectorsPanel.gridy = 2;
         tabDisplay.add(targetVectorsPanel, gbc_targetVectorsPanel);
-        targetVectorsPanel.setLayout(new BoxLayout(targetVectorsPanel, BoxLayout.Y_AXIS));
+        targetVectorsPanel.setLayout(new BoxLayout(targetVectorsPanel,
+                BoxLayout.Y_AXIS));
 
         JRadioButton rdbtnNone = new JRadioButton("none");
         rdbtnNone.setActionCommand(DrawTargetLinePolicy.NONE.name());
@@ -195,7 +209,8 @@ public class MallFrame extends JFrame {
         targetVectorsPanel.add(rdbtnSelection);
 
         JRadioButton rdbtnSelectionRoute = new JRadioButton("selection route");
-        rdbtnSelectionRoute.setActionCommand(DrawTargetLinePolicy.SELECTION_ROUTE.name());
+        rdbtnSelectionRoute
+                .setActionCommand(DrawTargetLinePolicy.SELECTION_ROUTE.name());
         rdbtnSelectionRoute.addActionListener(Listeners.targetLineListener);
         targetVectorsPanel.add(rdbtnSelectionRoute);
 
@@ -210,8 +225,9 @@ public class MallFrame extends JFrame {
         targetLinesGroup.add(rdbtnAll);
 
         JPanel speedPanel = new JPanel();
-        speedPanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null),
-                "Animation speed [ms/f]", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        speedPanel.setBorder(new TitledBorder(new EtchedBorder(
+                EtchedBorder.LOWERED, null, null), "Animation speed [ms/f]",
+                TitledBorder.LEADING, TitledBorder.TOP, null, null));
         GridBagConstraints gbc_speedPanel = new GridBagConstraints();
         gbc_speedPanel.insets = new Insets(0, 0, 5, 0);
         gbc_speedPanel.fill = GridBagConstraints.BOTH;
@@ -226,7 +242,6 @@ public class MallFrame extends JFrame {
                 GuiState.animationSpeed = ((JSlider) e.getSource()).getValue();
             }
         });
-
         sldSimulationSpeed.setMajorTickSpacing(150);
         sldSimulationSpeed.setPaintLabels(true);
         sldSimulationSpeed.setPaintTicks(true);
@@ -251,7 +266,6 @@ public class MallFrame extends JFrame {
                 }
             }
         });
-
         GridBagConstraints gbc_tglbtnPause = new GridBagConstraints();
         gbc_tglbtnPause.insets = new Insets(0, 0, 5, 0);
         gbc_tglbtnPause.gridx = 0;
@@ -281,8 +295,10 @@ public class MallFrame extends JFrame {
         panel.add(txtrTuIdWszelkie);
 
         JScrollPane boardScrollPane = new JScrollPane();
-        boardScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        boardScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        boardScrollPane
+                .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        boardScrollPane
+                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         splitPane.setLeftComponent(boardScrollPane);
 
         JPanel boardPanel = new JPanel();
@@ -291,7 +307,6 @@ public class MallFrame extends JFrame {
         guiBoard = new GUIBoard(mall.getBoard());
         boardPanel.add(guiBoard);
     }
-
 
     public GUIBoard getBoard() {
         return guiBoard;
