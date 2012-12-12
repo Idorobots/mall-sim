@@ -1,11 +1,8 @@
 package sim.model;
 
-import java.awt.Point;
-
 import sim.model.algo.Empty;
-import sim.model.algo.MovementAlgorithm;
 import sim.model.algo.MallFeature;
-import sim.model.helpers.MyPoint;
+import sim.model.algo.MovementAlgorithm;
 
 public class Cell {
     public static final Cell WALL = new Cell(Type.BLOCKED, Empty.getInstance());
@@ -18,6 +15,11 @@ public class Cell {
     private Agent agent = null;
     private MovementAlgorithm algorithm = null;
     private MallFeature feature = null;
+    
+    /**
+     * Licznik odwiedzin - ile razy agenci wchodzili na dane pole.
+     */
+    private int visitsCounter;
 
     private int forceValue;
     private int forceValue4Rendering;
@@ -32,6 +34,7 @@ public class Cell {
         this.type = type;
         this.algorithm = algo;
         forceValue = 0;
+        clearVisitsCounter();
     }
 
     public Agent getAgent() {
@@ -92,4 +95,15 @@ public class Cell {
         this.algorithm = algorithm;
     }
 
+    public int getVisitsCounter() {
+    	return visitsCounter;
+    }
+    
+    public void clearVisitsCounter() {
+    	visitsCounter = 0;
+    }
+    
+    public void incrementVisitsCounter() {
+    	visitsCounter++;
+    }
 }

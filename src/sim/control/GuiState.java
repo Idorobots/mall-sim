@@ -8,9 +8,14 @@ public class GuiState {
         NONE, SELECTION, SELECTION_ROUTE, ALL
     }
 
+    public static enum BackgroundPolicy {
+        NONE, SOCIAL_FIELD, VISITS
+    }
+
     private static Agent selectedAgent = null;
 
     public static DrawTargetLinePolicy targetLinePolicy = DrawTargetLinePolicy.NONE;
+    public static BackgroundPolicy backgroundPolicy = BackgroundPolicy.NONE;
 
     public static int animationSpeed = 300;
 

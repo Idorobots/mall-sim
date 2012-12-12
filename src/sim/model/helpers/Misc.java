@@ -21,15 +21,9 @@ public class Misc {
         if (a != null) {
             a.setPosition(p);
             Mall.getInstance().getBoard().modifyForceField(a, new MyPoint(p), 1);
+            Mall.getInstance().getBoard().getCell(p).incrementVisitsCounter();
         }
     }
-
-//    public static void setAgentDirection(Agent a, Direction d) {
-//        Mall.getInstance().getBoard().modifyForceField(a, a.-1);
-//        a.setDirection(d);
-//        Mall.getInstance().getBoard().modifyForceField(a, 1);
-//    }
-
 
     /**
      * Zamienia miejscami agentów z płytek określonych przez przekazane jako

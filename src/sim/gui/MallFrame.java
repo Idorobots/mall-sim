@@ -18,6 +18,7 @@ import javax.swing.border.EmptyBorder;
 
 import sim.MallSim;
 import sim.control.GuiState;
+import sim.control.GuiState.BackgroundPolicy;
 import sim.control.Listeners;
 import sim.control.GuiState.DrawTargetLinePolicy;
 import sim.gui.actions.ExitAction;
@@ -110,25 +111,54 @@ public class MallFrame extends JFrame {
         tabbedPane.addTab("Display", null, tabDisplay, null);
         GridBagLayout gbl_tabDisplay = new GridBagLayout();
         gbl_tabDisplay.columnWidths = new int[] { 306, 0 };
-        gbl_tabDisplay.rowHeights = new int[] { 0, 0, 0, 0, 0 };
+        gbl_tabDisplay.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
         gbl_tabDisplay.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-        gbl_tabDisplay.rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
+        gbl_tabDisplay.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE };
         tabDisplay.setLayout(gbl_tabDisplay);
 
-        JCheckBox chckbxShowSocialForce = new JCheckBox("show social force field");
-        chckbxShowSocialForce.addActionListener(new ActionListener() {
+        JPanel backgroundContentPanel = new JPanel();
+        backgroundContentPanel.setBorder(new TitledBorder(null, "Background content", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        GridBagConstraints gbc_backgroundContentPanel = new GridBagConstraints();
+        gbc_backgroundContentPanel.insets = new Insets(0, 0, 5, 0);
+        gbc_backgroundContentPanel.fill = GridBagConstraints.BOTH;
+        gbc_backgroundContentPanel.gridx = 0;
+        gbc_backgroundContentPanel.gridy = 0;
+        tabDisplay.add(backgroundContentPanel, gbc_backgroundContentPanel);
+        backgroundContentPanel.setLayout(new BoxLayout(backgroundContentPanel, BoxLayout.Y_AXIS));
+        
+        JRadioButton rdbtnBgNone = new JRadioButton("none");
+        rdbtnBgNone.setActionCommand(BackgroundPolicy.NONE.name());
+        rdbtnBgNone.addActionListener(Listeners.backgroundListener);
+        backgroundContentPanel.add(rdbtnBgNone);
+        
+        JRadioButton rdbtnBgSocialField = new JRadioButton("social field");
+        rdbtnBgSocialField.setActionCommand(BackgroundPolicy.SOCIAL_FIELD.name());
+        rdbtnBgSocialField.addActionListener(Listeners.backgroundListener);
+        backgroundContentPanel.add(rdbtnBgSocialField);
+        
+        JRadioButton rdbtnBgVisits = new JRadioButton("visits");
+        rdbtnBgVisits.setActionCommand(BackgroundPolicy.VISITS.name());
+        rdbtnBgVisits.addActionListener(Listeners.backgroundListener);
+        backgroundContentPanel.add(rdbtnBgVisits);
+        
+        ButtonGroup backgroundGroup = new ButtonGroup();
+        backgroundGroup.add(rdbtnBgNone);
+        backgroundGroup.add(rdbtnBgVisits);
+        backgroundGroup.add(rdbtnBgSocialField);
+        
+        switch (GuiState.backgroundPolicy) {
+        case NONE:
+        	rdbtnBgNone.doClick();
+        	break;
+        case SOCIAL_FIELD:
+        	rdbtnBgSocialField.doClick();
+        	break;
+        case VISITS:
+        	rdbtnBgVisits.doClick();
+        	break;
+        }
+        
 
-            public void actionPerformed(ActionEvent arg0) {
-                JCheckBox cb = (JCheckBox) arg0.getSource();
-                guiBoard.setShowForceField(cb.isSelected());
-            }
-        });
-        GridBagConstraints gbc_chckbxShowSocialForce = new GridBagConstraints();
-        gbc_chckbxShowSocialForce.fill = GridBagConstraints.BOTH;
-        gbc_chckbxShowSocialForce.insets = new Insets(0, 0, 5, 0);
-        gbc_chckbxShowSocialForce.gridx = 0;
-        gbc_chckbxShowSocialForce.gridy = 0;
-        tabDisplay.add(chckbxShowSocialForce, gbc_chckbxShowSocialForce);
 
         ButtonGroup targetLinesGroup = new ButtonGroup();
 
@@ -139,7 +169,7 @@ public class MallFrame extends JFrame {
         gbc_targetVectorsPanel.insets = new Insets(0, 0, 5, 0);
         gbc_targetVectorsPanel.fill = GridBagConstraints.BOTH;
         gbc_targetVectorsPanel.gridx = 0;
-        gbc_targetVectorsPanel.gridy = 1;
+        gbc_targetVectorsPanel.gridy = 2;
         tabDisplay.add(targetVectorsPanel, gbc_targetVectorsPanel);
         targetVectorsPanel.setLayout(new BoxLayout(targetVectorsPanel, BoxLayout.Y_AXIS));
 
@@ -167,7 +197,7 @@ public class MallFrame extends JFrame {
         targetLinesGroup.add(rdbtnSelection);
         targetLinesGroup.add(rdbtnSelectionRoute);
         targetLinesGroup.add(rdbtnAll);
-
+        
         JPanel speedPanel = new JPanel();
         speedPanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null),
                 "Animation speed [ms/f]", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -175,7 +205,7 @@ public class MallFrame extends JFrame {
         gbc_speedPanel.insets = new Insets(0, 0, 5, 0);
         gbc_speedPanel.fill = GridBagConstraints.BOTH;
         gbc_speedPanel.gridx = 0;
-        gbc_speedPanel.gridy = 2;
+        gbc_speedPanel.gridy = 3;
         tabDisplay.add(speedPanel, gbc_speedPanel);
 
         JSlider sldSimulationSpeed = new JSlider();
@@ -192,7 +222,7 @@ public class MallFrame extends JFrame {
         sldSimulationSpeed.setMinimum(50);
         speedPanel.add(sldSimulationSpeed);
         sldSimulationSpeed.setName("Simulation speed");
-        sldSimulationSpeed.setValue(800);
+        sldSimulationSpeed.setValue(300);
 
         JToggleButton tglbtnPause = new JToggleButton("Pause");
         tglbtnPause.addActionListener(new ActionListener() {
@@ -210,17 +240,21 @@ public class MallFrame extends JFrame {
             }
         });
         GridBagConstraints gbc_tglbtnPause = new GridBagConstraints();
+        gbc_tglbtnPause.insets = new Insets(0, 0, 5, 0);
         gbc_tglbtnPause.gridx = 0;
-        gbc_tglbtnPause.gridy = 3;
+        gbc_tglbtnPause.gridy = 4;
         tabDisplay.add(tglbtnPause, gbc_tglbtnPause);
 
         switch (GuiState.targetLinePolicy) {
         case NONE:
             rdbtnNone.doClick();
+        	break;
         case SELECTION:
-            rdbtnNone.doClick();
+            rdbtnSelection.doClick();
+        	break;
         case ALL:
-            rdbtnNone.doClick();
+            rdbtnAll.doClick();
+        	break;
         }
 
         JPanel panel = new JPanel();
@@ -243,8 +277,6 @@ public class MallFrame extends JFrame {
 
         guiBoard = new GUIBoard(mall.getBoard());
         boardPanel.add(guiBoard);
-        
-        chckbxShowSocialForce.doClick();
     }
 
 
