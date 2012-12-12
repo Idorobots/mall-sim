@@ -244,15 +244,11 @@ public class MallSim {
 
             System.out.println(board.countAgents());
 
-            long msecs = 0;
-
             loop: for (int lp = 0; lp < LOOPS; lp++) {
 
                 // testSocialForce(board);
                 // testPed4(board);
                 testTactical(board);
-
-                // board.computeForceField();
 
                 int nAgentsBegin = board.countAgents();
                 nTotalAgents += nAgentsBegin;
@@ -261,7 +257,6 @@ public class MallSim {
                 int targetsReached = 0;
 
                 for (int i = 0; i < STEPS; i++) {
-                    msecs = System.currentTimeMillis();
                     targetsReached = computeTargetReached();
 
                     if (targetsReached == nAgentsBegin) {
@@ -275,18 +270,12 @@ public class MallSim {
                     } catch (InterruptedException e) {
                     }
 
-                    System.out.println(String.format("dt[REACH] = %d", System.currentTimeMillis() - msecs));
-                    msecs = System.currentTimeMillis();
                     prepareAgents();
 
-                    System.out.println(String.format("dt[PREPARE] = %d", System.currentTimeMillis() - msecs));
-                    msecs = System.currentTimeMillis();
                     Map<Agent, Integer> speedPointsLeft = computeMovementPointsLeft();
                     moveAgents(speedPointsLeft);
 
                     assert (nAgentsBegin == board.countAgents());
-
-                    System.out.println(String.format("dt[MOVED] = %d", System.currentTimeMillis() - msecs));
                 }
 
                 nAgentSuccesses += targetsReached;

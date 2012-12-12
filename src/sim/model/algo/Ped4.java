@@ -10,13 +10,10 @@ import java.util.Random;
 
 import sim.model.Agent;
 import sim.model.Board;
-import sim.model.Cell;
 import sim.model.Mall;
 import sim.model.helpers.Direction;
 import sim.model.helpers.Misc;
 import sim.model.helpers.MyPoint;
-
-// TODO: zweryfikować użycie funkcji board.swapAgent()
 
 public final class Ped4 implements MovementAlgorithm {
 
@@ -476,9 +473,6 @@ public final class Ped4 implements MovementAlgorithm {
     public void nextIterationStep(Agent a, Map<Agent, Integer> mpLeft) {
         Board board = Mall.getInstance().getBoard();
         stepForward(board, a.getPosition(), mpLeft);
-        long msecs = System.currentTimeMillis();
-//        board.computeForceField();  // XXX: docelowo optymalniej
-//        System.out.println(System.currentTimeMillis() - msecs);
     }
 
 
@@ -486,10 +480,7 @@ public final class Ped4 implements MovementAlgorithm {
     public void prepare(Agent a) {
         Board b = Mall.getInstance().getBoard();
         adjustDirection(a);
-        
-//        changeLane(b, a);
-//        Mall.getInstance().getBoard().computeForceField();  // XXX: docelowo
-                                                           // optymalniej
+        changeLane(b, a);
     }
 
 }
