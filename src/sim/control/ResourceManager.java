@@ -70,7 +70,7 @@ public class ResourceManager {
             grid = new Cell[h][w];
 
             // Used to cache Attractors
-            HashMap<Integer, MallFeature> attractors = new HashMap<Integer, MallFeature>();
+            HashMap<Integer, MallFeature> features = new HashMap<Integer, MallFeature>();
 
             Logger.log("Creating board...");
 
@@ -97,21 +97,23 @@ public class ResourceManager {
 
                     map.getPixel(j, i, pixel);
 
-                    // [type][context data 0][contex data 1]
-                    switch(pixel[0]) {
-                        case MAP_ATTRACTOR:
-                            if(attractors.get(pixel[1]) != null) {
-                                grid[i][j].setFeature(attractors.get(pixel[1]));
-                            }
-                            else {
-                                MallFeature att = new Attractor(pixel[1]);
-                                attractors.put(pixel[1], att);
-                                grid[i][j].setFeature(att);
-                            }
-                        break;
+                    int hash = pixel[0] * 255 * 255 + pixel[1] * 255 + pixel[2];
 
-                        default:
-                        break;
+                    // [type][context data 0][contex data 1]
+                    if(features.get(hash) != null) {
+                        grid[i][j].setFeature(features.get(hash));
+                    }
+                    else {
+                        switch(pixel[0]) {
+                            case MAP_ATTRACTOR:
+                                MallFeature att = new Attractor(pixel[1], pixel[2]);
+                                features.put(hash, att);
+                                grid[i][j].setFeature(att);
+                                break;
+
+                            default:
+                                break;
+                        }
                     }
                 }
             }

@@ -133,6 +133,7 @@ public class MallSim {
                                 // TODO: metoda probabilistyczna
                                 if (r.nextDouble() < 1 / (dist * dist)) {
                                     a.reachTarget();
+
                                     if (a.getTargetCount() > 0)
                                         a.setInitialDistanceToTarget(curr.distanceSq(a.getTarget()));
                                 }
@@ -211,6 +212,8 @@ public class MallSim {
                             // czasie)
 
                             board.getCell(p).getAlgorithm().nextIterationStep(a, speedPointsLeft);
+                            board.getCell(p).getFeature().performAction(a);
+
                             speedPointsLeft.put(a, speedPointsLeft.get(a) - 1);
                         }
                     }

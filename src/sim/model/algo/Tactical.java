@@ -11,6 +11,9 @@ import java.util.Comparator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.ListIterator;
+import java.util.PriorityQueue;
+import java.util.BitSet;
+import java.util.Iterator;
 
 import sim.util.Logger;
 
@@ -20,7 +23,7 @@ import sim.model.Board;
 import sim.model.Cell;
 
 public class Tactical {
-    public static final int HEURISTIC_FACTOR = 3;
+    public static final int HEURISTIC_FACTOR = 5;
     public static final int SCORE_FACTOR = 100;
     public static final int MAX_TARGETS = 15;
     public static final int MIN_TARGETS = 1;
@@ -48,6 +51,7 @@ public class Tactical {
 
         initializeTargets(agent, numTargets);
     }
+
 
     public void initializeTargets(Agent agent, int numTargets) {
         Logger.log(String.format("Initializing targets for %s...", agent));
@@ -103,50 +107,60 @@ public class Tactical {
 
 
     public List<Point> computePath(Point start, Point target) {
-        // NOTE O(N log N log H(target)) :(
+        // NOTE O(N log H(target)) :(
 
-        ArrayList<Node> closed = new ArrayList<Node>();
-        ArrayList<Node> open = new ArrayList<Node>();
+        int width = board.getDimension().width;
+        int height = board.getDimension().height;
+
+        BitSet closed = new BitSet(width * height);
+        PriorityQueue<Node> open = new PriorityQueue<Node>(100, new NodeComparator());
 
         open.add(new Node(start, 0, heuristicCostEstimate(start, target)));
 
         Node node = new Node(); // Only for lookups.
         Node current = null;
-        NodeComparator nodeComparator = new NodeComparator();
 
         while(!open.isEmpty()) {
-            Object[] arr = open.toArray();
-            Arrays.sort(arr, nodeComparator);
-            current = (Node) arr[0];
+            current = open.poll();
 
-            open.remove(current);
-            closed.add(current);
+            Point c = current.point;
+            closed.set(c.y * width + c.x);
 
-            if(current.point.equals(target)) {
+            if(c.equals(target)) {
                 break;
             }
 
             List<Point> neighbours = null;
 
             if(useMoore) {
-                neighbours = getNeighboursMoore(current.point);
+                neighbours = getNeighboursMoore(c);
             }
             else {
-                neighbours = getNeighboursVonNeumann(current.point);
+                neighbours = getNeighboursVonNeumann(c);
             }
 
             for(Point neighbour : neighbours) {
                 node.point = neighbour;
 
-                if(closed.contains(node)) {
+                if(closed.get(neighbour.y * width + neighbour.x)) {
                     continue;
                 }
 
-                int score = current.score + getScoreDelta(current.point, neighbour);
+                int score = current.score + getScoreDelta(c, neighbour);
 
                 if(open.contains(node)) {
                     if(score <= node.score) {
-                        Node n = open.get(open.indexOf(node));
+                        Node n = null;
+
+                        Iterator<Node> iter = open.iterator();
+
+                        while(iter.hasNext()) {
+                            n = iter.next();
+
+                            if(n.equals(node)) break;
+                        }
+
+                        assert n != null; // Improbable, yet so, so scary...
 
                         n.prev = current;
                         n.score = score;
@@ -234,7 +248,7 @@ public class Tactical {
 
             List<Point> a = selectMidpoints(points, start, middle);
             List<Point> b = selectMidpoints(points, middle, end);
-            b.remove(0); // NOTE We don't wart midpoint duplication.
+            b.remove(0); // NOTE We don't want midpoint duplication.
 
             result.addAll(a);
             result.addAll(b);

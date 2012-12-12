@@ -1,14 +1,14 @@
 package sim.model.algo;
 
-import sim.model.algo.MallFeature.Type;
 import sim.model.Agent;
 
 public class Attractor extends MallFeature {
-    private Type type = Type.ATTRACTOR;
     private int attraction = 0;
+    private int holdTime = 0;
 
-    public Attractor(int attraction) {
+    public Attractor(int attraction, int holdTime) {
         this.attraction = attraction;
+        this.holdTime = holdTime;
     }
 
     public int modifyHeuristicEstimate(int score) {
@@ -16,10 +16,6 @@ public class Attractor extends MallFeature {
     }
 
     public void performAction(Agent a) {
-        // Do nothing.
-    }
-
-    public Type getType() {
-        return type;
+        // Hold agent for some time...
     }
 }
