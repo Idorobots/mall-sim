@@ -200,6 +200,11 @@ public class MallSim {
                         if (a == null || moved.contains(a))
                             continue;
 
+                        if (a.getHoldTime() > 0) {
+                            a.decrementHoldTime();
+                            continue;
+                        }
+
                         if (a.getTargetCount() == 0 || a.getTarget().equals(p))
                             continue;
 
@@ -212,7 +217,7 @@ public class MallSim {
                             // czasie)
 
                             board.getCell(p).getAlgorithm().nextIterationStep(a, speedPointsLeft);
-                            board.getCell(p).getFeature().performAction(a);
+                            board.getCell(a.getPosition()).getFeature().performAction(a);
 
                             speedPointsLeft.put(a, speedPointsLeft.get(a) - 1);
                         }

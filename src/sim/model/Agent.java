@@ -83,6 +83,12 @@ public class Agent {
     private double initialDistanceToTarget = 0;
 
 
+    /**
+     * Czas wstrzymania dekrementowany co każdy krok symulacji.
+     */
+
+    private int holdTime = 0;
+
     public Agent(MovementBehavior movementBehavior) {
 
         try {
@@ -246,4 +252,18 @@ public class Agent {
         return agility;
     }
 
+
+    public int getHoldTime() {
+        return holdTime;
+    }
+
+    public void setHoldTime(int ht) {
+        holdTime = ht;
+
+        if(holdTime < 0) holdTime = 0;
+    }
+
+    public void decrementHoldTime() {
+        setHoldTime(holdTime - 1);
+    }
 }

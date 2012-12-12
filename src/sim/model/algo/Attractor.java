@@ -16,6 +16,6 @@ public class Attractor extends MallFeature {
     }
 
     public void performAction(Agent a) {
-        // Hold agent for some time...
+        a.setHoldTime(holdTime);
     }
 }
