@@ -59,9 +59,6 @@ public class SocialForce implements MovementAlgorithm {
     public void nextIterationStep(Agent a, Map<Agent, Integer> mpLeft) {
         Board board = Mall.getInstance().getBoard();
         
-        // XXX: mało wydajne, ale przynajmniej działa skutecznie
-        board.computeForceField();
-        
         Point hpt = getHighestPotentialTile(board, a.getPosition());
 
         // Brak możliwości ruchu - agent "drepcze" w miejscu.

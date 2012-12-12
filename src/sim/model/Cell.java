@@ -72,6 +72,8 @@ public class Cell {
 
 
     public void setForceValue(int forceValue) {
+        if (type == Type.BLOCKED)
+            return;
         this.forceValue = forceValue;
     }
 
@@ -80,6 +82,8 @@ public class Cell {
     }
 
     void changeForce(int forceValue) {
+        if (type == Type.BLOCKED)
+            return;
         this.forceValue += forceValue;
     }
 
