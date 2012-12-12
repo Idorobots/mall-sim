@@ -15,7 +15,7 @@ public class Cell {
     private Agent agent = null;
     private MovementAlgorithm algorithm = null;
     private MallFeature feature = null;
-    
+
     /**
      * Licznik odwiedzin - ile razy agenci wchodzili na dane pole.
      */

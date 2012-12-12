@@ -125,40 +125,51 @@ public class MallFrame extends JFrame {
         gbc_backgroundContentPanel.gridy = 0;
         tabDisplay.add(backgroundContentPanel, gbc_backgroundContentPanel);
         backgroundContentPanel.setLayout(new BoxLayout(backgroundContentPanel, BoxLayout.Y_AXIS));
-        
+
         JRadioButton rdbtnBgNone = new JRadioButton("none");
         rdbtnBgNone.setActionCommand(BackgroundPolicy.NONE.name());
         rdbtnBgNone.addActionListener(Listeners.backgroundListener);
         backgroundContentPanel.add(rdbtnBgNone);
-        
+
         JRadioButton rdbtnBgSocialField = new JRadioButton("social field");
         rdbtnBgSocialField.setActionCommand(BackgroundPolicy.SOCIAL_FIELD.name());
         rdbtnBgSocialField.addActionListener(Listeners.backgroundListener);
         backgroundContentPanel.add(rdbtnBgSocialField);
-        
+
         JRadioButton rdbtnBgVisits = new JRadioButton("visits");
         rdbtnBgVisits.setActionCommand(BackgroundPolicy.VISITS.name());
         rdbtnBgVisits.addActionListener(Listeners.backgroundListener);
         backgroundContentPanel.add(rdbtnBgVisits);
-        
+
+
+        JRadioButton rdbtnBgMovement = new JRadioButton("movement algorithm");
+        rdbtnBgMovement.setActionCommand(BackgroundPolicy.MOVEMENT_ALGORITHM.name());
+        rdbtnBgMovement.addActionListener(Listeners.backgroundListener);
+        backgroundContentPanel.add(rdbtnBgMovement);
+
+        JRadioButton rdbtnBgFeatures = new JRadioButton("feature map");
+        rdbtnBgFeatures.setActionCommand(BackgroundPolicy.FEATURES.name());
+        rdbtnBgFeatures.addActionListener(Listeners.backgroundListener);
+        backgroundContentPanel.add(rdbtnBgFeatures);
+
         ButtonGroup backgroundGroup = new ButtonGroup();
         backgroundGroup.add(rdbtnBgNone);
         backgroundGroup.add(rdbtnBgVisits);
         backgroundGroup.add(rdbtnBgSocialField);
-        
+        backgroundGroup.add(rdbtnBgMovement);
+        backgroundGroup.add(rdbtnBgFeatures);
+
         switch (GuiState.backgroundPolicy) {
         case NONE:
-        	rdbtnBgNone.doClick();
-        	break;
+            rdbtnBgNone.doClick();
+            break;
         case SOCIAL_FIELD:
-        	rdbtnBgSocialField.doClick();
-        	break;
+            rdbtnBgSocialField.doClick();
+            break;
         case VISITS:
-        	rdbtnBgVisits.doClick();
-        	break;
+            rdbtnBgVisits.doClick();
+            break;
         }
-        
-
 
         ButtonGroup targetLinesGroup = new ButtonGroup();
 
@@ -197,7 +208,7 @@ public class MallFrame extends JFrame {
         targetLinesGroup.add(rdbtnSelection);
         targetLinesGroup.add(rdbtnSelectionRoute);
         targetLinesGroup.add(rdbtnAll);
-        
+
         JPanel speedPanel = new JPanel();
         speedPanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null),
                 "Animation speed [ms/f]", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -215,6 +226,7 @@ public class MallFrame extends JFrame {
                 GuiState.animationSpeed = ((JSlider) e.getSource()).getValue();
             }
         });
+
         sldSimulationSpeed.setMajorTickSpacing(150);
         sldSimulationSpeed.setPaintLabels(true);
         sldSimulationSpeed.setPaintTicks(true);
@@ -239,6 +251,7 @@ public class MallFrame extends JFrame {
                 }
             }
         });
+
         GridBagConstraints gbc_tglbtnPause = new GridBagConstraints();
         gbc_tglbtnPause.insets = new Insets(0, 0, 5, 0);
         gbc_tglbtnPause.gridx = 0;
@@ -248,13 +261,13 @@ public class MallFrame extends JFrame {
         switch (GuiState.targetLinePolicy) {
         case NONE:
             rdbtnNone.doClick();
-        	break;
+            break;
         case SELECTION:
             rdbtnSelection.doClick();
-        	break;
+            break;
         case ALL:
             rdbtnAll.doClick();
-        	break;
+            break;
         }
 
         JPanel panel = new JPanel();

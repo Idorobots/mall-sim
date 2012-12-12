@@ -27,9 +27,7 @@ public class ResourceManager {
     public static final int MALL_PED4 = 0x7F;
     public static final int MALL_SOCIAL_FORCE = 0xFF;
 
-    public static final int MAP_QUEUE = 0xFF;
-    public static final int MAP_ATTRACTOR = 0x77;
-    public static final int MAP_HOLDER = 0xFF;
+    public static final int MAP_ATTRACTOR = 0x88;
 
     /**
      * Loads shopping mall data from an image file.
@@ -106,7 +104,7 @@ public class ResourceManager {
                     else {
                         switch(pixel[0]) {
                             case MAP_ATTRACTOR:
-                                MallFeature att = new Attractor(pixel[1], pixel[2]);
+                                MallFeature att = new Attractor(0xff-pixel[1], 0xff-pixel[2], hash);
                                 features.put(hash, att);
                                 grid[i][j].setFeature(att);
                                 break;
@@ -135,7 +133,7 @@ public class ResourceManager {
 
         Logger.log("Mall loaded!");
     }
-    
+
     public void loadShoppingMall(String mallFile) {
         BufferedImage mallImage = null;
 
@@ -197,16 +195,10 @@ public class ResourceManager {
         Logger.log("Randomizing board...");
 
         randomize(b, h*w/25);
-        
-//        Point p = new Point(3, 2);
-//        Agent a = new Agent(MovementBehavior.DYNAMIC);
-//        a.addTarget(new Point(10, 8));
-//        Misc.setAgent(a, p);
-            
         Logger.log("Board randomized!");
 
         Logger.log("Mall loaded!");
-    }    
+    }
 
 
     public Agent loadAgent(String agentFile) {
