@@ -11,7 +11,6 @@ import java.util.Random;
 import sim.model.Agent;
 import sim.model.Board;
 import sim.model.Mall;
-import sim.model.algo.Ped4.GapReport;
 import sim.model.helpers.Direction;
 import sim.model.helpers.Misc;
 import sim.model.helpers.MyPoint;
@@ -52,21 +51,21 @@ public class SocialForce implements MovementAlgorithm {
 
 	@Override
 	public void nextIterationStep(Agent a, Map<Agent, Integer> mpLeft) {
+		final double EXCHANGE_CHANCE = 0.5;
 		Board board = Mall.getInstance().getBoard();
 
 		Point hpt = getHighestPotentialTile(board, a.getPosition());
 
 		// Brak możliwości ruchu - agent "drepcze" w miejscu.
-		if (hpt == null) {
+		if (hpt == null || hpt != null && board.getCell(hpt).getAgent() != null
+				&& Math.random() < EXCHANGE_CHANCE) {
 			a.setDirection(a.getDirection().nextCW());
-			return;
+		} else {
+			MyPoint p = a.getPosition();
+			Misc.swapAgent(p, hpt);
+			adjustDirection(a, p);
+			a.incrementFieldsMoved();
 		}
-
-		MyPoint p = a.getPosition();
-		Misc.swapAgent(p, hpt);
-		adjustDirection(a, p);
-
-		a.incrementFieldsMoved();
 	}
 
 	/**
@@ -113,21 +112,24 @@ public class SocialForce implements MovementAlgorithm {
 		Map<Point, Double> potentialMap = new HashMap<Point, Double>();
 		Point target = a.getTarget();
 		for (Point p : points) {
-			// TODO: modyfikacja wzoru?
-			double targetForce = 5 / target.distance(p);
-			potentialMap.put(p, b.getCell(p).getForceValue() + targetForce);
+			// TODO: kalibracja
+			final double targetForce = 5 / target.distance(p);
+			final double agentPenalty = (b.getCell(p).getAgent() == null) ? 0.0
+					: -10.0;
+			potentialMap.put(p, b.getCell(p).getForceValue() + targetForce
+					+ agentPenalty);
 		}
 
-		// Agent jest sfrustrowany chodzeniem - idzie po najmniejszej linii
-		// oporu.
+		// Agent jest sfrustrowany chodzeniem, przez co mniej zważa na innych
+		// ludzi.
 		final double MIN_WALKING_FORCE = 1.3;
 		double distToTarget = a.getInitialDistanceToTarget();
 		double walkingForce = (distToTarget > 0.0) ? a.getFieldsMoved()
 				/ distToTarget : 0;
-		// XXX: zostawić?
+
 		if (walkingForce > MIN_WALKING_FORCE) {
 			final double WALKING_FORCE_MODIFIER = 3.0;
-			
+
 			// Get point closest to target.
 			Point closestToTarget = null;
 			double minDistToTarget = Double.MAX_VALUE;
@@ -188,11 +190,11 @@ public class SocialForce implements MovementAlgorithm {
 		MyPoint left = agentPosition.add(d.nextCCW().getVec());
 		MyPoint right = agentPosition.add(d.nextCW().getVec());
 
-		if (testCell(board, left))
+		if (isCellAccessible(board, left))
 			targetPoints.add(left);
-		if (testCell(board, front))
+		if (isCellAccessible(board, front))
 			targetPoints.add(front);
-		if (testCell(board, right))
+		if (isCellAccessible(board, right))
 			targetPoints.add(right);
 
 		// Punkty dopuszczalne ze względu na aktualny kierunek ruchu.
@@ -201,11 +203,11 @@ public class SocialForce implements MovementAlgorithm {
 		left = agentPosition.add(a.getDirection().nextCCW().getVec());
 		right = agentPosition.add(a.getDirection().nextCW().getVec());
 
-		if (testCell(board, left))
+		if (isCellAccessible(board, left))
 			agentPoints.add(left);
-		if (testCell(board, front))
+		if (isCellAccessible(board, front))
 			agentPoints.add(front);
-		if (testCell(board, right))
+		if (isCellAccessible(board, right))
 			agentPoints.add(right);
 
 		points = new ArrayList<Point>(targetPoints);
@@ -214,11 +216,18 @@ public class SocialForce implements MovementAlgorithm {
 		return points;
 	}
 
-	private boolean testCell(Board b, Point p) {
-		return (b.isOnBoard(p) && b.getCell(p).getAgent() == null && b.getCell(
-				p).isPassable());
+	private boolean isCellAccessible(Board b, Point p) {
+		return (b.isOnBoard(p) && b.getCell(p).isPassable());
 	}
 
+	/**
+	 * Zwraca kierunek celu (kierunek świata wg najmniejszego odchylenia od
+	 * kierunku wektora celu).
+	 * 
+	 * @param target
+	 * @param position
+	 * @return
+	 */
 	private Direction getTargetDirection(Point target, Point position) {
 		// Trzeba pamiętać, że oś OY ma w programie przeciwny zwrot.
 		double targetAngle = Math.toDegrees(Math.atan2(target.x - position.x,
@@ -237,157 +246,5 @@ public class SocialForce implements MovementAlgorithm {
 			return Direction.W;
 		else
 			return Direction.N;
-	}
-
-	private Orientation getDir(Direction dir1, Direction dir2) {
-		if (dir1 == dir2)
-			return Orientation.SAME;
-
-		return (Math.abs(dir1.diff(dir2)) == 1) ? Orientation.ORTHO
-				: Orientation.OPP;
-	}
-
-	private void stepForward(Board board, Point cp, Map<Agent, Integer> mpLeft) {
-		final double p_exchg = 0.5;
-
-		Agent walk = board.getCell(cp).getAgent();
-		MyPoint curr = new MyPoint(cp);
-
-		if (mpLeft.get(walk) < 1)
-			return;
-
-		// (1)
-		GapReport report = calculateGap(board, curr, walk);
-
-		// (3) : bi-directional
-		if (report.direction == Orientation.OPP) {
-			if (mpLeft.get(report.opponent) > 0 && Math.random() < p_exchg) {
-				MyPoint dest = curr.add(walk.getDirection().getVec());
-
-				// wyzeruj oryginalne pole oponenta
-				if (board.getCell(dest).getAgent() == null) {
-					MyPoint oppLoc = dest.add(walk.getDirection().getVec());
-					Misc.setAgent(null, oppLoc);
-				}
-
-				// board.swapAgent(curr, dest);
-				Misc.setAgent(walk, dest);
-				Misc.setAgent(report.opponent, curr);
-				mpLeft.put(walk, mpLeft.get(walk) - 1);
-				mpLeft.put(report.opponent, mpLeft.get(report.opponent) - 1);
-				return;
-			}
-		}
-
-		// (4) : bi-diagonal
-		List<Point> l = new ArrayList<Point>();
-
-		MyPoint[] points = new MyPoint[] {
-				curr.add(walk.getDirection().getVec()).add(
-						walk.getDirection().nextCCW().getVec()),
-				curr.add(walk.getDirection().getVec()).add(
-						walk.getDirection().nextCW().getVec()) };
-
-		for (Point p : points) {
-			if (board.isOnBoard(p) && board.getCell(p).isPassable()) {
-				Agent walk_opp = board.getCell(p).getAgent();
-				if (walk_opp != null
-						&& getDir(walk.getDirection(), walk_opp.getDirection()) == Orientation.OPP
-						&& mpLeft.get(walk_opp) > 0)
-					l.add(p);
-			}
-		}
-
-		if (!l.isEmpty() && Math.random() < p_exchg) {
-			Point dest = l.get(r.nextInt(l.size()));
-			Agent t = board.getCell(dest).getAgent();
-			Misc.setAgent(walk, dest);
-			Misc.setAgent(t, curr);
-			mpLeft.put(walk, mpLeft.get(walk) - 1);
-			mpLeft.put(t, mpLeft.get(t) - 1);
-			return;
-		}
-
-		// (5) : cross-diagonal
-		MyPoint frontTile = curr.add(walk.getDirection().getVec());
-		points = new MyPoint[] {
-				frontTile.add(walk.getDirection().nextCCW().getVec()),
-				frontTile.add(walk.getDirection().nextCW().getVec()) };
-
-		for (MyPoint p : points) {
-			if (board.isOnBoard(p) && board.getCell(p).isPassable()) {
-				Agent walk_opp = board.getCell(p).getAgent();
-				if (walk_opp != null
-						&& p.add(walk_opp.getDirection().getVec()).equals(
-								frontTile) && mpLeft.get(walk_opp) > 0)
-					l.add(p);
-			}
-		}
-
-		if (!l.isEmpty() && Math.random() < p_exchg) {
-			Point dest = l.get(r.nextInt(l.size()));
-			Agent t = board.getCell(dest).getAgent();
-			Misc.setAgent(walk, dest);
-			Misc.setAgent(t, curr);
-			mpLeft.put(walk, mpLeft.get(walk) - 1);
-			mpLeft.put(t, mpLeft.get(t) - 1);
-			return;
-		}
-
-		// (6) : cross-forward-adjacent exchange
-		frontTile = curr.add(walk.getDirection().getVec());
-
-		if (board.isOnBoard(frontTile) && board.getCell(frontTile).isPassable()) {
-			Agent walk_opp = board.getCell(frontTile).getAgent();
-			if (walk_opp != null
-					&& getDir(walk.getDirection(), walk_opp.getDirection()) == Orientation.ORTHO
-					&& mpLeft.get(walk_opp) > 0 && Math.random() < p_exchg) {
-				Misc.setAgent(walk, frontTile);
-				Misc.setAgent(walk_opp, curr);
-				mpLeft.put(walk, mpLeft.get(walk) - 1);
-				mpLeft.put(walk_opp, mpLeft.get(walk_opp) - 1);
-				return;
-			}
-		}
-	}
-
-	private GapReport calculateGap(Board board, MyPoint p, Agent w) {
-		MyPoint np = new MyPoint(p);
-
-		Orientation dir = Orientation.SAME;
-		int gap_same = 2 * w.getvMax();
-		int gap_opp = w.getvMax();
-		Agent op = null;
-
-		for (int i = 1; i <= 1; i++) {
-			np = np.add(w.getDirection().getVec());
-			if (!board.isOnBoard(np)) {
-				if (i <= w.getvMax())
-					return new GapReport(Orientation.OUT, i, null);
-				else
-					break;
-			}
-
-			if (!board.getCell(np).isPassable()) {
-				gap_same = i - 1;
-				break;
-			}
-
-			op = board.getCell(np).getAgent();
-			if (op != null) {
-				if (getDir(w.getDirection(), op.getDirection()) == Orientation.OPP) {
-					gap_opp = (i - 1) / 2;
-					dir = Orientation.OPP;
-				} else {
-					// ORTHO też traktowane jak SAME, bo bez ryzyka kolizji
-					gap_same = i - 1;
-				}
-				break;
-			}
-		}
-
-		int gap = Math.min(w.getvMax(), Math.min(gap_same, gap_opp));
-
-		return new GapReport(dir, gap, op);
 	}
 }
