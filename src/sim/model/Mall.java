@@ -24,4 +24,7 @@ public class Mall {
         return board;
     }
 
+    public void reset() {
+    	board.reset();
+    }
 }

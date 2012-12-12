@@ -114,7 +114,7 @@ public class SocialForce implements MovementAlgorithm {
 		Point target = a.getTarget();
 		for (Point p : points) {
 			// TODO: modyfikacja wzoru?
-			double targetForce = 1 / target.distance(p);
+			double targetForce = 5 / target.distance(p);
 			potentialMap.put(p, b.getCell(p).getForceValue() + targetForce);
 		}
 
@@ -125,30 +125,23 @@ public class SocialForce implements MovementAlgorithm {
 		double walkingForce = (distToTarget > 0.0) ? a.getFieldsMoved()
 				/ distToTarget : 0;
 		// XXX: zostawić?
-//		if (walkingForce > MIN_WALKING_FORCE) {
-//			// Get point closest to target.
-//			Point closestToTarget = null;
-//			double minDistToTarget = Double.MAX_VALUE;
-//			Point p = new Point();
-//			for (int dx = -1; dx < 1; dx++)
-//				for (int dy = -1; dy < 1; dy++) {
-//					p.setLocation(agentPosition.x + dx, agentPosition.y + dy);
-//					if (!b.isOnBoard(p))
-//						continue;
-//
-//					double dist = p.distance(target);
-//					if (dist < minDistToTarget) {
-//						closestToTarget = p;
-//						minDistToTarget = dist;
-//					}
-//				}
-//
-//			if (potentialMap.containsKey(closestToTarget))
-//				potentialMap.put(closestToTarget,
-//						potentialMap.get(closestToTarget) + walkingForce);
-//			else
-//				potentialMap.put(closestToTarget, b.getCell(p).getForceValue() + walkingForce);
-//		}
+		if (walkingForce > MIN_WALKING_FORCE) {
+			final double WALKING_FORCE_MODIFIER = 3.0;
+			
+			// Get point closest to target.
+			Point closestToTarget = null;
+			double minDistToTarget = Double.MAX_VALUE;
+			for (Point p : points) {
+				double dist = p.distance(target);
+				if (dist < minDistToTarget) {
+					closestToTarget = p;
+					minDistToTarget = dist;
+				}
+			}
+
+			potentialMap.put(closestToTarget, potentialMap.get(closestToTarget)
+					+ walkingForce * WALKING_FORCE_MODIFIER);
+		}
 
 		// Pozostaw pola o najwyższym potencjale.
 		double maxPotential = Collections.max(potentialMap.values());
@@ -176,43 +169,43 @@ public class SocialForce implements MovementAlgorithm {
 
 	/**
 	 * 
-	 * @param a
-	 *            agent
-	 * @param p
+	 * @param board
+	 *            plansza
+	 * @param agentPosition
 	 *            pozycja agenta
 	 * @return
 	 */
-	private List<Point> getAvailableTiles(Board b, MyPoint p) {
+	private List<Point> getAvailableTiles(Board board, MyPoint agentPosition) {
 
 		List<Point> points;
 
-		Agent a = b.getCell(p).getAgent();
-		Direction d = getTargetDirection(a.getTarget(), p);
+		Agent a = board.getCell(agentPosition).getAgent();
+		Direction d = getTargetDirection(a.getTarget(), agentPosition);
 
 		// Punkty dopuszczalne ze względu na kierunek do celu.
 		List<Point> targetPoints = new ArrayList<Point>();
-		MyPoint front = p.add(d.getVec());
-		MyPoint left = p.add(d.nextCCW().getVec());
-		MyPoint right = p.add(d.nextCW().getVec());
+		MyPoint front = agentPosition.add(d.getVec());
+		MyPoint left = agentPosition.add(d.nextCCW().getVec());
+		MyPoint right = agentPosition.add(d.nextCW().getVec());
 
-		if (testCell(b, left))
+		if (testCell(board, left))
 			targetPoints.add(left);
-		if (testCell(b, front))
+		if (testCell(board, front))
 			targetPoints.add(front);
-		if (testCell(b, right))
+		if (testCell(board, right))
 			targetPoints.add(right);
 
 		// Punkty dopuszczalne ze względu na aktualny kierunek ruchu.
 		List<Point> agentPoints = new ArrayList<Point>();
-		front = p.add(a.getDirection().getVec());
-		left = p.add(a.getDirection().nextCCW().getVec());
-		right = p.add(a.getDirection().nextCW().getVec());
+		front = agentPosition.add(a.getDirection().getVec());
+		left = agentPosition.add(a.getDirection().nextCCW().getVec());
+		right = agentPosition.add(a.getDirection().nextCW().getVec());
 
-		if (testCell(b, left))
+		if (testCell(board, left))
 			agentPoints.add(left);
-		if (testCell(b, front))
+		if (testCell(board, front))
 			agentPoints.add(front);
-		if (testCell(b, right))
+		if (testCell(board, right))
 			agentPoints.add(right);
 
 		points = new ArrayList<Point>(targetPoints);
