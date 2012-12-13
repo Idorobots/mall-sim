@@ -106,12 +106,12 @@ Zgodnie z metodą \emph{Divide and Conquer} zaproponowaną we \hyperref[sec:intr
         \label{fig:overview}
     \end{figure}
 
-Model centrum handlowego przewiduje istnienie specjalnych stref, wewnątrz których algorytmy odpowiedzialne za poruszanie agentów są modyfikowane lub zastępowane celem modelowania dobrze zdefiniowanych elementarnych zachowań, takich jak \emph{kolejkowanie}, czy \emph{grupowanie się}. W wyniku obserwacji stwierdzono istnienie czterech rodzajów stref specjalnych - strefy przyciągania uwagi (atraktory), kolejki, przejścia i miejsca przeznaczone do czekania.
+Model centrum handlowego przewiduje istnienie specjalnych stref, wewnątrz których algorytmy odpowiedzialne za poruszanie agentów są modyfikowane lub zastępowane celem modelowania dobrze zdefiniowanych elementarnych zachowań, takich jak \emph{kolejkowanie}, czy \emph{grupowanie się}. W wyniku obserwacji stwierdzono istnienie czterech rodzajów stref specjalnych - strefy przyciągania uwagi (atraktory), kolejki, przejścia i miejsca oczekiwania (opóźniacze).
 
     \subsection{Atraktory}
     \label{sec:attractors}
 
-Atraktor jest specjalną strefą charakteryzującą się podwyższonym zainteresowaniem ze strony agentów poruszających się po centrum handlowym. Atraktor ma za zadanie modelować obecność przedmiotu lub zjawiska, które przykuwa uwagę ludzi na terenie centrum handlowego, a wynikiem jego działania jest spontaniczne powstawanie skupisk ludzi - \emph{grupowanie się}.
+Atraktor jest specjalną strefą przyciągającą uwagę agentów poruszających się po centrum handlowym. Atraktor ma za zadanie modelować obecność przedmiotu lub zjawiska, które przykuwa uwagę ludzi na terenie centrum handlowego, a wynikiem jego działania jest spontaniczne powstawanie skupisk ludzi - \emph{grupowanie się}.
 
     \begin{figure}[H]
         \centering
@@ -120,7 +120,7 @@ Atraktor jest specjalną strefą charakteryzującą się podwyższonym zainteres
         \label{fig:crowding}
     \end{figure}
 
-Atraktory różnią się między sobą typami - atraktory różnych typów przyciągają inne rodzaje agentów, co modeluje różnice w preferencjach ludzi przebywających w centrum handlowym. Działanie atraktorów jest najistotniejsze w \hyperref[sec:tactical]{taktycznej} fazie modelu ruchu, w której ma miejsce wybór i modyfikacja preferowanych przez agentów dróg prowadzących do wybranych celów.
+Atraktory różnią się między sobą typami - atraktory różnych typów przyciągają inne rodzaje agentów, co modeluje różnice w preferencjach ludzi przebywających w centrum handlowym.
 
     \subsection{Kolejki}
     \label{sec:queues}
@@ -134,12 +134,10 @@ Drugim istotnym z punktu widzenia modelu centrum handlowego typem strefy specjal
         \label{fig:queueing}
     \end{figure}
 
-Kolejki modyfikują działanie \hyperref[sec:operational]{fazy operacyjnej} modelu ruchu zmniejszając udział modelu preferencji odległościowych w wyznaczaniu oceny sąsiadujących z agentem komórek mapy centrum handlowego.
-
     \subsection{Przejścia/wejścia/wyjścia}
     \label{sec:entrance-exits}
 
-Strefy przejść pozwalają na \emph{tworzenie}, \emph{przemieszczanie} pomiędzy różnymi fragmentami mapy centrum handlowego i \emph{usuwanie} agentów, którzy osiągnęli wszystkie cele swojej podróży.
+Strefy przejść podobnie jak koleki modyfikują preferencje odległościowe agentów i prowądzą do zmniejszenia odległości między nimi, co nie wynika z ogólnego modelu ruchu. Przejścia, jak sama nazwa wskazuje, modelują wszelkiego rodzaju wejścia, wyjścia i przejścia prowadzące między piętrami centrum handlowego.
 
     \begin{figure}[H]
         \centering
@@ -148,10 +146,10 @@ Strefy przejść pozwalają na \emph{tworzenie}, \emph{przemieszczanie} pomiędz
         \label{fig:passing-through}
     \end{figure}
 
-    \subsection{Miejsca oczekiwania}
+    \subsection{Miejsca oczekiwania (Opóźniacze)}
     \label{sec:holders}
 
-Ostatnim istotnym typem strefy specjalnej jest miejsce oczekiwania, modelujące wszelkiego rodzaju miejsca spędzania czasu w bezruchu. Agent trafiający do miejsca oczekiwania zostaje wstrzymany na ustaloną ilość czasu przed kontynuowaniem swojej podróży.
+Ostatnim istotnym typem strefy specjalnej jest miejsce oczekiwania, modelujące wszelkiego rodzaju miejsca spędzania czasu w bezruchu.
 
     \begin{figure}[H]
         \centering
@@ -169,15 +167,15 @@ W zastosowanym algorytmie można wyszczególnieć dwie główne, wzajemnie od si
 
     \begin{figure}[H]
         \centering
-        \includegraphics[scale=0.7]{./img/ActorActivity.pdf}
+        \includegraphics[scale=0.55]{./img/ActorActivity.pdf}
         \caption{Diagram aktywności agentów.}
         \label{fig:actor-activity}
     \end{figure}
 
-Algorytm rozpoczyna pracę od wygenerowania agenta na podstawie wcześniej zdefiniowanych archetypów.
-Dla każdego agenta wybierana jest wstępna lista miejsc docelowych, które zostaną przez niego odwiedzone w czasie działania symulacji, oraz obliczana jest optymalna ścieżka wiodące do pierwszego wybranego w poprzednim kroku miejsca docelowego. Algorytm następnie modyfikuje ścieżkę w oparciu o mapę rozkładu stref specjalnych centrum handlowego by lepiej modelować faktyczne zamiary danego aktora.
+Algorytm rozpoczyna działanie od wygenerowania agenta na podstawie wcześniej zdefiniowanych archetypów.
+Dla każdego agenta wybierana jest wstępna lista miejsc docelowych, które zostaną przez niego odwiedzone w czasie działania symulacji, oraz obliczana jest optymalna ścieżka łącząca wybrane w poprzednim kroku miejsca docelowe. Algorytm następnie modyfikuje ścieżkę w oparciu o mapę rozkładu stref specjalnych centrum handlowego by lepiej modelować faktyczne zamiary danego agenta. Faza taktyczna kończy się wybraniem niewielkiej ilości punktów pośrednich leżących na wyznaczonej ścieżce.
 
-Po wygenerowaniu niezbędnych danych taktycznych dla każdego agenta algorytm przechodzi do fazy operacyjnej, która odpowiada za właściwe przemieszczanie agentów. Faza ta zachodzi w lokalnym otoczeniu każdego agenta i odpowiada za zachowania takie jak omijanie przeszkód, grupowanie się, podążanie za obraną ścieżką i inne akcje związane ze specjalnymi strefami centrum handlowego.
+Po wygenerowaniu niezbędnych danych taktycznych dla każdego agenta algorytm przechodzi do fazy operacyjnej, która odpowiada za właściwe przemieszczanie agentów. Faza ta zachodzi w lokalnym otoczeniu każdego agenta i odpowiada za zachowania takie jak omijanie przeszkód, grupowanie się i podążanie za obraną ścieżką.
 Algorytm na podstawie bezpośredniego otoczenia agenta oraz metadanych dotyczących obecnego celu jego podróży podejmuje decyzje o możliwości wykonania ruchu, lub w przypadku skrajnym o modyfikacji wybranej ścieżki prowadzącej do celu, czy nawet zmianie aktualnego celu podróży.
 W przypadku osiągnięcia miejsca docelowego algorytm przechodzi do rozpatrywania następnego miejsca docelowego, lub w tryb ``błądzenia'', gdy osiągnięto już wszystkie wyznaczone cele.
 
@@ -193,8 +191,13 @@ W przypadku osiągnięcia miejsca docelowego algorytm przechodzi do rozpatrywani
         \end{figure}
 
 \noindent
-Faza taktyczna zachodzi globalnie dla każdego agenta bez uwzględnienia jego lokalnego otoczenia, innych agentów, czy fizycznych właściwości centrum handlowego - nie jest istotnym, czy dany korytarz został zablokowany przez grupę ludzi i nie umożliwia przejścia. Faza ta modeluje abstrakcyjne zamiary agenta i jej celem jest przede wszystkim wybór listy miejsc docelowych oraz wyznaczenie dróg do nich prowadzących, co zostało osiągnięte dzięki \hyperref[sec:path-finding]{algorytmowi znajdowania ścieżek} oraz \hyperref[sec:mall-impl]{mapie rozkładu stref specjalnych} centrum handlowego. Cele podróży agentów wybierane są ze zbioru punktów szczególnego zainteresowania - punktów graniczących ze ścianami centrum handlowego. Przy wyznaczaniu ścieżek pod uwagę brane są \hyperref[sec:attractors]{atraktory}, \hyperref[sec:queues]{kolejki} i \hyperref[sec:entrance-exits]{przejścia}, które algorytm stara się osiągnąć modyfikując wcześniej wyznaczoną, optymalną ścieżkę prowadzącą do aktualnego celu podróży.
+Faza taktyczna zachodzi globalnie dla każdego agenta bez uwzględnienia jego lokalnego otoczenia, innych agentów, czy fizycznych właściwości centrum handlowego - nie jest istotnym, czy dany korytarz został zablokowany przez grupę ludzi i nie umożliwia przejścia. Faza ta modeluje abstrakcyjne zamiary agenta i jej celem jest przede wszystkim wybór listy miejsc docelowych oraz wyznaczenie dróg do nich prowadzących. \\
 
+Osiągnięto to dzięki \hyperref[sec:path-finding]{algorytmowi znajdowania ścieżek A*} oraz \hyperref[sec:mall-impl]{mapie rozkładu stref specjalnych} centrum handlowego, która jest wykorzystywana jako dodatkowa heurystyka A* - specjalne strefy centrum handlowego modyfikują estymowaną ocenę danego punktu wyznaczanej ścieżki nadając jej pożądany kształt i prowadząc ją w odpowiedni sposób do celu podróży. \\
+
+Przy wyznaczaniu ścieżek pod uwagę brane są \hyperref[sec:attractors]{atraktory}, \hyperref[sec:queues]{kolejki} i \hyperref[sec:entrance-exits]{przejścia}, które algorytm stara się uwzględnić za pomocą opisanej heurystyki.
+
+\newpage
         \subsection{Faza operacyjna}
         \label{sec:operational}
 
@@ -210,20 +213,24 @@ Faza taktyczna zachodzi globalnie dla każdego agenta bez uwzględnienia jego lo
 \noindent
 Faza operacyjna zachodzi w lokalnym otoczeniu każdego agenta, a jej celem jest wykonanie właściwego ruchu agenta. Faza ta jest odpowiedzialna za unikanie kolizji i omijanie przeszkód. Pod uwagę brani są inni agenci oraz metadane dotyczące drogi prowadzącej do aktualnego celu podróży wygenerowane w taktyczniej fazie działania algorytmu. W implementacji fazy operacyjnej wykorzystano zmodyfikowane algorytmy \hyperref[sec:ped-4-impl]{Ped-4} i \hyperref[sec:social-force-impl]{Social-Force}. \\
 
-\noindent
-Oryginalny \textbf{Ped-4} został zaproponowany w pracy \textit{Modeling Four Directional Pedestrian Movements} (\cite{refs:4-way-movement}). Ponieważ prowadzi on do samoorganizowania się pieszych w kolumny, w symulacji galerii używany jest w odniesieniu do przestrzeni, po których ruch odbywa się w sposób uporządkowany (tj. do korytarzy, alejek oraz niewielkich skrzyżowań).
+Oryginalny \textbf{Ped-4} został zaproponowany w pracy \textit{Modeling Four Directional Pedestrian Movements} (\cite{refs:4-way-movement}). Ponieważ prowadzi on do samoorganizowania się pieszych w kolumny, w symulacji galerii używany jest w odniesieniu do przestrzeni, po których ruch odbywa się w sposób uporządkowany (tj. do korytarzy, alejek oraz niewielkich skrzyżowań). \\
 
+\noindent
 Algorytm składa się z następujących etapów:
 \begin{enumerate}
-\item dostosowanie kierunku ruchu \
-	Gdy kąt między kierunkiem ruchu, a kierunkiem do celu przekroczy wartość graniczną, pieszy skręca w stronę celu.
-\item zmiana pasa ruchu \
-	Obliczana jest ilość wolnych pól dla obecnie zajmowanego pasa i dla pasów sąsiednich. Pieszy zajmuje ten pas, który na chwilę obecną umożliwia mu przesunięcie się o największą ilość pól do przodu. Przy wyborze preferowany jest dotychczasowy pas. W przypadku, gdy obecnie zajmowany pas nie jest ``czysty'' (tzn. z naprzeciwka idzie inny pieszy), aby uniknać kolizji pieszy stara się ``schować'' za inną osobą idącą w tym samym co on kierunku.
-\item krok naprzód \
-	W przypadku, gdy pole bezpośrednio przed pieszym (zgodnie z kierunkiem ruchu) jest wolne - próba zajęcia go. Jeśli nie jest to możliwe - próba dokonania zamiany miejsca z innym pieszym. Wymiana odzwierciedla sytuację, gdy piesi ``skręcają tułowie'', by ``przecisnąć się'' obok siebie. Etap \textit{krok naprzód} powtarzany jest wielokrotnie, dopóki nie skończą się ``punkty ruchu'' pieszego.
+\item \textbf{Dostosowanie kierunku ruchu} \
+    - gdy kąt między kierunkiem ruchu, a kierunkiem do celu przekroczy wartość graniczną, pieszy skręca w stronę celu.
+\item \textbf{Zmiana pasa ruchu} \
+    - obliczana jest ilość wolnych pól dla obecnie zajmowanego pasa i dla pasów sąsiednich. Pieszy zajmuje ten pas, który na chwilę obecną umożliwia mu przesunięcie się o największą ilość pól do przodu. Przy wyborze preferowany jest dotychczasowy pas. W przypadku, gdy obecnie zajmowany pas nie jest ``czysty'' (tzn. z naprzeciwka idzie inny pieszy), aby uniknać kolizji pieszy stara się ``schować'' za inną osobą idącą w tym samym co on kierunku.
+\item \textbf{Krok naprzód} \
+    - w przypadku, gdy pole bezpośrednio przed pieszym (zgodnie z kierunkiem ruchu) jest wolne - próba zajęcia go. Jeśli nie jest to możliwe - próba dokonania zamiany miejsca z innym pieszym. Wymiana odzwierciedla sytuację, gdy piesi ``skręcają tułowie'', by ``przecisnąć się'' obok siebie. Etap \textit{krok naprzód} powtarzany jest wielokrotnie, dopóki nie skończą się ``punkty ruchu'' pieszego.
 \end{enumerate}
 
+\newpage
+
+\noindent
 Poniżej zamieszczono preferowaną kolejność dokonywania zamian:
+
 \begin{enumerate}
 \item między pieszymi idącymi w przeciwnych kierunkach na tym samym pasie
 \item między pieszymi idącymi w przeciwnych kierunkach na sąsiednich pasach (na polach po przekątnej)
@@ -231,36 +238,55 @@ Poniżej zamieszczono preferowaną kolejność dokonywania zamian:
 \item między pieszymi idącymi w kierunkach prostopadłych względem siebie (jeden ``tarasuje'' drugiemu drogę)
 \end{enumerate}
 
-Pieszy może wybrać daną możliwość tylko wtedy, gdy jego ``partner'' do zamiany nie wykonał jeszcze swojego ruchu. Jeśli dana wymiana nie dojdzie do skutku, próbowana jest kolejna opcja z listy (znajduje to potwierdzenie w obserwacjach - w sytuacji dużego tłoku ludzie chętniej dokonują takich manewrów).
-
 \noindent
+Pieszy może wybrać daną możliwość tylko wtedy, gdy jego ``partner'' do zamiany nie wykonał jeszcze swojego ruchu. Jeśli dana wymiana nie dojdzie do skutku, próbowana jest kolejna opcja z listy (znajduje to potwierdzenie w obserwacjach - w sytuacji dużego tłoku ludzie chętniej dokonują takich manewrów). \\
+
 Algorytm \textbf{Social Force} opiera się na obserwacji, że każdy człowiek posiada wokół siebie (głównie przed sobą) tzw. \textit{strefę komfortu}, w której niechętnie widzi osoby postronne. Po zsumowaniu stref komfortu wszystkich agentów otrzymuje się swoisty rozkład potencjału, na podstawie którego wyznaczany jest ich dalszy kierunek ruchu. Zasada, według której odbywa się ruch, jest prosta - dojść do celu po polach o jak najmniejszym potencjale. Jeśli w danym momencie brak jest dostępnych pól, pieszy ``drepcze'' w miejscu w oczekiwaniu na zwolnienie się któregoś z nich. Algorytm \textit{Social Force} służy głównie do modelowania miejsc, w których ludzie ``wałęsają się'', jak place czy wnętrza sklepów.
 
 \newpage
     \section{Implementacja}
     \label{sec:implementation}
 
-     % TODO Opisać technikalia implementacji...
+    W poniższej sekcji zawarto opis konkretnej implementacji wybranych algorytmów.
 
         \subsection{Reprezentacja centrum handlowego}
         \label{sec:mall-impl}
 
-        \begin{figure}[H]
-            \centering
-            \includegraphics[scale=0.2]{./img/MallLayout.pdf}
-            \caption{Przykładowy rozkład pomieszczeń małego centrum handlowego.}
-            \label{fig:mall-layout}
-        \end{figure}
+        Centra handlowe reprezentowane są za pomocą map bitowych (plików \emph{.bmp}), których piksele kodują odpowiadające im komórki siatki symulacji, co pozwala tworzyć nowe rozkłady pomieszczeń i stref spejcalnych w bardzo prosty i szybki sposób. Implementacja przewiduje istnienie dwóch map dla każdego centrum handlowego - mapę rozkładu pomieszczeń i algorytmów ruchu fazy operacyjnej (rysunek \ref{fig:mall-layout}) oraz mapę rozkładu stref specjalnych centrum handlowego (rysunek \ref{fig:mall-features}).
 
         \begin{figure}[H]
             \centering
-            \includegraphics[scale=0.2]{./img/MallFeatures.pdf}
+            \includegraphics[scale=0.3]{./img/MallLayout.pdf}
+            \caption{Przykładowy rozkład pomieszczeń i algorytmów ruchu małego centrum handlowego.}
+            \label{fig:mall-layout}
+        \end{figure}
+
+        \emph{Mapa rozkładu pomieszczeń} zawiera informacje o fizycznych właściwościach pomieszczeń modelowanego centrum handlowego - usytułówanie ściań i innych obiektów blokujących przejście. Dodatkowo zawarto na niej rozkład algorytmów ruchu wykorzystanych w \hyperref[sec:operational]{fazie operacyjnej}, co pozwala jednoznacznie określić położenie korytarzy, skrzyżowań i innych cech centrum handlowego związanych z ruchem agentów. \\
+
+\noindent
+Wartości znaczące poszczególnych pixeli RGB mapy:
+
+        \begin{itemize}
+            \item $(0x00, *, *)$ - wartość zarezerwowana dla ścian i innych obiektów blokujących przejście.
+            \item $(0x7F, *, *)$ - wartość determinująca wykorzystanie algorytmu \hyperref[sec:ped-4-impl]{Ped-4}.
+            \item $(0xFF, *, *)$ - wartość determinująca wykorzystanie algorytmu \hyperref[sec:social-force-impl]{Social Force}.
+        \end{itemize}
+
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.3]{./img/MallFeatures.pdf}
             \caption{Przykładowy rozkład stref specjalnych małego centrum handlowego.}
             \label{fig:mall-features}
         \end{figure}
 
-        % TODO Opisać jak obsługiwane są wielopiętrowe centra handlowe.
-        % TODO Opisać, jak kodowane są poszczególne strefy specjale.
+        \emph{Mapa rozkładu stref specjalnych} centrum handlowego zawiera informacje o funkcjonalnych cechach modelowanego centrum handlowego - rozmieszczenie miejsc przeznaczonych do czekania, kolejek przy kasach sklepowych, okien wystawowych i sieci routingu ułatwiającej przemieszczanie się w centrum handlowym. Informacje te wykorzystywane są przede wszystkim przez \hyperref[sec:tactical]{fazę taktyczną} wykorzystanego algorytmu, gdzie są służą jako \hyperref[sec:path-deviation]{dodatkowa heurystyka} \hyperref[sec:path-finding]{algorytmu wyszukiwania ścieżek A*}. \\
+
+\noindent
+Wartości znaczące poszczególnych pixeli RGB mapy:
+
+        \begin{itemize}
+            \item $(0x7F, A, H)$ - wartość oznaczająca \hyperref[sec:path-deviation]{uogólniony atraktor} o \emph{atrakcyjności} $A$ i \emph{czasie wstrzymania} $H$.
+        \end{itemize}
 
         \subsection{Reprezentacja agentów}
         \label{sec:actor-impl}
