@@ -6,10 +6,27 @@
 \usepackage{hyperref}
 \usepackage[margin=2cm]{geometry}
 \usepackage{amsmath}
-\usepackage[polish]{babel}
 \usepackage[nottoc,numbib]{tocbibind}
+\usepackage{enumerate}
+\usepackage{indentfirst}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amssymb,latexsym,stmaryrd,dsfont,amsthm, algorithmicx}
+\usepackage[polish]{babel}
 %\usepackage{polski}
 
+\newcommand{\image}[2]{
+\begin{center}
+\includegraphics[scale = #1]{#2}
+\end{center}
+}
+
+\newcommand{\capimage}[3]{
+\begin{center}
+\includegraphics[scale = #1]{#2}\\
+\small #3 \normalsize
+\end{center}
+}
 
 \title{\textbf{Symulacja ruchu ludzi w centrum handlowym}}
 \author{Paweł Kłeczek \\ \emph{pkleczek@student.agh.edu.pl} \and Kajetan Rzepecki \\ \emph{kajetan.rzepecki+agh@gmail.com}}
@@ -211,7 +228,7 @@ Przy wyznaczaniu ścieżek pod uwagę brane są \hyperref[sec:attractors]{atrakt
         % TODO Potrzeba większego opisu, który bardziej zagłębia się w wybrany algorytm operacyjny.
 
 \noindent
-Faza operacyjna zachodzi w lokalnym otoczeniu każdego agenta, a jej celem jest wykonanie właściwego ruchu agenta. Faza ta jest odpowiedzialna za unikanie kolizji i omijanie przeszkód. Pod uwagę brani są inni agenci oraz metadane dotyczące drogi prowadzącej do aktualnego celu podróży wygenerowane w taktyczniej fazie działania algorytmu. W implementacji fazy operacyjnej wykorzystano zmodyfikowane algorytmy \hyperref[sec:ped-4-impl]{Ped-4} i \hyperref[sec:social-force-impl]{Social-Force}. \\
+Faza operacyjna zachodzi w lokalnym otoczeniu każdego agenta, a jej celem jest wykonanie właściwego ruchu agenta. Faza ta jest odpowiedzialna za unikanie kolizji i omijanie przeszkód. Pod uwagę brani są inni agenci oraz metadane dotyczące drogi prowadzącej do aktualnego celu podróży wygenerowane w taktyczniej fazie działania algorytmu. W implementacji fazy operacyjnej wykorzystano zmodyfikowane algorytmy \hyperref[sec:movement-impl]{Ped-4} i \hyperref[sec:social-force-impl]{Social-Force}. \\
 
 Oryginalny \textbf{Ped-4} został zaproponowany w pracy \textit{Modeling Four Directional Pedestrian Movements} (\cite{refs:4-way-movement}). Ponieważ prowadzi on do samoorganizowania się pieszych w kolumny, w symulacji galerii używany jest w odniesieniu do przestrzeni, po których ruch odbywa się w sposób uporządkowany (tj. do korytarzy, alejek oraz niewielkich skrzyżowań). \\
 
@@ -268,7 +285,7 @@ Wartości znaczące poszczególnych pixeli $RGB$ mapy:
 
         \begin{itemize}
             \item $(0x00, *, *)$ - wartość zarezerwowana dla ścian i innych obiektów blokujących przejście.
-            \item $(0x7F, *, *)$ - wartość determinująca wykorzystanie algorytmu \hyperref[sec:ped-4-impl]{Ped-4}.
+            \item $(0x7F, *, *)$ - wartość determinująca wykorzystanie algorytmu \hyperref[sec:movement-impl]{Ped-4}.
             \item $(0xFF, *, *)$ - wartość determinująca wykorzystanie algorytmu \hyperref[sec:social-force-impl]{Social Force}.
         \end{itemize}
 
@@ -325,21 +342,153 @@ Zależnie od zastosowanej heurystyki algorytm A* jest w stanie dostarczać optym
 
         \emph{Czas wstrzymania} odpowiada za opóźnianie agentów podczas wykonywania ruchu - agent osiągający komórkę siatki symulacji obarczoną czasem oczekiwania zostaje opóźniony na zadaną ilość czasu. Wartość czasu wstrzymania kodowana jest przez komponent $B$ pixeli $RGB$ mapy rozkładu stref specjalnych centrum handlowego, kodujących atraktory. Wartość tego komponentu traktowana jest jako ilość kroków symulacji, na które opóźniany agent zostanie wstrzymany. \\
 
-Implementacja \emph{uogólnionego atraktora} okazała się na tyle elastyczna, że wyeliminowała konieczność osobnej implementacji \hyperref[sec:queues]{kolejek} i \hyperref[sec:holders]{opóźniaczy} - kolejki realizowane są jako linie znacząco zwiększonej atrakcji o krótkim czasie wstrzymania, natomiast opóźniacze są punktami o znacząco zwiększonym czasie wstrzymania. \hyperref[sec:atractors]{Atraktory} zostały zrealizowane jako gradienty zwiększającej się atrakcji i czasu wstrzymania - agenci odwiedzajacy atraktor spędzają w nim tym więcej czasu, im bliżej jego centrum się znajdują. Dodatkowym atutem zastosowanej implementacji jest możliwość routingu agentów w centrum handlowym. Wszystkie formy stref specjalnych wyrażonych przez modyfikację heurystyki algorytmu A* zostały zawarte na poglądowym rysunku \ref{fig:mall-features}.
+Implementacja \emph{uogólnionego atraktora} okazała się na tyle elastyczna, że wyeliminowała konieczność osobnej implementacji \hyperref[sec:queues]{kolejek} i \hyperref[sec:holders]{opóźniaczy} - kolejki realizowane są jako linie znacząco zwiększonej atrakcji o krótkim czasie wstrzymania, natomiast opóźniacze są punktami o znacząco zwiększonym czasie wstrzymania. \hyperref[sec:attractors]{Atraktory} zostały zrealizowane jako gradienty zwiększającej się atrakcji i czasu wstrzymania - agenci odwiedzajacy atraktor spędzają w nim tym więcej czasu, im bliżej jego centrum się znajdują. Dodatkowym atutem zastosowanej implementacji jest możliwość routingu agentów w centrum handlowym. Wszystkie formy stref specjalnych wyrażonych przez modyfikację heurystyki algorytmu A* zostały zawarte na poglądowym rysunku \ref{fig:mall-features}.
 
         \subsection{Reprezentacja agentów}
         \label{sec:actor-impl}
 
-        % TODO Opisać parametry agentów.
+        Na chwilę obecną agenci opisywani są przez parametry wpływające tylko i wyłącznie na ich ruch w fazie operacyjnej. Docelowo planowane jest rozszerzenie ich zachowania o preferencje dotyczące odwiedzanych miejsc, czasu spędzanego w galerii itp.
 
-        \subsection{Ruch agentów}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.75]{./img/agent.png}
+        \caption{Klasa agenta}
+        \label{fig:agent}
+    \end{figure}
+
+\noindent
+Znaczenie poszczególnych parametrów:
+\begin{itemize}
+\item \textbf{vMax} – maksymalna ilość punktów ruchu do wykorzystania w danej iteracji fazy operacyjnej
+\item \textbf{agility} – skłonność do dokonywania zamian z innymi podczas etapu poruszania agentów
+\item \textbf{position} – położenie agenta na planszy galerii
+\item \textbf{direction} – aktualny kierunek ruchu (dostępne kierunki są zgodne ze stronami świata)
+\item \textbf{route} – lista współrzędnych płytek-celów do odwiedzenia
+\item \textbf{forceField} – opis wartości potencjału pól wokół agenta (przy założeniu, że agent zwrócony jest w kierunku północnym)
+\item \textbf{fieldsMoved} – odległość (mierzona w płytkach) przebyta od ostatniego celu do danej chwili
+\item \textbf{initialDistanceToTarget} – teoretyczna minimalna odległość od poprzedniego do obecnego celu
+\item \textbf{holdTime} – pozostały czas oczekiwania (np. w kolejce)
+\end{itemize}
+
+Część spośród powyższych parametrów agenta inicjalizowana jest na podstawie plików zawierających opisy pewnych ogólnych charakterystyk ludzi, np. "typ dynamiczny" oznacza człowieka poruszającego się szybko i skłonnego do dokonywania zamian, "typ emeryta" oznacza stateczny krok i niechęć do zamian.
+
+        \subsection{Ruch agentów i Ped-4}
         \label{sec:movement-impl}
 
-        \subsection{Ped-4}
-        \label{sec:ped-4-impl}
+\noindent
+Faza operacyjna składa się z czterech wykonywanych w pętli etapów, co zilustrowano na poniższym schemacie:
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.5]{./img/mainloop.png}
+        \caption{Pętla fazy operacyjnej}
+        \label{fig:operloop}
+    \end{figure}
+
+\indent Sprawdzanie osiągnięcia celu służy wyznaczeniu kolejnego celu, o ile poprzedni został osiągnięty. Cel można osiągnąć na dwa sposoby: wchodząc bezpośrednio na płytkę o zadanych współrzędnych bądź wchodząc na płytkę w sąsiedztwie celu (w tym przypadku prawdopodobieństwo uznania celu za osiągnięty zależy od odległości płytki od niego). Po wyznaczeniu nowego celu aktualizowane są parametry wykorzystywane przez algorytmy ruchu, jak początkowa (teoretyczna) minimalna odległość od celu. \newline
+\indent Przygotowanie agentów polega na wywołaniu dla każdego z nich metody \emph{prepare()} algorytmu przypisanego do płytki, na której agent aktualnie się znajduje. \newline
+\indent Obliczanie dostępnych w danym obiegu fazy iteracyjnej punktów ruchu to przepisanie aktualnej prędkości maksymalnej każdego z agentów. \newline
+\indent W etapie poruszania agentów agenci rozpatrywani są cyklicznie. W jednej iteracji (``kroku'') każdy z agentów może wykonać tylko jedną akcję,  np. czkać bądź przemieścić się o jedno (!) pole. Dzięki takiemu rozwiązaniu żaden z agentów nie jest faworyzowany przy dostępie do pól.
+
+\begin{algorithm}
+\caption{Faza operacyjna}
+\label{alg2}
+\begin{algorithmic}
+\Procedure{operation\_phase}{}
+    \ForAll{agent w galerii}
+    \Comment{sprawdź osiągnięcie celu}
+        \If{agent osiągnął cel OR agent uznał, że osiągnął cel}
+            \State pobierz kolejny cel z listy
+            \State zapisz statystyki dotyczące dalszej drogi
+        \EndIf
+    \EndFor
+    \newline
+    \ForAll{agent w galerii}
+    \Comment{przygotuj agentów}
+        \State \textbf{call} Algorithm.prepare with agent
+    \EndFor
+    \newline
+    \ForAll{agent w galerii}
+    \Comment{oblicz punkty ruchu}
+        \State punkty\_ruchu\_agenta $\gets$ predkosc\_agenta
+    \EndFor
+    \newline
+    \For{krok od 1 do $v_{max}$}
+    \Comment{porusz agentów}
+        \ForAll{agent w galerii}
+            \If{agent jest wstrzymywany}
+                \State zmniejsz pozostały czas wstrzymania
+            \ElsIf{agent nie wykorzystał jeszcze w tym kroku punktów ruchu}
+                \State \textbf{call} Algorithm.nextIterationStep with agent
+                \State \textbf{call} Feature.performAction with agent
+                \State wykorzystaj punkt ruchu
+            \EndIf
+        \EndFor
+    \EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+Metoda \emph{performAction()}, wywoływana dla elementów galerii, ustawia parametry agenta związane z symulacją takich zdarzeń, jak np. oczekiwanie w kolejce. \newline
+
+Wszystkie algorytmy ruchu implementują interfejs \emph{MovementAlgorithm}. Interfejs ten zawiera dwie metody wywoływane w fazie operacyjnej dla każdego agenta:
+\begin{itemize}
+\item \emph{prepare()} - wywoływana jeden raz, na początku; służy ustawieniu agenta na odpowiedniej pozycji początkowej
+\item \emph{nextIterationStep()} - wywoływana tyle razy, ile agent posiada punktów ruchu; obsługuje ruch "do przodu"; przy każdym jej wywołaniu agent przesuwa się co najwyżej o jedno pole (w sąsiedztwie Moore'a)
+\end{itemize}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.75]{./img/move_algos.png}
+        \caption{Interfejs \emph{MovementAlgorithm} i jego realizacje}
+        \label{fig:movealgo}
+    \end{figure}
 
         \subsection{Social Force}
         \label{sec:social-force-impl}
+
+Poniżej przedstawiono pseudokody metody odpowiedzialnej za ruch "do przodu" w algorytmie Social Force:
+
+\begin{algorithm}
+\caption{Ruch agenta w algorytmie Social Force}
+\label{alg1}
+\begin{algorithmic}
+\Procedure{nextIterationStep}{}
+    \If{brak możliwości ruchu}
+        \State obróć agenta
+        \Comment{umożliwia przeszukanie nowych obszarów}
+    \Else
+        \State cel $\gets$ wyznacz\_pole\_o\_najwiekszym\_potencjale()
+        \State przesuń agenta na docelową płytkę
+        \State odzwierciedl kierunek wykonanego ruchu poprzez zmianę zwrotu agenta
+    \EndIf
+\EndProcedure
+\newline
+\Function{wyznacz\_pole\_o\_najwiekszym\_potencjale}{}
+    \State dostepne\_pola $\gets$ wyznacz\_dostepne\_pola()
+    \ForAll{dostępne pole}
+        \State uwzględnij wartość pola potencjału innych ludzi i odległość od celu
+    \EndFor
+    \If{agent jest zmęczony}
+        \State zwiększ dodatkowo potencjał dostępnego pola najbliżej celu
+    \EndIf
+    \State pozostaw pola o najwyższym potencjale \\
+    \Return{pole leżące najbliżej celu}
+\EndFunction
+\newline
+\Function{wyznacz\_dostepne\_pola}{}
+    \State pola\_agenta $\gets$ pola w sąsiedztwie von Neumanna leżące w półkolu wyznaczonym przez kierunek ruchu agenta
+    \State pola\_celu $\gets$ pola w sąsiedztwie von Neumanna leżące w półkolu wyznaczonym przez kierunek do celu \\
+    \Return{pola\_agenta AND pola\_celu}
+    \Comment{część wspólna zbiorów}
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+
+\indent Funkcja wyznaczająca dostępne pola ogranicza możliwoś ruchu tak, aby agent albo dalej przemieszczał się po dotychczasowej trajektorii, albo skręcił w stronę celu. \\
+\indent Potencjał pola obliczany jest na podstawie siły oddziaływania innych ludzi (ujemna składowa) oraz odległości pola od celu (dodatnia składowa). W przypadku, gdy agent już dość długo zmierza do celu (tzn. przebyta przez niego droga znacząco przekracza minimalną drogę konieczną do osiągnięcia celu), lecz nie może go osiągnąć, przestaje zwracać taką uwagę na innych agentów – efekt ten został osiągnięty przez dodatkowe zwiększenie potencjału dostępnej płytki leżącej najbliżej celu. \\
+\indent W przypadku, gdy brak jest dostępnych płytek, agent obraca się odrobinę w miejscu, by w następnym kroku zyskać nowe możliwości ruchu (ze względu na zmianę zbioru dostępnych płytek).
 
 \newpage
     \section{Symulacja i analiza wyników}
