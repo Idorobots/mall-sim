@@ -46,6 +46,8 @@ public class GuiState {
 
         if (selectedAgent != null)
             GuiState.selectedAgent.addObserver(frame.getPropertiesTable());
+        
+        frame.getPropertiesTable().updateAgentData(getSelectedAgent());
     }
 
 }

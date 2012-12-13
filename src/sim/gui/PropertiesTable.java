@@ -5,6 +5,7 @@ import java.util.Observer;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import sim.control.GuiState;
 import sim.model.Agent;
@@ -12,34 +13,39 @@ import sim.model.Agent;
 @SuppressWarnings("serial")
 public class PropertiesTable extends JTable implements Observer {
 
+    private static Object[][] rawData = { { "vMax", "" }, { "agility", "" }, { "position", "" }, { "direction", "" },
+            { "route length", "" }, { "fieldsMoved", "" }, { "initialDistanceToTarget", "" },
+            { "holdTime", "" } };
+    
+    private static String[] columnNames = { "Parameter", "Value" };
+    
     public PropertiesTable() {
+        super(rawData, columnNames);
+        
         updateAgentData(null);
     }
 
 
     public void updateAgentData(Agent agent) {
 
-        Object[][] data = null;
-
+        TableModel m = getModel();
+        
         if (agent == null) {
-            Object[][] d = { { "vMax", "" }, { "agility", "" }, { "position", "" }, { "direction", "" },
-                    { "route length", "" }, { "fieldsMoved", "" }, { "initialDistanceToTarget", "" },
-                    { "holdTime", "" } };
-            data = d;
+            for (int i = 0; i < rawData.length; i++)
+                m.setValueAt("", i, 1);
         } else {
 
             String position = String.format("[%d, %d]", agent.getPosition().x, agent.getPosition().y);
 
-            Object[][] d = { { "vMax", agent.getvMax() }, { "agility", agent.getAgility() }, { "position", position },
-                    { "direction", agent.getDirection().name() }, { "route length", agent.getRoute().size() },
-                    { "fieldsMoved", agent.getFieldsMoved() },
-                    { "initialDistanceToTarget", agent.getInitialDistanceToTarget() },
-                    { "holdTime", agent.getHoldTime() } };
-            data = d;
+            m.setValueAt(agent.getvMax(), 0, 1);
+            m.setValueAt(agent.getAgility(), 1, 1);
+            m.setValueAt(position, 2, 1);
+            m.setValueAt(agent.getDirection().name(), 3, 1);
+            m.setValueAt(agent.getRoute().size(), 4, 1);
+            m.setValueAt(agent.getFieldsMoved(), 5, 1);
+            m.setValueAt(agent.getInitialDistanceToTarget(), 6, 1);
+            m.setValueAt(agent.getHoldTime(), 7, 1);
         }
-
-        setModel(new DefaultTableModel(data, new String[] { "Parameter", "Value" }));
-
     }
 
 
