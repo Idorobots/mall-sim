@@ -18,15 +18,15 @@ public class Board {
             for (int x = 0; x < dimension.width; x++)
                 grid[y][x] = new Cell(Cell.Type.PASSABLE, Ped4.getInstance());
     }
-    
+
     public void reset() {
-    	Point p = new Point();
+        Point p = new Point();
         for (int y = 0; y < getDimension().height; y++)
             for (int x = 0; x < getDimension().width; x++) {
-            	p.setLocation(x, y);
-            	getCell(p).clearVisitsCounter();
-            	getCell(p).setAgent(null);
-            	getCell(p).setForceValue(0);
+                p.setLocation(x, y);
+                getCell(p).clearVisitsCounter();
+                getCell(p).setAgent(null);
+                getCell(p).setForceValue(0);
             }
     }
 

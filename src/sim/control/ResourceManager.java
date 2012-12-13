@@ -20,6 +20,7 @@ import sim.model.algo.Ped4;
 import sim.model.algo.SocialForce;
 import sim.model.algo.MallFeature;
 import sim.model.algo.Attractor;
+import sim.model.algo.Spawner;
 import sim.model.helpers.Misc;
 
 public class ResourceManager {
@@ -28,6 +29,7 @@ public class ResourceManager {
     public static final int MALL_SOCIAL_FORCE = 0xFF;
 
     public static final int MAP_ATTRACTOR = 0x7F;
+    public static final int MAP_SPAWNER = 0xFF;
 
     /**
      * Loads shopping mall data from an image file.
@@ -43,6 +45,7 @@ public class ResourceManager {
         Raster map = null;
 
         Cell[][] grid = null;
+        Board b = null;
 
         int h = 0;
         int w = 0;
@@ -66,6 +69,9 @@ public class ResourceManager {
 
             int[] pixel = new int[3];
             grid = new Cell[h][w];
+
+            b = new Board(grid);
+            Mall.getInstance().setBoard(b);
 
             // Used to cache Attractors
             HashMap<Integer, MallFeature> features = new HashMap<Integer, MallFeature>();
@@ -109,6 +115,11 @@ public class ResourceManager {
                                 grid[i][j].setFeature(att);
                                 break;
 
+                            case MAP_SPAWNER:
+                                MallFeature spawn = new Spawner(b, hash);
+                                features.put(hash, spawn);
+                                grid[i][j].setFeature(spawn);
+                                break;
                             default:
                                 break;
                         }
@@ -119,9 +130,6 @@ public class ResourceManager {
         catch (IOException e) {
             e.printStackTrace();
         }
-
-        Board b = new Board(grid);
-        Mall.getInstance().setBoard(b);
 
         Logger.log("Board created!");
 

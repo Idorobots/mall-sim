@@ -303,6 +303,7 @@ Wartości znaczące poszczególnych pixeli $RGB$ mapy:
 
         \begin{itemize}
             \item $(0x7F, A, H)$ - wartość oznaczająca \hyperref[sec:path-deviation]{uogólniony atraktor} o \emph{atrakcyjności} $A$ i \emph{czasie wstrzymania} $H$.
+            \item $(0xFF, *, *)$ - wartość oznaczająca \hyperref[sec:entrance-exits]{przejścia/wejścia}, które odpowiednio tworzą lub usuwają agentów z symulacji.
         \end{itemize}
 
 \noindent
@@ -317,7 +318,7 @@ Z racji ograniczonego czasu i niższego priorytetu implementacja nie uwzględnia
         \subsection{Znajdowanie ścieżek}
         \label{sec:path-finding}
 
-        W celu wyznaczania ścieżek prowadzących do punktów docelowych wykorzystano algorytm \textbf{A*}. A* jest algorytmem kompletnym, służącym do wyznaczania najkrótszej drogi łączącej dwa wierzchołki grafu, który w każdym przypadku jest w stanie znaleźć drogę, jeśli takowa istnieje. A* wykorzystuje \hyperref[sec:path-deviation]{heurystykę}, która estymuje koszt ścieżki prowadzącej z danego wierzchołka do celu, starając się rozpatrywać tylko najbardziej obiecujące wierzchołki. \\
+W celu wyznaczania ścieżek prowadzących do punktów docelowych wykorzystano algorytm \textbf{A*}. A* jest algorytmem kompletnym, służącym do wyznaczania najkrótszej drogi łączącej dwa wierzchołki grafu, który w każdym przypadku jest w stanie znaleźć drogę, jeśli takowa istnieje. A* wykorzystuje \hyperref[sec:path-deviation]{heurystykę}, która estymuje koszt ścieżki prowadzącej z danego wierzchołka do celu, starając się rozpatrywać tylko najbardziej obiecujące wierzchołki. \\
 
 \noindent
 Algorytm przochowuje zbiory wierzchołków ``otwartych'' i ``zamkniętych'', czyli odpowiednio, wierzchołków, które są rozpatrywane i tych, które już zostały sprawdzone. Działanie algorytmu rozpoczyna się od dodania aktualnej pozycji agenta do zbioru wierzchołków otwartych. W każdym następnym kroku algorytm wykonuje iteracyjnie następujące operacje:

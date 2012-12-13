@@ -90,6 +90,12 @@ public class Agent extends Observable {
 
     private int holdTime = 0;
 
+
+    /**
+     * Flaga określająca, czy Agent został usunięty z symulacji.
+     */
+    private boolean isDead = false;
+
     public Agent(MovementBehavior movementBehavior) {
 
         try {
@@ -104,7 +110,7 @@ public class Agent extends Observable {
 
         route = new LinkedList<Point>();
         forceField = Collections.unmodifiableMap(initForceField());
-        
+
         assert forceField != null;
     }
 
@@ -157,7 +163,7 @@ public class Agent extends Observable {
         tForceField.put(new Vec(-1, level), -1);
         tForceField.put(new Vec(0, level), -2);
         tForceField.put(new Vec(1, level), -1);
-        
+
         return tForceField;
     }
 
@@ -171,7 +177,7 @@ public class Agent extends Observable {
         Mall.getInstance().getBoard().modifyForceField(this, getPosition(), -1);
         this.direction = direction;
         Mall.getInstance().getBoard().modifyForceField(this, getPosition(), 1);
-        
+
         setChanged();
         notifyObservers();
     }
@@ -194,7 +200,7 @@ public class Agent extends Observable {
 
     public void addTarget(Point target) {
         route.add(target);
-        
+
         setChanged();
         notifyObservers();
     }
@@ -209,7 +215,7 @@ public class Agent extends Observable {
         if (!route.isEmpty())
             route.remove(0);
         fieldsMoved = 0;
-        
+
         setChanged();
         notifyObservers();
     }
@@ -218,7 +224,7 @@ public class Agent extends Observable {
     public void clearTargets() {
         route.clear();
         fieldsMoved = 0;
-        
+
         setChanged();
         notifyObservers();
     }
@@ -237,7 +243,7 @@ public class Agent extends Observable {
 
     public void incrementFieldsMoved() {
         fieldsMoved++;
-        
+
         setChanged();
         notifyObservers();
     }
@@ -250,7 +256,7 @@ public class Agent extends Observable {
 
     public void setInitialDistanceToTarget(double initialDistanceToTarget) {
         this.initialDistanceToTarget = initialDistanceToTarget;
-        
+
         setChanged();
         notifyObservers();
     }
@@ -263,7 +269,7 @@ public class Agent extends Observable {
 
     public void setPosition(Point position) {
         this.position = new MyPoint(position);
-        
+
         setChanged();
         notifyObservers();
     }
@@ -282,15 +288,23 @@ public class Agent extends Observable {
         holdTime = ht;
 
         if(holdTime < 0) holdTime = 0;
-        
+
         setChanged();
         notifyObservers();
     }
 
     public void decrementHoldTime() {
         setHoldTime(holdTime - 1);
-        
+
         setChanged();
         notifyObservers();
+    }
+
+    public void setDead(boolean state) {
+        isDead = state;
+    }
+
+    public boolean getDead() {
+        return isDead;
     }
 }
