@@ -21,7 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
+import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.BevelBorder;
@@ -37,13 +37,16 @@ import sim.control.GuiState.BackgroundPolicy;
 import sim.control.GuiState.DrawTargetLinePolicy;
 import sim.control.Listeners;
 import sim.gui.actions.ExitAction;
+import sim.gui.actions.PauseResumeAction;
 import sim.model.Mall;
+import javax.swing.JCheckBoxMenuItem;
 
 @SuppressWarnings("serial")
 public class MallFrame extends JFrame {
 
     private JPanel contentPane;
     private GUIBoard guiBoard;
+    private PropertiesTable propertiesTable;
 
     /**
      * Create the frame.
@@ -84,6 +87,9 @@ public class MallFrame extends JFrame {
                 MallSim.runAlgoTest();
             }
         });
+        
+        JCheckBoxMenuItem chckbxmntmPaused = new JCheckBoxMenuItem(new PauseResumeAction());
+        mnSimulation.add(chckbxmntmPaused);
         mnSimulation.add(mntmRestart);
 
         JMenu mnHelp = new JMenu("Help");
@@ -259,10 +265,10 @@ public class MallFrame extends JFrame {
 
                 if (button.isSelected()) {
                     button.setText("Resume");
-                    MallSim.getThread().suspend();
+                    MallSim.setThreadState(true);
                 } else {
                     button.setText("Pause");
-                    MallSim.getThread().resume();
+                    MallSim.setThreadState(false);
                 }
             }
         });
@@ -284,15 +290,14 @@ public class MallFrame extends JFrame {
             break;
         }
 
-        JPanel panel = new JPanel();
-        tabbedPane.addTab("Properties", null, panel, null);
-
-        JTextArea txtrTuIdWszelkie = new JTextArea();
-        txtrTuIdWszelkie.setEditable(false);
-        txtrTuIdWszelkie.setRows(5);
-        txtrTuIdWszelkie
-                .setText("--- INFO ---\r\nTu idą wszelkie wyświetlane\r\nwłaściwości aktorów, atraktorów,\r\npłytek itp.");
-        panel.add(txtrTuIdWszelkie);
+        JPanel propertiesPanel = new JPanel();
+        tabbedPane.addTab("Properties", null, propertiesPanel, null);
+        GridBagLayout gbl_propertiesPanel = new GridBagLayout();
+        gbl_propertiesPanel.columnWidths = new int[]{1, 0};
+        gbl_propertiesPanel.rowHeights = new int[]{1, 0};
+        gbl_propertiesPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+        gbl_propertiesPanel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+        propertiesPanel.setLayout(gbl_propertiesPanel);
 
         JScrollPane boardScrollPane = new JScrollPane();
         boardScrollPane
@@ -306,9 +311,22 @@ public class MallFrame extends JFrame {
 
         guiBoard = new GUIBoard(mall.getBoard());
         boardPanel.add(guiBoard);
+        
+        propertiesTable = new PropertiesTable();
+        GridBagConstraints gbc_propertiesTable = new GridBagConstraints();
+        gbc_propertiesTable.fill = GridBagConstraints.HORIZONTAL;
+        gbc_propertiesTable.gridx = 0;
+        gbc_propertiesTable.gridy = 0;
+        propertiesPanel.add(propertiesTable, gbc_propertiesTable);
+        
+        tabbedPane.setSelectedIndex(0);
     }
 
     public GUIBoard getBoard() {
         return guiBoard;
+    }
+    
+    public PropertiesTable getPropertiesTable() {
+    	return propertiesTable;
     }
 }

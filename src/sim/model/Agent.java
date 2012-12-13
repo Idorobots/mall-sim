@@ -9,13 +9,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 import java.util.Properties;
 
 import sim.model.helpers.Direction;
 import sim.model.helpers.MyPoint;
 import sim.model.helpers.Vec;
 
-public class Agent {
+public class Agent extends Observable {
 
     /**
      * Parametry agenta w odniesieniu do modelu ruchu (prędkość, zwinność itp.)
@@ -171,6 +172,8 @@ public class Agent {
         this.direction = direction;
         Mall.getInstance().getBoard().modifyForceField(this, getPosition(), 1);
         
+        setChanged();
+        notifyObservers();
     }
 
 
@@ -191,6 +194,9 @@ public class Agent {
 
     public void addTarget(Point target) {
         route.add(target);
+        
+        setChanged();
+        notifyObservers();
     }
 
 
@@ -203,12 +209,18 @@ public class Agent {
         if (!route.isEmpty())
             route.remove(0);
         fieldsMoved = 0;
+        
+        setChanged();
+        notifyObservers();
     }
 
 
     public void clearTargets() {
         route.clear();
         fieldsMoved = 0;
+        
+        setChanged();
+        notifyObservers();
     }
 
 
@@ -225,6 +237,9 @@ public class Agent {
 
     public void incrementFieldsMoved() {
         fieldsMoved++;
+        
+        setChanged();
+        notifyObservers();
     }
 
 
@@ -235,6 +250,9 @@ public class Agent {
 
     public void setInitialDistanceToTarget(double initialDistanceToTarget) {
         this.initialDistanceToTarget = initialDistanceToTarget;
+        
+        setChanged();
+        notifyObservers();
     }
 
 
@@ -245,6 +263,9 @@ public class Agent {
 
     public void setPosition(Point position) {
         this.position = new MyPoint(position);
+        
+        setChanged();
+        notifyObservers();
     }
 
 
@@ -261,9 +282,15 @@ public class Agent {
         holdTime = ht;
 
         if(holdTime < 0) holdTime = 0;
+        
+        setChanged();
+        notifyObservers();
     }
 
     public void decrementHoldTime() {
         setHoldTime(holdTime - 1);
+        
+        setChanged();
+        notifyObservers();
     }
 }

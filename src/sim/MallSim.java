@@ -32,6 +32,9 @@ public class MallSim {
     static Thread simThread = null;
     static MallFrame frame = null;
 
+    static boolean isSuspended = false;
+
+
     /**
      * Launch the application.
      */
@@ -40,14 +43,12 @@ public class MallSim {
 
             public void run() {
                 try {
-                    UIManager.setLookAndFeel(UIManager
-                            .getSystemLookAndFeelClassName());
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                ResourceManager.loadShoppingMall("./data/malls/simple2.bmp",
-                        "./data/malls/simple2map.bmp");
+                ResourceManager.loadShoppingMall("./data/malls/simple2.bmp", "./data/malls/simple2map.bmp");
                 // resMgr.loadShoppingMall("./data/malls/small.bmp");
 
                 Mall mall = Mall.getInstance();
@@ -63,6 +64,7 @@ public class MallSim {
         });
     }
 
+
     /**
      * Testuje działanie algotymów ruchu.
      */
@@ -71,13 +73,15 @@ public class MallSim {
         SimLoop loop = new SimLoop(Mall.getInstance());
         loop.addObserver(frame.getBoard());
         Board b = Mall.getInstance().getBoard();
-        ResourceManager.randomize(Mall.getInstance().getBoard(),
-                b.getDimension().height * b.getDimension().width / 25);
+        ResourceManager.randomize(Mall.getInstance().getBoard(), b.getDimension().height * b.getDimension().width / 25);
 
         if (simThread != null)
             simThread.stop();
         simThread = new Thread(loop);
         simThread.start();
+
+        if (isSuspended)
+            simThread.suspend();
     }
 
     private static class SimLoop extends Observable implements Runnable {
@@ -85,11 +89,13 @@ public class MallSim {
         private Mall mall;
         private Board board;
 
+
         public SimLoop(Mall mall) {
             super();
             this.mall = mall;
             board = mall.getBoard();
         }
+
 
         /**
          * Sprawdza, czy agenci dotarli do celu (jeśli tak - uaktualnia cele).
@@ -109,8 +115,7 @@ public class MallSim {
                         if (a.getTarget().equals(curr)) {
                             a.reachTarget();
                             if (a.getTargetCount() > 0)
-                                a.setInitialDistanceToTarget(curr.distanceSq(a
-                                        .getTarget()));
+                                a.setInitialDistanceToTarget(curr.distanceSq(a.getTarget()));
                         } else {
                             final double maxDistanceFromTarget = 2;
                             double dist = a.getTarget().distance(curr);
@@ -120,8 +125,7 @@ public class MallSim {
                                     a.reachTarget();
 
                                     if (a.getTargetCount() > 0)
-                                        a.setInitialDistanceToTarget(curr
-                                                .distanceSq(a.getTarget()));
+                                        a.setInitialDistanceToTarget(curr.distanceSq(a.getTarget()));
                                 }
                             }
                         }
@@ -134,6 +138,7 @@ public class MallSim {
 
             return targetsReached;
         }
+
 
         private void prepareAgents() {
             // Movement
@@ -154,6 +159,7 @@ public class MallSim {
             this.notifyObservers();
         }
 
+
         private Map<Agent, Integer> computeMovementPointsLeft() {
             // Obliczenie ilości pozostałych punktów ruchu dla agentów.
             Map<Agent, Integer> speedPointsLeft = new WeakHashMap<Agent, Integer>();
@@ -169,6 +175,7 @@ public class MallSim {
 
             return speedPointsLeft;
         }
+
 
         private void moveAgents(Map<Agent, Integer> speedPointsLeft) {
             Point p = new Point();
@@ -188,6 +195,7 @@ public class MallSim {
                             continue;
                         }
 
+                        // Agent osiągnął swój końcowy cel.
                         if (a.getTargetCount() == 0 || a.getTarget().equals(p))
                             continue;
 
@@ -199,10 +207,8 @@ public class MallSim {
                             // równomierny rozkład wykonanych kroków w
                             // czasie)
 
-                            board.getCell(p).getAlgorithm()
-                                    .nextIterationStep(a, speedPointsLeft);
-                            board.getCell(a.getPosition()).getFeature()
-                                    .performAction(a);
+                            board.getCell(p).getAlgorithm().nextIterationStep(a, speedPointsLeft);
+                            board.getCell(a.getPosition()).getFeature().performAction(a);
 
                             speedPointsLeft.put(a, speedPointsLeft.get(a) - 1);
                         }
@@ -213,6 +219,7 @@ public class MallSim {
             this.setChanged();
             this.notifyObservers();
         }
+
 
         @Override
         public void run() {
@@ -265,17 +272,16 @@ public class MallSim {
                 nAgentSuccesses += targetsReached;
             }
 
-            System.out.println(String.format(
-                    "Sukcesy pętli:  \t %d / %d\t (%d%%)", nSuccesses, LOOPS,
-                    nSuccesses * 100 / LOOPS));
-            System.out.println(String.format(
-                    "Sukcesy agentów:\t %d / %d\t (%d%%)", nAgentSuccesses,
-                    nTotalAgents, nAgentSuccesses * 100 / nTotalAgents));
+            System.out.println(String.format("Sukcesy pętli:  \t %d / %d\t (%d%%)", nSuccesses, LOOPS, nSuccesses * 100
+                    / LOOPS));
+            System.out.println(String.format("Sukcesy agentów:\t %d / %d\t (%d%%)", nAgentSuccesses, nTotalAgents,
+                    nAgentSuccesses * 100 / nTotalAgents));
 
             System.exit(0);
         }
 
     }
+
 
     private static void testSocialForce(Board b) {
         for (int y = 0; y < b.getDimension().height; y++)
@@ -289,6 +295,7 @@ public class MallSim {
         testSocialForceMassive(b);
     }
 
+
     private static void testSocialForceIndividual(Board b) {
         final int TARGET_BEHIND = 1;
         final int WALK_AROUND = 2;
@@ -298,23 +305,21 @@ public class MallSim {
         if (mode == TARGET_BEHIND) {
             Agent a1 = new Agent(MovementBehavior.DYNAMIC);
             a1.addTarget(new Point(3, 6));
-            a1.setInitialDistanceToTarget(new Point(5, 6).distance(new Point(3,
-                    6)));
+            a1.setInitialDistanceToTarget(new Point(5, 6).distance(new Point(3, 6)));
             Misc.setAgent(a1, new Point(5, 6));
         } else if (mode == WALK_AROUND) {
             Agent a1 = new Agent(MovementBehavior.DYNAMIC);
             a1.addTarget(new Point(12, 3));
-            a1.setInitialDistanceToTarget(new Point(2, 6).distance(new Point(
-                    12, 3)));
+            a1.setInitialDistanceToTarget(new Point(2, 6).distance(new Point(12, 3)));
             Misc.setAgent(a1, new Point(2, 6));
 
             Agent a2 = new Agent(MovementBehavior.DYNAMIC);
             a2.addTarget(new Point(7, 5));
-            a2.setInitialDistanceToTarget(new Point(7, 5).distance(new Point(7,
-                    5)));
+            a2.setInitialDistanceToTarget(new Point(7, 5).distance(new Point(7, 5)));
             Misc.setAgent(a2, new Point(7, 5));
         }
     }
+
 
     private static void testSocialForceMassive(Board b) {
         final int N_AGENTS = 10;
@@ -334,6 +339,7 @@ public class MallSim {
         }
     }
 
+
     private static void testPed4(Board b) {
         for (int y = 0; y < b.getDimension().height; y++)
             for (int x = 0; x < b.getDimension().width; x++) {
@@ -345,6 +351,7 @@ public class MallSim {
         // testPed4Individual(b);
         testPed4Massive(b);
     }
+
 
     private static void testPed4Individual(Board b) {
         for (int y = 0; y < b.getDimension().height; y++)
@@ -363,6 +370,7 @@ public class MallSim {
         Misc.setAgent(a, new Point(0, 0));
     }
 
+
     private static void testPed4Massive(Board b) {
         final int N_AGENTS = 20;
 
@@ -379,6 +387,7 @@ public class MallSim {
             }
         }
     }
+
 
     private static void testTactical(Board board) {
         Tactical tactical = new Tactical(board);
@@ -400,7 +409,22 @@ public class MallSim {
         }
     }
 
-    public static Thread getThread() {
-        return simThread;
+
+    synchronized public static void setThreadState(boolean _isSuspended) {
+        isSuspended = _isSuspended;
+
+        if (isSuspended)
+            simThread.suspend();
+        else
+            simThread.resume();
     }
+
+
+    synchronized public static boolean getThreadState() {
+        return isSuspended;
+    }
+
+    // public static Thread getThread() {
+    // return simThread;
+    // }
 }

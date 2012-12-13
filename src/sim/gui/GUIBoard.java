@@ -2,6 +2,7 @@ package sim.gui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -32,8 +33,7 @@ import sim.model.Board;
 import sim.model.Cell;
 
 @SuppressWarnings("serial")
-public class GUIBoard extends JComponent implements MouseInputListener,
-        MouseWheelListener, ComponentListener, Observer {
+public class GUIBoard extends JComponent implements MouseInputListener, MouseWheelListener, ComponentListener, Observer {
 
     private Board board;
 
@@ -44,12 +44,14 @@ public class GUIBoard extends JComponent implements MouseInputListener,
 
     int maxVisits;
 
+
     public GUIBoard(Board board) {
         this.board = board;
         setDoubleBuffered(true);
 
         initialize();
     }
+
 
     private void initialize() {
         addMouseListener(this);
@@ -59,9 +61,10 @@ public class GUIBoard extends JComponent implements MouseInputListener,
         setBackground(Color.WHITE);
         setOpaque(true);
 
-        setPreferredSize(new Dimension(board.getDimension().width * cellSize
-                + 1, board.getDimension().height * cellSize + 1));
+        setPreferredSize(new Dimension(board.getDimension().width * cellSize + 1, board.getDimension().height
+                * cellSize + 1));
     }
+
 
     protected void paintComponent(Graphics g) {
         if (isOpaque()) {
@@ -78,6 +81,7 @@ public class GUIBoard extends JComponent implements MouseInputListener,
                 drawRoute(g, a);
         }
     }
+
 
     private void drawNetting(Graphics g, int gridSpace) {
         Insets insets = getInsets();
@@ -110,8 +114,7 @@ public class GUIBoard extends JComponent implements MouseInputListener,
                 Cell c = board.getCell(p);
 
                 g.setColor(computeCellColor(c));
-                g.fillRect((x * cellSize) + 1, (y * cellSize) + 1,
-                        (cellSize - 1), (cellSize - 1));
+                g.fillRect((x * cellSize) + 1, (y * cellSize) + 1, (cellSize - 1), (cellSize - 1));
 
                 Agent a = c.getAgent();
 
@@ -137,7 +140,7 @@ public class GUIBoard extends JComponent implements MouseInputListener,
         Graphics2D g2d = (Graphics2D) g;
         Stroke s = g2d.getStroke();
         g2d.setStroke(new BasicStroke(TARGET_VECTOR_WIDTH)); // set stroke
-                                                                // width of 10
+                                                             // width of 10
         for (Map.Entry<Point, Point> entry : targets.entrySet()) {
             int x1 = entry.getKey().x * cellSize + cellSize / 2;
             int y1 = entry.getKey().y * cellSize + cellSize / 2;
@@ -148,6 +151,7 @@ public class GUIBoard extends JComponent implements MouseInputListener,
         }
         g2d.setStroke(s);
     }
+
 
     private int computeMaxVisits() {
         Point p = new Point();
@@ -162,6 +166,7 @@ public class GUIBoard extends JComponent implements MouseInputListener,
         return vmax;
     }
 
+
     private Color computeCellColor(Cell cell) {
 
         Color color = null;
@@ -175,23 +180,20 @@ public class GUIBoard extends JComponent implements MouseInputListener,
                 if (cell.getVisitsCounter() == 0)
                     color = Color.WHITE;
                 else
-                    color = new Color(1.0f, 1.0f - Math.min(1.0f,
-                            (float) cell.getVisitsCounter() / maxVisits), 0.0f);
+                    color = new Color(1.0f, 1.0f - Math.min(1.0f, (float) cell.getVisitsCounter() / maxVisits), 0.0f);
                 break;
             case MOVEMENT_ALGORITHM:
                 if (cell.getAlgorithm() == Ped4.getInstance()) {
                     color = new Color(0xcccccc);
-                }
-                else {
+                } else {
                     color = Color.WHITE;
                 }
                 break;
             case FEATURES:
                 MallFeature feature = cell.getFeature();
-                if(feature != null) {
+                if (feature != null) {
                     color = new Color(feature.getPixelValue());
-                }
-                else {
+                } else {
                     color = Color.WHITE;
                 }
                 break;
@@ -208,6 +210,7 @@ public class GUIBoard extends JComponent implements MouseInputListener,
         return color;
     }
 
+
     private Color getPassableColor(Cell c) {
         int forceValue = c.getForceValue4Rendering();
 
@@ -219,18 +222,16 @@ public class GUIBoard extends JComponent implements MouseInputListener,
 
         // Ujemny współczynnik powstaje np. gdy ludzie długo chodzą w kółko.
         try {
-            return (coef > 0) ? new Color(coef, 255 - coef, 0) : new Color(
-                    -coef, 0, 255 + coef);
+            return (coef > 0) ? new Color(coef, 255 - coef, 0) : new Color(-coef, 0, 255 + coef);
         } catch (Exception e) {
             // FIXME Bugs like crazy.
             System.out.println("Niewłaściwe wartości kolorów: ");
-            System.out
-                    .println(String.format("%d, %d, %d", coef, 255 - coef, 0));
-            System.out.println(String
-                    .format("%d, %d, %d", -coef, 0, 255 + coef));
+            System.out.println(String.format("%d, %d, %d", coef, 255 - coef, 0));
+            System.out.println(String.format("%d, %d, %d", -coef, 0, 255 + coef));
         }
         return Color.MAGENTA;
     }
+
 
     private void drawRoute(Graphics g, Agent a) {
         // FIXME Throws java.util.ConcurrentModificationException sometimes.
@@ -260,6 +261,7 @@ public class GUIBoard extends JComponent implements MouseInputListener,
         g2d.setStroke(s);
     }
 
+
     // Convinience method for the soon to be lengthy Agent drawing code.
     private void drawAgent(Graphics g, Agent a, int x, int y) {
         final int DIRECTION_MARKER_LENGTH = 10;
@@ -267,8 +269,7 @@ public class GUIBoard extends JComponent implements MouseInputListener,
         assert a != null;
         assert g != null;
 
-        Color torsoColor = (a == GuiState.getSelectedAgent()) ? Color.RED
-                : Color.BLUE;
+        Color torsoColor = (a == GuiState.getSelectedAgent()) ? Color.RED : Color.BLUE;
         g.setColor(torsoColor);
 
         int agentH = 0;
@@ -294,26 +295,32 @@ public class GUIBoard extends JComponent implements MouseInputListener,
         g.fillOval(agentX - agentW / 2, agentY - agentH / 2, agentW, agentH);
 
         g.setColor(Color.GREEN);
-        g.drawLine(agentX, agentY, agentX + a.getDirection().getVec().x
-                * DIRECTION_MARKER_LENGTH, agentY + a.getDirection().getVec().y
-                * DIRECTION_MARKER_LENGTH);
+        g.drawLine(agentX, agentY, agentX + a.getDirection().getVec().x * DIRECTION_MARKER_LENGTH, agentY
+                + a.getDirection().getVec().y * DIRECTION_MARKER_LENGTH);
 
         g.setColor(Color.YELLOW);
-        g.fillOval(agentX - agentHeadSize / 2, agentY - agentHeadSize / 2,
-                agentHeadSize, agentHeadSize);
+        g.fillOval(agentX - agentHeadSize / 2, agentY - agentHeadSize / 2, agentHeadSize, agentHeadSize);
     }
+
 
     public void mouseClicked(MouseEvent e) {
         int x = e.getX() / cellSize;
         int y = e.getY() / cellSize;
 
         Agent a = board.getCell(new Point(x, y)).getAgent();
-        GuiState.setSelectedAgent(a);
+
+        Component c = this;
+        while (!(c instanceof MallFrame))
+            c = c.getParent();
+
+        GuiState.setSelectedAgent(a, (MallFrame) c);
         repaint();
     }
 
+
     public void componentResized(ComponentEvent e) {
     }
+
 
     public void mouseDragged(MouseEvent e) {
         /*
@@ -323,29 +330,38 @@ public class GUIBoard extends JComponent implements MouseInputListener,
          */
     }
 
+
     public void mouseExited(MouseEvent e) {
     }
+
 
     public void mouseEntered(MouseEvent e) {
     }
 
+
     public void componentShown(ComponentEvent e) {
     }
+
 
     public void componentMoved(ComponentEvent e) {
     }
 
+
     public void mouseReleased(MouseEvent e) {
     }
+
 
     public void mouseMoved(MouseEvent e) {
     }
 
+
     public void componentHidden(ComponentEvent e) {
     }
 
+
     public void mousePressed(MouseEvent e) {
     }
+
 
     // Half-assed dynamic resizing. Still needs some work. FIXME
     public void mouseWheelMoved(MouseWheelEvent e) {
@@ -353,11 +369,10 @@ public class GUIBoard extends JComponent implements MouseInputListener,
 
         if (rotation != 0) {
             cellSize = Helpers.clamp(cellSize + resizeDelta * rotation, 3, 25);
-            agentSize = Helpers
-                    .clamp(agentSize + resizeDelta * rotation, 2, 27);
+            agentSize = Helpers.clamp(agentSize + resizeDelta * rotation, 2, 27);
 
-            Dimension d = new Dimension(board.getDimension().width * cellSize
-                    + 1, board.getDimension().height * cellSize + 1);
+            Dimension d = new Dimension(board.getDimension().width * cellSize + 1, board.getDimension().height
+                    * cellSize + 1);
 
             setPreferredSize(d);
 
@@ -366,10 +381,12 @@ public class GUIBoard extends JComponent implements MouseInputListener,
         }
     }
 
+
     @Override
     public void update(Observable o, Object arg) {
         repaint();
     }
+
 
     public void setBoard(Board board) {
         this.board = board;
