@@ -27,7 +27,7 @@ public class ResourceManager {
     public static final int MALL_PED4 = 0x7F;
     public static final int MALL_SOCIAL_FORCE = 0xFF;
 
-    public static final int MAP_ATTRACTOR = 0x88;
+    public static final int MAP_ATTRACTOR = 0x7F;
 
     /**
      * Loads shopping mall data from an image file.
