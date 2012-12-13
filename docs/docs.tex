@@ -264,7 +264,7 @@ Algorytm \textbf{Social Force} opiera się na obserwacji, że każdy człowiek p
         \emph{Mapa rozkładu pomieszczeń} zawiera informacje o fizycznych właściwościach pomieszczeń modelowanego centrum handlowego - usytułówanie ściań i innych obiektów blokujących przejście. Dodatkowo zawarto na niej rozkład algorytmów ruchu wykorzystanych w \hyperref[sec:operational]{fazie operacyjnej}, co pozwala jednoznacznie określić położenie korytarzy, skrzyżowań i innych cech centrum handlowego związanych z ruchem agentów. \\
 
 \noindent
-Wartości znaczące poszczególnych pixeli RGB mapy:
+Wartości znaczące poszczególnych pixeli $RGB$ mapy:
 
         \begin{itemize}
             \item $(0x00, *, *)$ - wartość zarezerwowana dla ścian i innych obiektów blokujących przejście.
@@ -282,31 +282,55 @@ Wartości znaczące poszczególnych pixeli RGB mapy:
         \emph{Mapa rozkładu stref specjalnych} centrum handlowego zawiera informacje o funkcjonalnych cechach modelowanego centrum handlowego - rozmieszczenie miejsc przeznaczonych do czekania, kolejek przy kasach sklepowych, okien wystawowych i sieci routingu ułatwiającej przemieszczanie się w centrum handlowym. Informacje te wykorzystywane są przede wszystkim przez \hyperref[sec:tactical]{fazę taktyczną} wykorzystanego algorytmu, gdzie są służą jako \hyperref[sec:path-deviation]{dodatkowa heurystyka} \hyperref[sec:path-finding]{algorytmu wyszukiwania ścieżek A*}. \\
 
 \noindent
-Wartości znaczące poszczególnych pixeli RGB mapy:
+Wartości znaczące poszczególnych pixeli $RGB$ mapy:
 
         \begin{itemize}
             \item $(0x7F, A, H)$ - wartość oznaczająca \hyperref[sec:path-deviation]{uogólniony atraktor} o \emph{atrakcyjności} $A$ i \emph{czasie wstrzymania} $H$.
         \end{itemize}
 
-        \subsection{Reprezentacja agentów}
-        \label{sec:actor-impl}
-
-        % TODO Opisać parametry agentów.
+\noindent
+Z racji ograniczonego czasu i niższego priorytetu implementacja nie uwzględnia istnienia wielu pięter w centrum handlowym - symulacja ruchu ludzi wewnątrz wielopiętrowego centrum handlowego może być traktowana jako wiele symulacji ruchu ludzi wewnątrz jednopiętrowego centrum handlowego.
 
         \subsection{Wybór puntków docelowych}
         \label{sec:destination-choice}
 
-        % TODO Opisać, jak wybierane są punkty docelowe.
+        \emph{Punkty docelowe} reprezentują cele podróży agentów. Z racji mniejszego priorytetu i braku czasu algorytm wybiera zadaną ilość losowych miejsc znajdujących się we wnętrzu centrum handlowego, które następnie sortuje celem minimalizacji sumarycznej długości drogi je łączącej. Opisany sposób wyboru miejsc docelowych pozwala symulować wszystkie zachowania poruszających się ludzi na poziomie lokalnym (na przykład kolejkowanie się) i większość schematów zachowań tłumu na poziomie globalnym (z wyłączeniem bardziej abstrakcyjnych zachowań uwarunkowanych socjologicznie i kulturowo, takich jak różne stosunki ilościowe agentów danego typu w różnych częściach centrum handlowego).
 
+\newpage
         \subsection{Znajdowanie ścieżek}
         \label{sec:path-finding}
 
-        % TODO Opisać algorytm A*.
+        W celu wyznaczania ścieżek prowadzących do punktów docelowych wykorzystano algorytm \textbf{A*}. A* jest algorytmem kompletnym, służącym do wyznaczania najkrótszej drogi łączącej dwa wierzchołki grafu, który w każdym przypadku jest w stanie znaleźć drogę, jeśli takowa istnieje. A* wykorzystuje \hyperref[sec:path-deviation]{heurystykę}, która estymuje koszt ścieżki prowadzącej z danego wierzchołka do celu, starając się rozpatrywać tylko najbardziej obiecujące wierzchołki. \\
+
+\noindent
+Algorytm przochowuje zbiory wierzchołków ``otwartych'' i ``zamkniętych'', czyli odpowiednio, wierzchołków, które są rozpatrywane i tych, które już zostały sprawdzone. Działanie algorytmu rozpoczyna się od dodania aktualnej pozycji agenta do zbioru wierzchołków otwartych. W każdym następnym kroku algorytm wykonuje iteracyjnie następujące operacje:
+
+        \begin{itemize}
+            \item Ze zbioru wierzchołków otwartych wybierany jest najbardziej obiecujący wierzchołek $x$, minimalizujący funkcję $f(x)$:
+              \[ f(x) = g(x) + h(x) \]
+              gdzie $g(x)$ określa długość drogi prowadzącej z wierzchołka początkowego do wierzchołka $x$, a $h(x)$ określa przewidywaną przez heurystykę długość drogi łączącej wierzchołek $x$ i cel podróży.
+            \item W przypadku osiągnięcia punktu docelowego algorytm kończy się sukcesem.
+            \item W przeciwnym przypadku wierzchołek $x$ dodawany jest do zbioru wierzchołków zamikniętych, a sąsiadujące z nim wierzchołki (wierzchołki osiągalne w jednym kroku zaczynając w $x$), które nie należą do zbioru wierzchołków zamkniętych, dodawane są do zbioru wierzchołków otwartych.
+        \end{itemize}
+
+\noindent
+Zależnie od zastosowanej heurystyki algorytm A* jest w stanie dostarczać optymalne ścieżki łączące dwa punkty lub suboptymalne ścieżki, które są obliczane szybciej. Ze względu na rozwiązywany problem i brak wymogu dostarczania optymalnych ścieżek w implementacji zastosowano złożoną, dopuszczalną (\emph{ang. admissible}) heurystykę opisaną w następnej sekcji, którą dodatkowo obarczono wagą $\epsilon = 5$, co pozwala szybko generować ścieżki o pożądanym i koszcie nie przekraczającym $\epsilon$ razy kosztu ścieżki optymalnej.
 
         \subsection{Dewiacja ścieżek}
         \label{sec:path-deviation}
 
-        % TODO Opisać wpływ różnych stref specjalnych na wygenerowane ścieżki.
+        Dewiacja ścieżek zachodzi podczas działania algorytmu wyszukiwania ścieżek opisanego w poprzedniej sekcji celem ułatwienia zachodzenia pewnych zachowań, takich jak poruszanie się w odpowiedni sposób po korytarzach centrum handlowego. Odpowiednia dewiacja ścieżek została osiągnięta przez modyfikację heurystyki zastosowanego algorytmu A* - każdy fragment \hyperref[fig:mall-features]{mapy rozkładu stref specjalnych} centrum handlowego posiada przypisaną mu wartość determinującą parametry \textbf{uogólnionego atraktora} - \emph{atrakcję A} oraz \emph{czas wstrzymania H}. \\
+
+        \emph{Atrakcja} odpowiada za przyciąganie agentów do pewnych stref centrum handlowego i ma za zadanie przede wszystkim umożliwić realizację zdefiniowanych przy analizie problemu \hyperref[sec:attractors]{atraktorów}. Jej wartość kodowana jest przez komponent $G$ pixeli $RGB$ mapy rozkładu stref specjalnych centrum handlowego, kodujących atraktory (komponent $R$ równy $0x7F$). Wartość komponentu $G$ należy podzielić przez $0x7F$ celem przeskalowania do przedziału $[0, 2)$. Heurystyka algorytmu A* wykorzystuje tę wartość, jako dodatkowy mnożnik estymowanego kosztu ścieżki, toteż wartość 0 oznacza najsilniejszą atrakcję, wartość 1 brak atrakcji natomiast wartość 2 oznacza odpychanie - algorytm wyszukiwania ścieżek będzie preferował inne drogi.
+
+        \emph{Czas wstrzymania} odpowiada za opóźnianie agentów podczas wykonywania ruchu - agent osiągający komórkę siatki symulacji obarczoną czasem oczekiwania zostaje opóźniony na zadaną ilość czasu. Wartość czasu wstrzymania kodowana jest przez komponent $B$ pixeli $RGB$ mapy rozkładu stref specjalnych centrum handlowego, kodujących atraktory. Wartość tego komponentu traktowana jest jako ilość kroków symulacji, na które opóźniany agent zostanie wstrzymany. \\
+
+Implementacja \emph{uogólnionego atraktora} okazała się na tyle elastyczna, że wyeliminowała konieczność osobnej implementacji \hyperref[sec:queues]{kolejek} i \hyperref[sec:holders]{opóźniaczy} - kolejki realizowane są jako linie znacząco zwiększonej atrakcji o krótkim czasie wstrzymania, natomiast opóźniacze są punktami o znacząco zwiększonym czasie wstrzymania. \hyperref[sec:atractors]{Atraktory} zostały zrealizowane jako gradienty zwiększającej się atrakcji i czasu wstrzymania - agenci odwiedzajacy atraktor spędzają w nim tym więcej czasu, im bliżej jego centrum się znajdują. Dodatkowym atutem zastosowanej implementacji jest możliwość routingu agentów w centrum handlowym. Wszystkie formy stref specjalnych wyrażonych przez modyfikację heurystyki algorytmu A* zostały zawarte na poglądowym rysunku \ref{fig:mall-features}.
+
+        \subsection{Reprezentacja agentów}
+        \label{sec:actor-impl}
+
+        % TODO Opisać parametry agentów.
 
         \subsection{Ruch agentów}
         \label{sec:movement-impl}
