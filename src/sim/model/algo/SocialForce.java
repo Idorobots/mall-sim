@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import sim.MallSim;
 import sim.model.Agent;
 import sim.model.Board;
 import sim.model.Mall;
@@ -34,7 +35,7 @@ public class SocialForce implements MovementAlgorithm {
 
 	private static MovementAlgorithm instance = new SocialForce();
 
-	private static Random r = new Random();
+	private static Random r = MallSim.r;
 
 	private SocialForce() {
 	}

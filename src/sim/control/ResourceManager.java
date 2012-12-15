@@ -10,6 +10,7 @@ import java.awt.Dimension;
 import java.awt.image.Raster;
 import java.awt.image.BufferedImage;
 
+import sim.MallSim;
 import sim.util.Logger;
 import sim.model.Agent.MovementBehavior;
 import sim.model.Mall;
@@ -216,7 +217,7 @@ public class ResourceManager {
 
 
     public static void randomize(Board b, int nAgents) {
-        Random r = new Random();
+        Random r = MallSim.r;
         Dimension d = b.getDimension();
 
         for (int i = 0; i < nAgents; i++) {

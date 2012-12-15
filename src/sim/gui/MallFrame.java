@@ -11,17 +11,18 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.BevelBorder;
@@ -39,7 +40,7 @@ import sim.control.Listeners;
 import sim.gui.actions.ExitAction;
 import sim.gui.actions.PauseResumeAction;
 import sim.model.Mall;
-import javax.swing.JCheckBoxMenuItem;
+import sim.util.Logger;
 
 @SuppressWarnings("serial")
 public class MallFrame extends JFrame {
@@ -91,6 +92,22 @@ public class MallFrame extends JFrame {
         JCheckBoxMenuItem chckbxmntmPaused = new JCheckBoxMenuItem(new PauseResumeAction());
         mnSimulation.add(chckbxmntmPaused);
         mnSimulation.add(mntmRestart);
+        
+        JMenuItem mntmSeed = new JMenuItem("Seed");
+        mntmSeed.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                String str = JOptionPane.showInputDialog(null, "Seed:", MallSim.seed);
+                
+                try {
+                    Long newSeed = Long.valueOf(str);
+                    MallSim.seed = newSeed;
+                    MallSim.r.setSeed(newSeed);
+                } catch (NumberFormatException e) {
+                    Logger.log("ERROR: Could not change seed (NumberFormatException)");
+                }
+            }
+        });
+        mnSimulation.add(mntmSeed);
 
         JMenu mnHelp = new JMenu("Help");
         mnHelp.setMnemonic('H');

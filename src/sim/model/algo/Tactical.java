@@ -1,26 +1,21 @@
 package sim.model.algo;
 
-import java.awt.Point;
 import java.awt.Dimension;
-
-import java.util.List;
-import java.util.LinkedList;
+import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.Comparator;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.ListIterator;
-import java.util.PriorityQueue;
 import java.util.BitSet;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Random;
 
-import sim.util.Logger;
-
-import sim.model.algo.MallFeature;
+import sim.MallSim;
 import sim.model.Agent;
 import sim.model.Board;
 import sim.model.Cell;
+import sim.util.Logger;
 
 public class Tactical {
     public static final int HEURISTIC_FACTOR = 5;
@@ -37,7 +32,7 @@ public class Tactical {
 
     public Tactical(Board board) {
         this.board = board;
-        r = new Random();
+        r = MallSim.r;
     }
 
 

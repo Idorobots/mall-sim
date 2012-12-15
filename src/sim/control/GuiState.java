@@ -1,17 +1,7 @@
 package sim.control;
 
-import java.awt.Point;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
-
 import sim.gui.MallFrame;
 import sim.model.Agent;
-import sim.model.helpers.Direction;
-import sim.model.helpers.MyPoint;
-import sim.model.helpers.Vec;
 
 public class GuiState {
 
@@ -29,8 +19,7 @@ public class GuiState {
     public static BackgroundPolicy backgroundPolicy = BackgroundPolicy.NONE;
 
     public static int animationSpeed = 300;
-
-
+    
     public static Agent getSelectedAgent() {
         return selectedAgent;
     }

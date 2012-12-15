@@ -28,7 +28,9 @@ import sim.model.helpers.Misc;
 
 public class MallSim {
 
-    static Random r = new Random();
+    public static long seed = 0L;
+    public static Random r = new Random(seed);
+    
     static Thread simThread = null;
     static MallFrame frame = null;
 
@@ -266,7 +268,7 @@ public class MallSim {
                     Map<Agent, Integer> speedPointsLeft = computeMovementPointsLeft();
                     moveAgents(speedPointsLeft);
 
-                    assert (nAgentsBegin == board.countAgents());
+//                    assert (nAgentsBegin == board.countAgents());
                 }
 
                 nAgentSuccesses += targetsReached;

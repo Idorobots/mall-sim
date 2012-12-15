@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import sim.MallSim;
 import sim.model.Agent;
 import sim.model.Board;
 import sim.model.Mall;
@@ -52,7 +53,7 @@ public final class Ped4 implements MovementAlgorithm {
 
     // TODO: jak rozwiązać problem różnych v_max dla różnych ludzi?
 
-    private static Random r = new Random();
+    private static Random r = MallSim.r;
 
     /**
      * Identyfikatory "pasów ruchu" (
