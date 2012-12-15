@@ -85,19 +85,20 @@ public class MallFrame extends JFrame {
         mntmRestart.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent arg0) {
+                MallSim.reseed();
                 MallSim.runAlgoTest();
             }
         });
-        
+
         JCheckBoxMenuItem chckbxmntmPaused = new JCheckBoxMenuItem(new PauseResumeAction());
         mnSimulation.add(chckbxmntmPaused);
         mnSimulation.add(mntmRestart);
-        
+
         JMenuItem mntmSeed = new JMenuItem("Seed");
         mntmSeed.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 String str = JOptionPane.showInputDialog(null, "Seed:", MallSim.seed);
-                
+
                 try {
                     Long newSeed = Long.valueOf(str);
                     MallSim.seed = newSeed;
@@ -328,22 +329,22 @@ public class MallFrame extends JFrame {
 
         guiBoard = new GUIBoard(mall.getBoard());
         boardPanel.add(guiBoard);
-        
+
         propertiesTable = new PropertiesTable();
         GridBagConstraints gbc_propertiesTable = new GridBagConstraints();
         gbc_propertiesTable.fill = GridBagConstraints.HORIZONTAL;
         gbc_propertiesTable.gridx = 0;
         gbc_propertiesTable.gridy = 0;
         propertiesPanel.add(propertiesTable, gbc_propertiesTable);
-        
+
         tabbedPane.setSelectedIndex(0);
     }
 
     public GUIBoard getBoard() {
         return guiBoard;
     }
-    
+
     public PropertiesTable getPropertiesTable() {
-    	return propertiesTable;
+        return propertiesTable;
     }
 }

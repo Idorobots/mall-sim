@@ -30,7 +30,7 @@ public class MallSim {
 
     public static long seed = 0L;
     public static Random r = new Random(seed);
-    
+
     static Thread simThread = null;
     static MallFrame frame = null;
 
@@ -429,4 +429,8 @@ public class MallSim {
     // public static Thread getThread() {
     // return simThread;
     // }
+
+    public static void reseed() {
+        r = new Random(seed);
+    }
 }
