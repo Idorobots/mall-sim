@@ -207,7 +207,7 @@ public class Tactical {
                 // NOTE For all other segments their starting points are the same as the ending
                 // NOTE points of the previous segments, so we can safely remove them.
 
-                segment.remove(0);
+                if(segment.size() > 1) segment.remove(0);
                 midpoints.addAll(segment);
             }
 
@@ -243,7 +243,7 @@ public class Tactical {
 
             List<Point> a = selectMidpoints(points, start, middle);
             List<Point> b = selectMidpoints(points, middle, end);
-            b.remove(0); // NOTE We don't want midpoint duplication.
+            if(b.size() > 1) b.remove(0); // NOTE We don't want midpoint duplication.
 
             result.addAll(a);
             result.addAll(b);
@@ -274,7 +274,7 @@ public class Tactical {
             iter.x = (int) x;
             iter.y = (int) y;
 
-            if(board.getCell(iter) == Cell.WALL) return false;
+            if(!board.isOnBoard(iter) || (board.getCell(iter) == Cell.WALL)) return false;
 
             x += dx;
             y += dy;

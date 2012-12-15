@@ -117,7 +117,7 @@ public class ResourceManager {
                                 break;
 
                             case MAP_SPAWNER:
-                                MallFeature spawn = new Spawner(b, hash);
+                                MallFeature spawn = new Spawner(hash);
                                 features.put(hash, spawn);
                                 grid[i][j].setFeature(spawn);
                                 break;

@@ -88,7 +88,7 @@ public class Board {
             }
         }
     }
-    
+
     public void printForceField() {
         // Clear force field.
         Point curr = new Point();
@@ -141,11 +141,11 @@ public class Board {
                     System.err.println(p.toString() + " : " + getCell(p).getForceValue());
                     throw new AssertionError();
                 }
-                
+
                 getCell(p).flipForceValue();
             }
         }
-        
+
 //        Mall.getInstance().getBoard().printForceField();
     }
 

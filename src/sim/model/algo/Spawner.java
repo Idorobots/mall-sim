@@ -1,14 +1,12 @@
 package sim.model.algo;
 
 import sim.model.Agent;
-import sim.model.Board;
+import sim.model.helpers.Misc;
 
 public class Spawner extends MallFeature {
-    private Board board;
     private int pixelValue;
 
-    public Spawner(Board b, int pixelValue) {
-        this.board = b;
+    public Spawner(int pixelValue) {
         this.pixelValue = pixelValue;
     }
 
@@ -19,7 +17,7 @@ public class Spawner extends MallFeature {
     public void performAction(Agent a) {
         assert a != null;
 
-        board.getCell(a.getPosition()).setAgent(null);
+        Misc.setAgent(null, a.getPosition());
         a.setDead(true);
     }
 
