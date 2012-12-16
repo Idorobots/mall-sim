@@ -1,8 +1,16 @@
 package sim;
 
+import java.awt.AWTException;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.Robot;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Observable;
@@ -11,6 +19,15 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import javax.swing.UIManager;
+
+import org.monte.media.Format;
+import org.monte.media.FormatKeys.MediaType;
+import org.monte.media.avi.AVIWriter;
+import org.monte.media.math.Rational;
+
+import static org.monte.media.AudioFormatKeys.*;
+import static org.monte.media.VideoFormatKeys.*;
+
 
 import sim.control.GuiState;
 import sim.control.ResourceManager;
@@ -35,6 +52,16 @@ public class MallSim {
     static MallFrame frame = null;
 
     static boolean isSuspended = false;
+    
+    /**
+     * Liczba klatek symulacji na jedną klatkę animacji (zapisywanej do pliku AVI).
+     */
+    public static int simFramesPerAviFrame = 1;
+    static AVIWriter out = null;
+    static Graphics2D g = null;
+    static BufferedImage img = null;
+    static String aviFilename = "out.avi";
+    static boolean isRecording = false;
 
 
     /**
@@ -66,6 +93,35 @@ public class MallSim {
         });
     }
 
+    public static void prepareAvi() throws IOException, AWTException {
+        Format format = new Format(EncodingKey, ENCODING_AVI_MJPG, DepthKey, 24, QualityKey, 1f);
+
+        Dimension dim = frame.getBoard().getParent().getParent().getSize();
+
+        // Make the format more specific
+        format = format.prepend(MediaTypeKey, MediaType.VIDEO,
+                FrameRateKey, new Rational(30, 1),
+                WidthKey, dim.width,
+                HeightKey, dim.height);
+
+        img = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_RGB);
+        g = img.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        out = new AVIWriter(new File(aviFilename));
+        out.addTrack(format);
+        out.setPalette(0, img.getColorModel());
+        
+        isRecording = true;
+    }    
+    
+    public static void finalizeAvi() throws IOException, AWTException {
+        if (out != null) {
+            out.close();
+        }
+
+        isRecording = false;
+    }
 
     /**
      * Testuje działanie algotymów ruchu.
@@ -250,6 +306,18 @@ public class MallSim {
                 int targetsReached = 0;
 
                 for (int i = 0; i < STEPS; i++) {
+                    if (isRecording && i % simFramesPerAviFrame == 0) {
+                        frame.getBoard().paint(g);
+                        try {
+                            out.write(0, img, 1);
+                        } catch (IOException e) {
+                            System.err.println("AVI write");
+                        }
+
+                        // XXX
+                    }
+                    
+                    
                     targetsReached = computeTargetReached();
 
                     if (targetsReached == nAgentsBegin) {

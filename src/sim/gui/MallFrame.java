@@ -1,5 +1,6 @@
 package sim.gui;
 
+import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -8,6 +9,7 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -41,6 +43,11 @@ import sim.gui.actions.ExitAction;
 import sim.gui.actions.PauseResumeAction;
 import sim.model.Mall;
 import sim.util.Logger;
+import javax.swing.JSpinner;
+import javax.swing.JLabel;
+import java.awt.Component;
+import javax.swing.Box;
+import javax.swing.SpinnerNumberModel;
 
 @SuppressWarnings("serial")
 public class MallFrame extends JFrame {
@@ -139,9 +146,9 @@ public class MallFrame extends JFrame {
         tabbedPane.addTab("Display", null, tabDisplay, null);
         GridBagLayout gbl_tabDisplay = new GridBagLayout();
         gbl_tabDisplay.columnWidths = new int[] { 306, 0 };
-        gbl_tabDisplay.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+        gbl_tabDisplay.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         gbl_tabDisplay.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-        gbl_tabDisplay.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0,
+        gbl_tabDisplay.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0,
                 1.0, Double.MIN_VALUE };
         tabDisplay.setLayout(gbl_tabDisplay);
 
@@ -295,6 +302,59 @@ public class MallFrame extends JFrame {
         gbc_tglbtnPause.gridx = 0;
         gbc_tglbtnPause.gridy = 4;
         tabDisplay.add(tglbtnPause, gbc_tglbtnPause);
+        
+        JPanel panel = new JPanel();
+        GridBagConstraints gbc_panel = new GridBagConstraints();
+        gbc_panel.insets = new Insets(0, 0, 5, 0);
+        gbc_panel.fill = GridBagConstraints.BOTH;
+        gbc_panel.gridx = 0;
+        gbc_panel.gridy = 6;
+        tabDisplay.add(panel, gbc_panel);
+        
+        JToggleButton tglbtnRecord = new JToggleButton("Record");
+        panel.add(tglbtnRecord);
+        
+        Component horizontalStrut = Box.createHorizontalStrut(20);
+        panel.add(horizontalStrut);
+        
+        JLabel lblSpf = new JLabel("spf:");
+        panel.add(lblSpf);
+        
+        JSpinner spinner = new JSpinner();
+        spinner.setModel(new SpinnerNumberModel(2, 1, 10, 1));
+        spinner.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                JSpinner s = (JSpinner) e.getSource();
+                MallSim.simFramesPerAviFrame = (Integer) s.getValue();
+            }
+        });
+        panel.add(spinner);
+        tglbtnRecord.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JToggleButton b = (JToggleButton) e.getSource();
+                if (b.isSelected()) {
+                    try {
+                        MallSim.prepareAvi();
+                    } catch (IOException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    } catch (AWTException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                } else {
+                    try {
+                        MallSim.finalizeAvi();
+                    } catch (IOException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    } catch (AWTException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
 
         switch (GuiState.targetLinePolicy) {
         case NONE:
