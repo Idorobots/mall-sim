@@ -224,7 +224,8 @@ public class ResourceManager {
             Point p = new Point(r.nextInt(d.width), r.nextInt(d.height));
 
             if(b.getCell(p).isPassable()) {
-                Misc.setAgent(new Agent(MovementBehavior.DYNAMIC), p);
+                MovementBehavior mb = MovementBehavior.values()[r.nextInt(MovementBehavior.values().length)];
+                Misc.setAgent(new Agent(mb), p);
             }
         }
 

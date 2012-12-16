@@ -25,7 +25,7 @@ public class Agent extends Observable {
      * 
      */
     public static enum MovementBehavior {
-        DYNAMIC("dynamic"), NORMAL("normal"), PENSIONER("pensioner");
+        DYNAMIC("dynamic"), AVERAGE("average"), PENSIONER("pensioner");
 
         private final String filename;
 
