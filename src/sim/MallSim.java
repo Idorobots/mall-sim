@@ -52,7 +52,7 @@ public class MallSim {
     static MallFrame frame = null;
 
     static boolean isSuspended = false;
-    
+
     /**
      * Liczba klatek symulacji na jedną klatkę animacji (zapisywanej do pliku AVI).
      */
@@ -77,7 +77,7 @@ public class MallSim {
                     e.printStackTrace();
                 }
 
-                ResourceManager.loadShoppingMall("./data/malls/simple2.bmp", "./data/malls/simple2map.bmp");
+                ResourceManager.loadShoppingMall("./data/malls/gk0.bmp", "./data/malls/gk0map.bmp");
                 // resMgr.loadShoppingMall("./data/malls/small.bmp");
 
                 Mall mall = Mall.getInstance();
@@ -111,10 +111,10 @@ public class MallSim {
         out = new AVIWriter(new File(aviFilename));
         out.addTrack(format);
         out.setPalette(0, img.getColorModel());
-        
+
         isRecording = true;
-    }    
-    
+    }
+
     public static void finalizeAvi() throws IOException, AWTException {
         if (out != null) {
             out.close();
@@ -131,7 +131,7 @@ public class MallSim {
         SimLoop loop = new SimLoop(Mall.getInstance());
         loop.addObserver(frame.getBoard());
         Board b = Mall.getInstance().getBoard();
-        ResourceManager.randomize(Mall.getInstance().getBoard(), b.getDimension().height * b.getDimension().width / 25);
+        ResourceManager.randomize(Mall.getInstance().getBoard(), b.getDimension().height * b.getDimension().width / 50);
 
         if (simThread != null)
             simThread.stop();

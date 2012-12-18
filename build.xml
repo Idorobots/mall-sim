@@ -2,7 +2,7 @@
 
 	<!-- External JARs included into classpath -->
 	<path id="external-libs">
-		<fileset dir="lib">
+		<fileset dir="libs">
 			<include name="*.jar" />
 		</fileset>
 	</path>

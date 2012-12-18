@@ -205,6 +205,7 @@ public class ResourceManager {
         Logger.log("Randomizing board...");
 
         randomize(b, h*w/25);
+
         Logger.log("Board randomized!");
 
         Logger.log("Mall loaded!");
