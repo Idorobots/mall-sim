@@ -263,7 +263,7 @@ Algorytm \textbf{Social Force} opiera się na obserwacji, że każdy człowiek p
     \section{Implementacja}
     \label{sec:implementation}
 
-    W celu wykonania projektu posłużono się językiem \textbf{Java} oraz bibliotekami \textbf{Java Swing} oraz \textbf{Monte Media Library}. Poniżej zawarto opis implementacji wybranych algorytmów i obiektów symulacji.
+    W celu wykonania projektu posłużono się językiem \textbf{Java} oraz bibliotekami \textbf{Java Swing} oraz \href{http://www.randelshofer.ch/monte/}{\textbf{Monte Media Library}}. Poniżej zawarto opis implementacji wybranych algorytmów i obiektów symulacji.
 
         \subsection{Reprezentacja centrum handlowego}
         \label{sec:mall-impl}
@@ -524,24 +524,180 @@ Poniżej przedstawiono pseudokody metody odpowiedzialnej za ruch "do przodu" w a
     \section{Symulacja i analiza wyników}
     \label{sec:sim}
 
-    % TODO Stworzyć i opisać przykładowy problem (albo dwa), takie jak mały sklep, czy duże centrum.
-    % TODO Zasymulawać przykładowy problem i zebrać dane.
+    W celu przetestowania poprawności modelu i działania programu zdecydowano się przeprowadzić symulację lokalnego centrum handlowego - \href{http://www.galeria-krakowska.pl/}{\emph{Galerii Krakowskiej}}. Przygotowano mapy parteru centrum zaprezentowane na poniższej ilustracji:
+
+    \begin{figure}[H]
+      \centering
+      \includegraphics[scale=0.5]{./img/GaleriaKrakowska.pdf}
+      \caption{Mapy parteru popularnej \emph{Galerii Krakowskiej}.}
+      \label{fig:gk-maps}
+    \end{figure}
+
+    \noindent
+    Ze względu na brak dostępu do danych i dynamiczne zmiany faktycznych rozkładów sklepowych półek i alejek mapy parteru symulowanego centrum handlowego, przedstawione na rysunku \ref{fig:gk-maps}, zawierają przykładowe, proste układy półek sklepowych - wizję autorów projektu. \\
 
         \subsection{Kalibracja i walidacja parametrów symulacji}
-        \label{sec:p}
+        \label{sec:calibration}
 
-        % TODO Opisać metody kalibracji i walidacji parametrów symulacji.
+        W celu kalibracji i walidacji parametrów modelu posłużono się obserwacjami przeprowadzonymi w symulowanym centrum handlowym w wolnym czasie. W związku z faktem, iż model zastosowany w tej pracy niewiele parametrów wymagających kalibracji, z których większość jest trudna, bądź niemożliwa do oszacowania bez dużej porcji danych statystycznych kalibrację przeprowadzono w dużej mierze ``metodą prób i błędów'' w oparciu o dane zebrane z obserwacji. Udało się w ten sposób zidentyfikować trzy typy agentów odwiedzających centrum handlowe (dynamiczny, przeciętny i ``pensjonariusz''), które różnią się maksymalną prędkością poruszania, chęcią do omijania innych agentów, czy wytrwałością w robieniu zakupów. \\
+
+        Po skalibrowaniu parametrów dotyczących zachowania agentów przystąpiono do kalibracji parametrów centrum handlowego, wyrażonych w większości przez \hyperref[sec:mall-features]{mapę rozkładu stref specjalnych} centrum handlowego, która jest wykorzystywana przez algorytm wyszukiwania ścieżek. Kalibracja przebiegała ze względu na dwa kluczowe aspekty symulacji - czas generowania ścieżek oraz zachodzenie abstrakcyjnych zjawisk opisanych w następnej sekcji. Kalibrację ponownie przeprowadzono w oparciu o dane pochodzące z własnych obserwacji i ``zrdrowego rozsądku'', niestety administracja \emph{Galerii Krakowskiej} nie udzieliła autorom pracy dostępu do istotnych danych, które umożliwiłyby stworzenie lepszej mapy rozkładu stref specjalnych, która dokładniej oddawałaby rzeczywisty charakter \emph{Galerii Krakowskiej}. \\
+
+        Walidację opracowanych parametrów przeprowadzono konfrontując wyniki symulacji z rzeczywistymi doświadczeniami wyniesionymi z symulowanego centrum handlowego. Porównanie wyników symulacji do poczynionych obserwacji rzeczywistego zachowania ludzi zawarto w następnych sekcjach.
 
         \subsection{Uzyskane wyniki ilościowe i jakościowe}
         \label{sec:results}
 
-        % TODO Opisać otrzymane wyniki, przedstawić statystyki zachowań,
-        % TODO czasów spędzonych w centrum handlowym itp.
+        Uzyskane wyniki spełniają wszystkie założenia postawione w sekcjach \ref{sec:mall-model} i \ref{sec:move-model} i są bardzo zbliżone do rzeczywistych zachowań ludzi w centrum handlowym. Agenci poruszają się zgodnie z wytyczonymi ścieżkami, które dobierane są w taki sposób, by dany agent odwiedził wiele sklepów w centrum handlowym:
+
+        \begin{figure}[H]
+          \centering
+          \includegraphics[scale=0.7]{./img/route.png}
+          \caption{Wybrana przez algorytm ścieżka prowadząca agenta po centrum handlowym.}
+          \label{fig:res-route}
+        \end{figure}
+
+\noindent
+Modeluje to strategiczne plany ludzi, którzy odwiedzając centrum handlowe przeważnie planują spędzić tam więcej czasu. Opisany w sekcji \ref{sec:path-finding} algorytm wyboru ścieżek prowadzi do powstania realistycznego routingu ludzi w centrum handlowym:
+
+        \begin{figure}[H]
+          \centering
+          \includegraphics[scale=0.7]{./img/routing.png}
+          \caption{Realistyczny routing agentów w centrum handlowym.}
+          \label{fig:res-routing}
+        \end{figure}
+
+\noindent
+Spontanicznie tworzą się pasy ruchu, którymi ludzie podążają do celu swojej podróży:
+
+        \begin{figure}[H]
+          \centering
+          \includegraphics[scale=0.7]{./img/lanes.png}
+          \caption{Samoistne tworzenie się pasów ruchu.}
+          \label{fig:res-lanes}
+        \end{figure}
+
+\noindent
+Zupełnie jak w prawdziwym centrum handlowym, agenci preferują poruszanie się środkiem korytarza w miarę możliwości, o czym świadczy większa wartość ``temperatury'' na środku poniższej ilustracji:
+
+        \begin{figure}[H]
+          \centering
+          \includegraphics[scale=0.7]{./img/middle.png}
+          \caption{Agenci preferujący środek korytarza.}
+          \label{fig:res-middle}
+        \end{figure}
+
+\noindent
+Takie zachowanie prowadzi do tworzenia się skupisk ludzi (\emph{ang. flocking}), co wpływa na preferencje odległościowe zaangażowanych agentów i zmianę ich gradientów \emph{Social Force}. Zmiana ta pociąga za sobą rozładowanie zatoru - model osiąga stabilność automatycznie się regulując:
+
+        \begin{figure}[H]
+          \centering
+          \includegraphics[scale=0.7]{./img/bottleneck.png}
+          \caption{Samoistne tworzenie się zgrupowań ludzi - \emph{flocking}.}
+          \label{fig:res-bottleneck}
+        \end{figure}
+
+Równie interesujące jest powstawanie abstrakcyjnych zachowań wymienionych w sekcji \ref{sec:mall-model}. Algorytm \hyperref[sec:tactical]{fazy taktycznej} uwzględnia \emph{atrakcję} agentów do różnych, interesujących stref centrum handlowego, co zaprezentowano na rysunku \ref{fig:res-attraction}.
+
+        \begin{figure}[H]
+          \centering
+          \includegraphics[scale=0.7]{./img/attraction.png}
+          \caption{Uwzględnianie miejsc przyciągających uwagę w ścieżce agenta.}
+          \label{fig:res-attraction}
+        \end{figure}
+
+\noindent
+Obserwować można naturalne zachowania, takie jak zatrzymanie się przed oknem wystawowym, często obserwowane w prawdziwych centrach handlowych:
+
+        \begin{figure}[H]
+          \centering
+          \includegraphics[scale=0.7]{./img/attraction2.png}
+          \caption{Charakterystyczne zboczenie z trasy celem osiągnięcia atraktora.}
+          \label{fig:res-attraction-2}
+        \end{figure}
+
+\noindent
+Agenci bardzo chętnie grupują się by obserwować różne ciekawe zjawiska obecne w symulowanym centrum handlowym - wszystko dzięki umieszczonym tam \hyperref[sec:attractors]{atraktorom}:
+
+        \begin{figure}[H]
+          \centering
+          \includegraphics[scale=0.7]{./img/attraction3.png}
+          \caption{Agenci w obrębie atraktora.}
+          \label{fig:res-attraction-3}
+        \end{figure}
+
+\hyperref[sec:queues]{Kolejki}, podobnie jak atraktory, brane są pod uwagę już w fazie taktycznej działania algorytmu - agenci dokonujący zakupu podchodzą do kasy i oczekują na obsługę imitując zachowanie prawdziwych ludzi:
+
+        \begin{figure}[H]
+          \centering
+          \includegraphics[scale=0.7]{./img/queueing.png}
+          \caption{Uwzględnianie sklepowych kas i kolejek w ścieżce agenta.}
+          \label{fig:res-queueing}
+        \end{figure}
+
+\noindent
+Zachowanie to udało się osiągnąć pomimo działania algorytmu \hyperref[sec:operational]{Social Force}, który nakazuje agentom trzymanie dystansu do siebie nawzajem:
+
+        \begin{figure}[H]
+          \centering
+          \includegraphics[scale=0.7]{./img/queueing2.png}
+          \caption{Agenci oczekujący na swoją kolej.}
+          \label{fig:res-queueing-2}
+        \end{figure}
+
+W podobny sposób osiągnięto \hyperref[sec:holders]{wstrzymanie agentów} - symulujące wszelkiego rodzaju odpoczynki i czasy oczekiwania zdarzające się w centrum handlowym:
+
+        \begin{figure}[H]
+          \centering
+          \includegraphics[scale=0.7]{./img/hold.png}
+          \caption{Agenci odpoczywający na ławce (w obrębie opóźniacza).}
+          \label{fig:res-hold}
+        \end{figure}
+
+Interesującym jest fakt, iż nawet pomimo zastosowania skomplikowanych algorytmów routingu i wyszukiwania ścieżek udało się otrzymać niemal stu procentowe pokrycie centrum handlowego. Agenci bezproblemowo osiągają wszystkie jego pomieszczenia, co doskonale oddaje charakterystyki prawdziwego centrum handlowego i zachowanie ludzi tam obecnych.
+
+        \begin{figure}[H]
+          \centering
+          \includegraphics[scale=0.7]{./img/coverage.png}
+          \caption{Pokrycie centrum handlowego.}
+          \label{fig:res-coverage}
+        \end{figure}
+
+
+Dodatkowo do dokumentacji projektu załączono kilka filmów pokazujących działanie symulacji i powstawanie wyżej opisanych zachowań:
+
+        \begin{itemize}
+          \item \textbf{overview.avi} - Prezentacja różnych aspektów wizualizacji symulacji: zbliżanie, oddalanie, przesuwanie planu galerii, rozkład pola potencjału, mapa ``temperatury'' (licznik odwiedzin pól).
+
+          \item \textbf{movement.avi} - Przykład formowania się ``pasów ruchu'' na prostych odcinkach korytarza (górna część animacji) dzięki użyciu algorytmu Ped-4. Problemy ze współistnieniem obok siebie algorytmów Ped-4 i Social Force (patrz: ruch agentów po wygiętych w łuch korytarzach) - piesi zawracają bądź ``kręcą się w kółko'' powodując zator.
+
+          \item \textbf{queue\_attractor.avi} - Działanie kolejek (po prawej stronie) oraz atraktorów (w środku i po lewej stronie) - agenci chętnie zbliżają do takich stref. Wejście na atraktor albo kolejkę powoduje wstrzymanie agenta na określony czas.
+
+          \item \textbf{social\_force.avi} - Przykład omijania innych klientów z uwzględnieniem stref komfortu dzięki zastosowaniu algorytmu Social Force.
+
+          \item \textbf{visits.avi} - Animacja pokazująca przepłw ludzi w galerii handlowej. Wyraźnie widać duży, skoncentrowany ruch po korytarzach oraz niewielki i rozproszony ruch po obszarach sklepów.
+
+          \item \textbf{wall\_error.avi} - Przykład błędów wyznaczania ścieżki skutkujący niemożliwością osiągnięcia wyznaczonego celu z powodu natrafienia na ścianę. Przyczyną jest przedwczesne uznanie wcześniejszego celu (leżącego w tym przypadku na szczycie ściany) za osiągnięty oraz wyznaczenie kolejnego celu w miejscu niewidocznym z pozycji agenta w chwili uznania poprzednieg celu za osiągnięty.
+        \end{itemize}
 
         \subsection{Wyniki symulacji a rzeczywistość}
         \label{sec:sim-vs-reality}
+Wyniki symulacji dość dobrze oddają charakter zjawisk obserwowanych w rzeczywistej galerii handlowej.
 
-        % TODO Napisać dokładne porównanie z rzeczywistymi danymi.
+W korytarzach obserwujemy formowanie się ``pasów ruchu'' - ludzie starają się iść jeden za drugim w kolumnie, próbują wyprzedzać się tylko wtedy, gdy nie nadchodzi nikt z naprzeciwka. We wnętrzach sklepów dzieje się na odwrót - brak pośpiechu sprawia, że klienci większą wagę przywiązują do nie naruszania swoich stref komfortu.
+
+Na podglądzie odwiedzonych płytek widzimy, że klienci preferują ruch środkiem korytarzy, jednak gdy zajdzie taka konieczność korzystają z całej jego dostępnej szerokości.
+
+W przypadku sklepów rozkład odwiedzanych miejsc jest znacznie bardziej równomierny, czego również można było oczekiwać - wewnątrz sklepu (o ile nie jest to dyskont spożywczy) klient porozgląda się i zapoznaje z ofertą sklepu, a uwagę różnych osób przyciągają różne produkty. Warto również zauważyć, że w przypadku niewielkich sklepów (typu: 101 drobiazgów, Świat Kawy i Herbaty) stosunkowo niewielu klientów wchodzi głębiej do środka - większość po wejściu rozgląda się chwilę i wychodzi. Zachowanie takie jest często obserwowane w galeriach handlowych.
+
+Analiza wyników symulacji wykazała również konieczność dalszej kalibracji (oraz ewentualnie częściowej zmiany metodologii) procesu wyznaczania ścieżek. Na chwilę obecną nie udało się w pełni wyeliminować niekorzystnego zjawiska ``forsowania ściany'' przez agentów spowodowanego równoczesnym wystąpieniem dwóch zdarzeń: przedwczesnym uznaniem celu za osiągnięty oraz wyznaczeniu kolejnego celu w miejscu niewidocznym z aktualnej pozycji agenta. Przykład takiej sytuacji pokazano poniżej: jeśli agent uzna punkt $A$ za osiągnięty jeszcze przed ominięciem ściany, wektor celu prowądzący do punktu $B$ spowoduje ruch agenta wzdłóż ściany i próbę jej późniejszego ``sforsowania''.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.7]{./img/wallsmasher.png}
+  \caption{Forsowanie ściany przez wybranego agenta.}
+  \label{fig:bug-wallsmasher}
+\end{figure}
 
 \newpage
     \begin{thebibliography}{9}
