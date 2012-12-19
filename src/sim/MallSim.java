@@ -87,8 +87,8 @@ public class MallSim {
 
                 // ResourceManager.loadShoppingMall("./data/malls/simple2.bmp",
                 // "./data/malls/simple2.bmp");
-//                ResourceManager.loadShoppingMall("./data/malls/gk0.bmp", "./data/malls/gk0map.bmp");
-                ResourceManager.loadShoppingMall("./data/malls/gk0_mod.bmp", "./data/malls/gk0map_mod.bmp");
+                ResourceManager.loadShoppingMall("./data/malls/gk0.bmp", "./data/malls/gk0map.bmp");
+//                ResourceManager.loadShoppingMall("./data/malls/gk0_mod.bmp", "./data/malls/gk0map_mod.bmp");
 
                 Mall mall = Mall.getInstance();
 
@@ -300,7 +300,7 @@ public class MallSim {
         @Override
         public void run() {
             final int LOOPS = 10;
-            final int STEPS = 500;
+            final int STEPS = 5000;
 
             // Liczba poprawnie zakończonych iteracji (wszystkie cele
             // osiągnięte).
@@ -322,8 +322,7 @@ public class MallSim {
                         p.setLocation(x, y);
                         board.getCell(p).clearVisitsCounter();
                     }
-                
-                
+
                 testTactical(board);
 
                 int nAgentsBegin = board.countAgents();
