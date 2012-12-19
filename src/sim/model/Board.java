@@ -5,11 +5,14 @@ import java.awt.Point;
 import java.util.Map;
 
 import sim.model.algo.Ped4;
+import sim.model.helpers.Misc;
 import sim.model.helpers.MyPoint;
 import sim.model.helpers.Vec;
 
 public class Board {
+
     private Cell[][] grid;
+
 
     public Board(Dimension dimension) {
         grid = new Cell[dimension.height][dimension.width];
@@ -19,16 +22,17 @@ public class Board {
                 grid[y][x] = new Cell(Cell.Type.PASSABLE, Ped4.getInstance());
     }
 
+
     public void reset() {
         Point p = new Point();
         for (int y = 0; y < getDimension().height; y++)
             for (int x = 0; x < getDimension().width; x++) {
                 p.setLocation(x, y);
                 getCell(p).clearVisitsCounter();
-                getCell(p).setAgent(null);
-                getCell(p).setForceValue(0);
+                Misc.setAgent(null, p);
             }
     }
+
 
     public Board(Cell[][] grid) {
         assert grid != null;
@@ -36,13 +40,16 @@ public class Board {
         this.grid = grid;
     }
 
+
     public boolean isOnBoard(Point p) {
         return p.x >= 0 && p.y >= 0 && p.x < getDimension().width && p.y < getDimension().height;
     }
 
+
     public Dimension getDimension() {
         return new Dimension(grid[0].length, grid.length);
     }
+
 
     public void setCell(Point p, Cell cell) {
         assert isOnBoard(p);
@@ -51,11 +58,13 @@ public class Board {
         grid[p.y][p.x] = cell;
     }
 
+
     public Cell getCell(Point p) {
         assert isOnBoard(p);
 
         return grid[p.y][p.x];
     }
+
 
     public void computeForceField() {
         // Clear force field.
@@ -89,6 +98,7 @@ public class Board {
         }
     }
 
+
     public void printForceField() {
         // Clear force field.
         Point curr = new Point();
@@ -103,6 +113,7 @@ public class Board {
         }
         System.out.println();
     }
+
 
     /**
      * Modyfikuje rozkład pola potencjału usuwając lub dodając wartości pola
@@ -145,9 +156,8 @@ public class Board {
                 getCell(p).flipForceValue();
             }
         }
-
-//        Mall.getInstance().getBoard().printForceField();
     }
+
 
     public int countAgents() {
         int nAgents = 0;

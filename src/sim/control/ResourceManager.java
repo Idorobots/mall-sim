@@ -136,7 +136,7 @@ public class ResourceManager {
 
         Logger.log("Randomizing board...");
 
-        randomize(b, h*w/80);
+        randomize(b, h*w/250);
 
         Logger.log("Board randomized!");
 

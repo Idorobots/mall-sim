@@ -55,6 +55,7 @@ public class MallFrame extends JFrame {
     private JPanel contentPane;
     private GUIBoard guiBoard;
     private PropertiesTable propertiesTable;
+    private JScrollPane boardScrollPane;
 
     /**
      * Create the frame.
@@ -336,20 +337,16 @@ public class MallFrame extends JFrame {
                     try {
                         MallSim.prepareAvi();
                     } catch (IOException e1) {
-                        // TODO Auto-generated catch block
                         e1.printStackTrace();
                     } catch (AWTException e1) {
-                        // TODO Auto-generated catch block
                         e1.printStackTrace();
                     }
                 } else {
                     try {
                         MallSim.finalizeAvi();
                     } catch (IOException e1) {
-                        // TODO Auto-generated catch block
                         e1.printStackTrace();
                     } catch (AWTException e1) {
-                        // TODO Auto-generated catch block
                         e1.printStackTrace();
                     }
                 }
@@ -377,7 +374,7 @@ public class MallFrame extends JFrame {
         gbl_propertiesPanel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
         propertiesPanel.setLayout(gbl_propertiesPanel);
 
-        JScrollPane boardScrollPane = new JScrollPane();
+        boardScrollPane = new JScrollPane();
         boardScrollPane
                 .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         boardScrollPane
@@ -407,4 +404,10 @@ public class MallFrame extends JFrame {
     public PropertiesTable getPropertiesTable() {
         return propertiesTable;
     }
+    
+    public JScrollPane getScrollPane() {
+        return boardScrollPane;
+    }
+    
+    
 }

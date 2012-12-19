@@ -1,13 +1,21 @@
 package sim;
 
+import static org.monte.media.FormatKeys.EncodingKey;
+import static org.monte.media.FormatKeys.FrameRateKey;
+import static org.monte.media.FormatKeys.MediaTypeKey;
+import static org.monte.media.VideoFormatKeys.DepthKey;
+import static org.monte.media.VideoFormatKeys.ENCODING_AVI_MJPG;
+import static org.monte.media.VideoFormatKeys.HeightKey;
+import static org.monte.media.VideoFormatKeys.QualityKey;
+import static org.monte.media.VideoFormatKeys.WidthKey;
+
 import java.awt.AWTException;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -24,10 +32,6 @@ import org.monte.media.Format;
 import org.monte.media.FormatKeys.MediaType;
 import org.monte.media.avi.AVIWriter;
 import org.monte.media.math.Rational;
-
-import static org.monte.media.AudioFormatKeys.*;
-import static org.monte.media.VideoFormatKeys.*;
-
 
 import sim.control.GuiState;
 import sim.control.ResourceManager;
@@ -54,12 +58,15 @@ public class MallSim {
     static boolean isSuspended = false;
 
     /**
-     * Liczba klatek symulacji na jedną klatkę animacji (zapisywanej do pliku AVI).
+     * Liczba klatek symulacji na jedną klatkę animacji (zapisywanej do pliku
+     * AVI).
      */
     public static int simFramesPerAviFrame = 1;
     static AVIWriter out = null;
     static Graphics2D g = null;
+    static Graphics2D unclippedG = null;
     static BufferedImage img = null;
+    static BufferedImage unclippedImg = null;
     static String aviFilename = "out.avi";
     static boolean isRecording = false;
 
@@ -77,8 +84,11 @@ public class MallSim {
                     e.printStackTrace();
                 }
 
+                // ResourceManager.loadShoppingMall("./data/malls/simple2.bmp",
+                // "./data/malls/simple2.bmp");
                 ResourceManager.loadShoppingMall("./data/malls/gk0.bmp", "./data/malls/gk0map.bmp");
-                // resMgr.loadShoppingMall("./data/malls/small.bmp");
+                // ResourceManager.loadShoppingMall("./data/malls/gk0_mod.bmp",
+                // "./data/malls/gk0map_mod.bmp");
 
                 Mall mall = Mall.getInstance();
 
@@ -93,20 +103,26 @@ public class MallSim {
         });
     }
 
+
     public static void prepareAvi() throws IOException, AWTException {
         Format format = new Format(EncodingKey, ENCODING_AVI_MJPG, DepthKey, 24, QualityKey, 1f);
 
-        Dimension dim = frame.getBoard().getParent().getParent().getSize();
+        // String cn =
+        // frame.getBoard().getParent().getParent().getClass().toString();
+        Rectangle dim = frame.getBoard().getVisibleRect();
 
         // Make the format more specific
-        format = format.prepend(MediaTypeKey, MediaType.VIDEO,
-                FrameRateKey, new Rational(30, 1),
-                WidthKey, dim.width,
+        format = format.prepend(MediaTypeKey, MediaType.VIDEO, FrameRateKey, new Rational(30, 1), WidthKey, dim.width,
                 HeightKey, dim.height);
 
         img = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_RGB);
         g = img.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        Dimension unclippedDim = frame.getBoard().getSize();
+        unclippedImg = new BufferedImage(unclippedDim.width, unclippedDim.height, BufferedImage.TYPE_INT_RGB);
+        unclippedG = unclippedImg.createGraphics();
+        unclippedG.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         out = new AVIWriter(new File(aviFilename));
         out.addTrack(format);
@@ -115,6 +131,7 @@ public class MallSim {
         isRecording = true;
     }
 
+
     public static void finalizeAvi() throws IOException, AWTException {
         if (out != null) {
             out.close();
@@ -122,6 +139,7 @@ public class MallSim {
 
         isRecording = false;
     }
+
 
     /**
      * Testuje działanie algotymów ruchu.
@@ -302,22 +320,38 @@ public class MallSim {
                 int nAgentsBegin = board.countAgents();
                 nTotalAgents += nAgentsBegin;
 
+                // System.out.println("begin = " + nAgentsBegin);
+
                 // Ilość agentów, którzy osiągnęli swój cel.
                 int targetsReached = 0;
 
                 for (int i = 0; i < STEPS; i++) {
                     if (isRecording && i % simFramesPerAviFrame == 0) {
-                        frame.getBoard().paint(g);
+                        frame.getBoard().paint(unclippedG);
+
+                        Rectangle r = frame.getBoard().getVisibleRect();
+
+                        int x, y;
+                        x = (r.x + img.getWidth() <= unclippedImg.getWidth()) ? r.x : unclippedImg.getWidth()
+                                - img.getWidth();
+                        y = (r.y + img.getHeight() <= unclippedImg.getHeight()) ? r.y : unclippedImg.getHeight()
+                                - img.getHeight();
+
+                        img = unclippedImg.getSubimage(x, y, img.getWidth(), img.getHeight());
                         try {
                             out.write(0, img, 1);
                         } catch (IOException e) {
                             System.err.println("AVI write");
-                        }
+                            e.printStackTrace();
 
-                        // XXX
+                            try {
+                                finalizeAvi();
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
+                        }
                     }
-                    
-                    
+
                     targetsReached = computeTargetReached();
 
                     if (targetsReached == nAgentsBegin) {
@@ -336,8 +370,12 @@ public class MallSim {
                     Map<Agent, Integer> speedPointsLeft = computeMovementPointsLeft();
                     moveAgents(speedPointsLeft);
 
-//                    assert (nAgentsBegin == board.countAgents());
+                    // assert (nAgentsBegin == board.countAgents());
+                    // System.out.println(String.format("i[%d] = %d", i,
+                    // board.countAgents()));
                 }
+
+                // System.out.println("end = " + board.countAgents());
 
                 nAgentSuccesses += targetsReached;
             }
@@ -349,7 +387,6 @@ public class MallSim {
 
             System.exit(0);
         }
-
     }
 
 
@@ -493,6 +530,7 @@ public class MallSim {
     synchronized public static boolean getThreadState() {
         return isSuspended;
     }
+
 
     // public static Thread getThread() {
     // return simThread;

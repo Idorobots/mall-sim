@@ -16,7 +16,6 @@ public class Misc {
             Mall.getInstance().getBoard().modifyForceField(c.getAgent(), new MyPoint(p), -1);
 
         Mall.getInstance().getBoard().getCell(p).setAgent(a);
-//        Mall.getInstance().getBoard().printForceField();
 
         if (a != null) {
             a.setPosition(p);
