@@ -244,7 +244,6 @@ Algorytm składa się z następujących etapów:
 \end{enumerate}
 
 \newpage
-
 \noindent
 Poniżej zamieszczono preferowaną kolejność dokonywania zamian:
 
@@ -264,7 +263,7 @@ Algorytm \textbf{Social Force} opiera się na obserwacji, że każdy człowiek p
     \section{Implementacja}
     \label{sec:implementation}
 
-    W poniższej sekcji zawarto opis konkretnej implementacji wybranych algorytmów.
+    W celu wykonania projektu posłużono się językiem \textbf{Java} oraz bibliotekami \textbf{Java Swing} oraz \textbf{Monte Media Library}. Poniżej zawarto opis implementacji wybranych algorytmów i obiektów symulacji.
 
         \subsection{Reprezentacja centrum handlowego}
         \label{sec:mall-impl}
@@ -381,7 +380,7 @@ Faza operacyjna składa się z czterech wykonywanych w pętli etapów, co zilust
 
     \begin{figure}[H]
         \centering
-        \includegraphics[scale=0.5]{./img/mainloop.png}
+        \includegraphics[scale=0.3]{./img/OperationalLoop.pdf}
         \caption{Pętla fazy operacyjnej}
         \label{fig:operloop}
     \end{figure}
@@ -486,10 +485,40 @@ Poniżej przedstawiono pseudokody metody odpowiedzialnej za ruch "do przodu" w a
 \end{algorithmic}
 \end{algorithm}
 
-
 \indent Funkcja wyznaczająca dostępne pola ogranicza możliwoś ruchu tak, aby agent albo dalej przemieszczał się po dotychczasowej trajektorii, albo skręcił w stronę celu. \\
 \indent Potencjał pola obliczany jest na podstawie siły oddziaływania innych ludzi (ujemna składowa) oraz odległości pola od celu (dodatnia składowa). W przypadku, gdy agent już dość długo zmierza do celu (tzn. przebyta przez niego droga znacząco przekracza minimalną drogę konieczną do osiągnięcia celu), lecz nie może go osiągnąć, przestaje zwracać taką uwagę na innych agentów – efekt ten został osiągnięty przez dodatkowe zwiększenie potencjału dostępnej płytki leżącej najbliżej celu. \\
 \indent W przypadku, gdy brak jest dostępnych płytek, agent obraca się odrobinę w miejscu, by w następnym kroku zyskać nowe możliwości ruchu (ze względu na zmianę zbioru dostępnych płytek).
+
+\newpage
+        \subsection{Wizualizacja i pozyskiwanie danych}
+        \label{sec:vis-and-data}
+
+        Wizualizację przebiegu symulacji wykonano w oparciu o bibliotekę \textbf{Java Swing} z racji na prostotę implementacji i zadowalające efekty wizualne, jakie ona dostarcza. Na rysunku \ref{fig:mall-sim-win} zaprezentowano wygląd głównego okna programu podczas przykładowej symulacji.
+
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.5]{./img/MallSim.pdf}
+            \caption{Główne okno programu.}
+            \label{fig:mall-sim-win}
+        \end{figure}
+
+        Program udostępnia wiele konfigurowalnych opcji odpowiadających za działanie symulacji i jej wizualizacji dostępnych za pośrednictwem \emph{panelu opcji}:
+
+        \begin{itemize}
+            \item \textbf{Opcje tła} - wybór danych wizualizowanych w tle symulacji; do wyboru jedna wartość z: \emph{brak}, \emph{gradient Social Force}, \emph{rozkład odwiedzin danych komórek centrum handlowego}, \emph{rozkład algorytmów ruchu}, \emph{rozkład stref specjalnych centrum handlowego}.
+            \item \textbf{Opcje celu} - opcje wizualizacji celu podróży agentów; do wyboru jedna wartość z: \emph{brak}, \emph{wektor najbliższego celu wybranego agenta}, \emph{aktualna ścieżka wybranego agenta}, \emph{wektory najbliższego celu wszystkich agentów}.
+            \item \textbf{Szybkość symulacji} - pasek wyboru szybkości symulacji (ilość milisekund na krok symulacji); wartości z przedziału 50 do 1000 milisekund.
+            \item \textbf{Opcje nagrywania} - opcje odpowiadające za nagrywanie przepiegu symulacji; obecnie dostępna jest tylko konfiguracja ilości kroków na klatkę filmu (\emph{spf}).
+        \end{itemize}
+
+        \noindent
+        ...oraz \emph{paska menu}:
+
+        \begin{itemize}
+            \item \textbf{Seed} - opcje odpowiadające za \emph{ziarno} symulacji umożliwiające kontrolowanie powtarzalności wyników.
+        \end{itemize}
+
+        W celu ułatwienia pozyskiwania danych do późniejszej analizy program udostępnia zakładkę \emph{Properties} generującą dynamicznie podgląd parametrów wybranego agenta oraz możliwość nagrania przebiegu symulacji za pomocą biblioteki \textbf{Monte Media Library} - przebieg symulacji zapisywany jest w główym katalogu programu w formacie \emph{.avi}.
 
 \newpage
     \section{Symulacja i analiza wyników}
