@@ -3,6 +3,7 @@ package sim.control;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import sim.MallSim;
 import sim.control.GuiState.BackgroundPolicy;
 import sim.control.GuiState.DrawTargetLinePolicy;
 
@@ -13,6 +14,9 @@ public abstract class Listeners {
         @Override
         public void actionPerformed(ActionEvent e) {
             GuiState.targetLinePolicy = DrawTargetLinePolicy.valueOf(e.getActionCommand());
+
+            if (MallSim.getGUIBoard() != null)
+                MallSim.getGUIBoard().repaint();
         }
     };
 
@@ -21,6 +25,8 @@ public abstract class Listeners {
         @Override
         public void actionPerformed(ActionEvent e) {
             GuiState.backgroundPolicy = BackgroundPolicy.valueOf(e.getActionCommand());
+            if (MallSim.getGUIBoard() != null)
+                MallSim.getGUIBoard().repaint();
         }
     };
 }

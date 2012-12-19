@@ -37,6 +37,8 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
 
     private Board board;
 
+    private static final int CELL_SIZE_BORDER_THRESHOLD = 10;
+
     private int cellSize = 14;
     private int agentSize = 16;
 
@@ -90,16 +92,20 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
         int lastX = this.getWidth() - insets.right;
         int lastY = this.getHeight() - insets.bottom;
 
-        int x = firstX;
-        while (x < lastX) {
-            g.drawLine(x, firstY, x, lastY);
-            x += gridSpace;
-        }
+        int x, y;
 
-        int y = firstY;
-        while (y < lastY) {
-            g.drawLine(firstX, y, lastX, y);
-            y += gridSpace;
+        if (cellSize > CELL_SIZE_BORDER_THRESHOLD) {
+            x = firstX;
+            while (x < lastX) {
+                g.drawLine(x, firstY, x, lastY);
+                x += gridSpace;
+            }
+
+            y = firstY;
+            while (y < lastY) {
+                g.drawLine(firstX, y, lastX, y);
+                y += gridSpace;
+            }
         }
 
         Map<Point, Point> targets = new HashMap<Point, Point>();
@@ -114,7 +120,11 @@ public class GUIBoard extends JComponent implements MouseInputListener, MouseWhe
                 Cell c = board.getCell(p);
 
                 g.setColor(computeCellColor(c));
-                g.fillRect((x * cellSize) + 1, (y * cellSize) + 1, (cellSize - 1), (cellSize - 1));
+
+                if (cellSize > CELL_SIZE_BORDER_THRESHOLD)
+                    g.fillRect((x * cellSize) + 1, (y * cellSize) + 1, (cellSize - 1), (cellSize - 1));
+                else
+                    g.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
 
                 Agent a = c.getAgent();
 

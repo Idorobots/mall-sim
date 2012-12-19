@@ -35,6 +35,7 @@ import org.monte.media.math.Rational;
 
 import sim.control.GuiState;
 import sim.control.ResourceManager;
+import sim.gui.GUIBoard;
 import sim.gui.MallFrame;
 import sim.model.Agent;
 import sim.model.Agent.MovementBehavior;
@@ -86,9 +87,8 @@ public class MallSim {
 
                 // ResourceManager.loadShoppingMall("./data/malls/simple2.bmp",
                 // "./data/malls/simple2.bmp");
-                ResourceManager.loadShoppingMall("./data/malls/gk0.bmp", "./data/malls/gk0map.bmp");
-                // ResourceManager.loadShoppingMall("./data/malls/gk0_mod.bmp",
-                // "./data/malls/gk0map_mod.bmp");
+//                ResourceManager.loadShoppingMall("./data/malls/gk0.bmp", "./data/malls/gk0map.bmp");
+                ResourceManager.loadShoppingMall("./data/malls/gk0_mod.bmp", "./data/malls/gk0map_mod.bmp");
 
                 Mall mall = Mall.getInstance();
 
@@ -315,6 +315,15 @@ public class MallSim {
 
                 // testSocialForce(board);
                 // testPed4(board);
+
+                Point p = new Point();
+                for (int y = 0; y < board.getDimension().height; y++)
+                    for (int x = 0; x < board.getDimension().width; x++) {
+                        p.setLocation(x, y);
+                        board.getCell(p).clearVisitsCounter();
+                    }
+                
+                
                 testTactical(board);
 
                 int nAgentsBegin = board.countAgents();
@@ -384,8 +393,6 @@ public class MallSim {
                     / LOOPS));
             System.out.println(String.format("Sukcesy agentów:\t %d / %d\t (%d%%)", nAgentSuccesses, nTotalAgents,
                     nAgentSuccesses * 100 / nTotalAgents));
-
-            System.exit(0);
         }
     }
 
@@ -538,5 +545,9 @@ public class MallSim {
 
     public static void reseed() {
         r = new Random(seed);
+    }
+    
+    public static GUIBoard getGUIBoard() {
+        return (frame != null) ? frame.getBoard() : null;
     }
 }
